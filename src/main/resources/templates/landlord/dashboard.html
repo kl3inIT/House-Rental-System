@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Landlord Dashboard - RentEase</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50">
+<!-- Navigation -->
+<nav class="bg-white shadow-lg sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+            <div class="flex items-center">
+                <a href="../index.html" class="text-2xl font-bold text-blue-600">RentEase</a>
+                <span class="ml-4 px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">Landlord</span>
+            </div>
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="#" class="text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
+                <a href="listings.html" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">My Properties</a>
+                <a href="requests.html" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Requests</a>
+                <div class="relative">
+                    <button class="flex items-center text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+                        <img src="/placeholder.svg?height=32&width=32" alt="Profile" class="w-8 h-8 rounded-full mr-2">
+                        Sarah Johnson
+                        <i class="fas fa-chevron-down ml-1"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Welcome Section -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Welcome back, Sarah!</h1>
+        <p class="text-gray-600">Here's what's happening with your properties today.</p>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                    <i class="fas fa-home text-xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Total Properties</p>
+                    <p class="text-2xl font-bold text-gray-900">12</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-green-100 text-green-600">
+                    <i class="fas fa-check-circle text-xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Occupied</p>
+                    <p class="text-2xl font-bold text-gray-900">9</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
+                    <i class="fas fa-clock text-xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Pending Requests</p>
+                    <p class="text-2xl font-bold text-gray-900">5</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-purple-100 text-purple-600">
+                    <i class="fas fa-dollar-sign text-xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Monthly Revenue</p>
+                    <p class="text-2xl font-bold text-gray-900">$18,400</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Recent Requests -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-gray-900">Recent Requests</h2>
+                <a href="requests.html" class="text-blue-600 hover:text-blue-800 text-sm">View All</a>
+            </div>
+
+            <div class="space-y-4">
+                <!-- Request 1 -->
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <h3 class="font-semibold text-gray-900">Michael Chen</h3>
+                            <p class="text-sm text-gray-600">Downtown Apartment - Unit 4B</p>
+                        </div>
+                        <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">Pending</span>
+                    </div>
+                    <p class="text-sm text-gray-700 mb-3">Interested in viewing the property this weekend. Available Saturday afternoon.</p>
+                    <div class="flex space-x-2">
+                        <button class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700">Accept</button>
+                        <button class="px-3 py-1 bg-gray-600 text-white text-sm rounded hover:bg-gray-700">Decline</button>
+                        <button class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700">Message</button>
+                    </div>
+                </div>
+
+                <!-- Request 2 -->
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <h3 class="font-semibold text-gray-900">Emily Rodriguez</h3>
+                            <p class="text-sm text-gray-600">Suburban House - 123 Oak St</p>
+                        </div>
+                        <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">Pending</span>
+                    </div>
+                    <p class="text-sm text-gray-700 mb-3">Looking to move in next month. Has excellent references and stable income.</p>
+                    <div class="flex space-x-2">
+                        <button class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700">Accept</button>
+                        <button class="px-3 py-1 bg-gray-600 text-white text-sm rounded hover:bg-gray-700">Decline</button>
+                        <button class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700">Message</button>
+                    </div>
+                </div>
+
+                <!-- Request 3 -->
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <h3 class="font-semibold text-gray-900">David Kim</h3>
+                            <p class="text-sm text-gray-600">Studio Apartment - Unit 2A</p>
+                        </div>
+                        <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Approved</span>
+                    </div>
+                    <p class="text-sm text-gray-700 mb-3">Application approved. Lease signing scheduled for tomorrow.</p>
+                    <div class="flex space-x-2">
+                        <button class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700">View Details</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Property Performance -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-gray-900">Property Performance</h2>
+                <select class="text-sm border border-gray-300 rounded px-2 py-1">
+                    <option>Last 30 days</option>
+                    <option>Last 3 months</option>
+                    <option>Last year</option>
+                </select>
+            </div>
+
+            <div class="space-y-4">
+                <!-- Property 1 -->
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <h3 class="font-semibold text-gray-900">Downtown Apartment</h3>
+                            <p class="text-sm text-gray-600">123 Main St, Unit 4B</p>
+                        </div>
+                        <span class="text-lg font-bold text-green-600">$1,800</span>
+                    </div>
+                    <div class="flex justify-between text-sm text-gray-600 mb-2">
+                        <span>Occupancy: 100%</span>
+                        <span>Views: 45 this month</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-green-600 h-2 rounded-full" style="width: 100%"></div>
+                    </div>
+                </div>
+
+                <!-- Property 2 -->
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <h3 class="font-semibold text-gray-900">Suburban House</h3>
+                            <p class="text-sm text-gray-600">456 Oak Ave</p>
+                        </div>
+                        <span class="text-lg font-bold text-blue-600">$2,200</span>
+                    </div>
+                    <div class="flex justify-between text-sm text-gray-600 mb-2">
+                        <span>Occupancy: 0% (Available)</span>
+                        <span>Views: 23 this month</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-yellow-500 h-2 rounded-full" style="width: 60%"></div>
+                    </div>
+                </div>
+
+                <!-- Property 3 -->
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <h3 class="font-semibold text-gray-900">Studio Apartment</h3>
+                            <p class="text-sm text-gray-600">789 Pine St, Unit 2A</p>
+                        </div>
+                        <span class="text-lg font-bold text-green-600">$1,200</span>
+                    </div>
+                    <div class="flex justify-between text-sm text-gray-600 mb-2">
+                        <span>Occupancy: 100%</span>
+                        <span>Views: 31 this month</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-green-600 h-2 rounded-full" style="width: 100%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="mt-8 bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-xl font-bold text-gray-900 mb-6">Quick Actions</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <a href="new-listing.html" class="flex items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors">
+                <div class="text-center">
+                    <i class="fas fa-plus text-2xl text-gray-400 mb-2"></i>
+                    <p class="text-sm font-medium text-gray-600">Add New Property</p>
+                </div>
+            </a>
+
+            <a href="listings.html" class="flex items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors">
+                <div class="text-center">
+                    <i class="fas fa-edit text-2xl text-gray-400 mb-2"></i>
+                    <p class="text-sm font-medium text-gray-600">Edit Properties</p>
+                </div>
+            </a>
+
+            <a href="requests.html" class="flex items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors">
+                <div class="text-center">
+                    <i class="fas fa-envelope text-2xl text-gray-400 mb-2"></i>
+                    <p class="text-sm font-medium text-gray-600">View All Requests</p>
+                </div>
+            </a>
+
+            <a href="profile.html" class="flex items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors">
+                <div class="text-center">
+                    <i class="fas fa-user text-2xl text-gray-400 mb-2"></i>
+                    <p class="text-sm font-medium text-gray-600">Update Profile</p>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

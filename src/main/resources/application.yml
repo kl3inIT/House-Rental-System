@@ -1,0 +1,23 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /house-rental
+
+spring:
+  datasource:
+    url: jdbc:sqlserver://localhost:1433;databaseName=HouseRentalDB;encrypt=true;trustServerCertificate=true
+    username: sa
+    password: Dat12345!
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.SQLServerDialect
+  thymeleaf:
+    cache: false
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML

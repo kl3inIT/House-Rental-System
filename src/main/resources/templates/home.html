@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RentEase - Find Your Perfect Home</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50">
+<!-- Navigation -->
+<nav class="bg-white shadow-lg sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <h1 class="text-2xl font-bold text-blue-600">RentEase</h1>
+                </div>
+            </div>
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="#" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Home</a>
+                <a href="user/search-results.html" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Properties</a>
+                <a href="#" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">About</a>
+                <a href="#" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Contact</a>
+                <a href="user/login.html" class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700">Login</a>
+                <a href="user/register.html" class="border border-blue-600 text-blue-600 px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-50">Sign Up</a>
+            </div>
+            <div class="md:hidden flex items-center">
+                <button class="text-gray-700 hover:text-blue-600">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center">
+            <h1 class="text-4xl md:text-6xl font-bold mb-6">Find Your Perfect Home</h1>
+            <p class="text-xl md:text-2xl mb-8 text-blue-100">Discover amazing rental properties in your desired location</p>
+
+            <!-- Search Form -->
+            <div class="bg-white rounded-lg shadow-xl p-6 max-w-4xl mx-auto">
+                <form class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-gray-700 text-sm font-medium mb-2">Location</label>
+                        <input type="text" placeholder="Enter city or area" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 text-sm font-medium mb-2">Property Type</label>
+                        <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900">
+                            <option>Any Type</option>
+                            <option>Apartment</option>
+                            <option>House</option>
+                            <option>Condo</option>
+                            <option>Studio</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 text-sm font-medium mb-2">Max Price</label>
+                        <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900">
+                            <option>Any Price</option>
+                            <option>Under $1,000</option>
+                            <option>$1,000 - $2,000</option>
+                            <option>$2,000 - $3,000</option>
+                            <option>Above $3,000</option>
+                        </select>
+                    </div>
+                    <div class="flex items-end">
+                        <button type="submit" class="w-full bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 font-medium">
+                            <i class="fas fa-search mr-2"></i>Search
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Properties -->
+<section class="py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">Featured Properties</h2>
+            <p class="text-gray-600 text-lg">Discover our handpicked selection of premium rental properties</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Property Card 1 -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow">
+                <img src="/placeholder.svg?height=200&width=300" alt="Modern Apartment" class="w-full h-48 object-cover">
+                <div class="p-6">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-xl font-semibold text-gray-900">Modern Downtown Apartment</h3>
+                        <span class="text-2xl font-bold text-blue-600">$1,800</span>
+                    </div>
+                    <p class="text-gray-600 mb-3">
+                        <i class="fas fa-map-marker-alt mr-1"></i>
+                        Downtown, New York
+                    </p>
+                    <p class="text-gray-700 mb-4">Spacious 2-bedroom apartment with city views and modern amenities.</p>
+                    <div class="flex justify-between items-center text-sm text-gray-600 mb-4">
+                        <span><i class="fas fa-bed mr-1"></i>2 Beds</span>
+                        <span><i class="fas fa-bath mr-1"></i>2 Baths</span>
+                        <span><i class="fas fa-ruler-combined mr-1"></i>1,200 sq ft</span>
+                    </div>
+                    <a href="user/property-detail.html" class="block w-full text-center bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-colors">
+                        View Details
+                    </a>
+                </div>
+            </div>
+
+            <!-- Property Card 2 -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow">
+                <img src="/placeholder.svg?height=200&width=300" alt="Cozy House" class="w-full h-48 object-cover">
+                <div class="p-6">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-xl font-semibold text-gray-900">Cozy Suburban House</h3>
+                        <span class="text-2xl font-bold text-blue-600">$2,200</span>
+                    </div>
+                    <p class="text-gray-600 mb-3">
+                        <i class="fas fa-map-marker-alt mr-1"></i>
+                        Suburbs, California
+                    </p>
+                    <p class="text-gray-700 mb-4">Beautiful 3-bedroom house with garden and garage in quiet neighborhood.</p>
+                    <div class="flex justify-between items-center text-sm text-gray-600 mb-4">
+                        <span><i class="fas fa-bed mr-1"></i>3 Beds</span>
+                        <span><i class="fas fa-bath mr-1"></i>2 Baths</span>
+                        <span><i class="fas fa-ruler-combined mr-1"></i>1,800 sq ft</span>
+                    </div>
+                    <a href="user/property-detail.html" class="block w-full text-center bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-colors">
+                        View Details
+                    </a>
+                </div>
+            </div>
+
+            <!-- Property Card 3 -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow">
+                <img src="/placeholder.svg?height=200&width=300" alt="Studio Apartment" class="w-full h-48 object-cover">
+                <div class="p-6">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-xl font-semibold text-gray-900">Stylish Studio</h3>
+                        <span class="text-2xl font-bold text-blue-600">$1,200</span>
+                    </div>
+                    <p class="text-gray-600 mb-3">
+                        <i class="fas fa-map-marker-alt mr-1"></i>
+                        Midtown, Chicago
+                    </p>
+                    <p class="text-gray-700 mb-4">Compact yet comfortable studio apartment perfect for young professionals.</p>
+                    <div class="flex justify-between items-center text-sm text-gray-600 mb-4">
+                        <span><i class="fas fa-bed mr-1"></i>Studio</span>
+                        <span><i class="fas fa-bath mr-1"></i>1 Bath</span>
+                        <span><i class="fas fa-ruler-combined mr-1"></i>600 sq ft</span>
+                    </div>
+                    <a href="user/property-detail.html" class="block w-full text-center bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-colors">
+                        View Details
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="bg-gray-100 py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">Why Choose RentEase?</h2>
+            <p class="text-gray-600 text-lg">We make finding and renting your perfect home simple and secure</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="text-center">
+                <div class="bg-blue-600 text-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-search text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">Easy Search</h3>
+                <p class="text-gray-600">Find properties that match your criteria with our advanced search filters.</p>
+            </div>
+
+            <div class="text-center">
+                <div class="bg-blue-600 text-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-shield-alt text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">Secure Booking</h3>
+                <p class="text-gray-600">Safe and secure booking process with verified landlords and properties.</p>
+            </div>
+
+            <div class="text-center">
+                <div class="bg-blue-600 text-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-headset text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">24/7 Support</h3>
+                <p class="text-gray-600">Round-the-clock customer support to help you with any questions or issues.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-gray-900 text-white py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+                <h3 class="text-2xl font-bold mb-4">RentEase</h3>
+                <p class="text-gray-400 mb-4">Making home rental simple, secure, and accessible for everyone.</p>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+
+            <div>
+                <h4 class="text-lg font-semibold mb-4">For Renters</h4>
+                <ul class="space-y-2 text-gray-400">
+                    <li><a href="#" class="hover:text-white">Search Properties</a></li>
+                    <li><a href="#" class="hover:text-white">How It Works</a></li>
+                    <li><a href="#" class="hover:text-white">Renter Guide</a></li>
+                    <li><a href="#" class="hover:text-white">FAQ</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="text-lg font-semibold mb-4">For Landlords</h4>
+                <ul class="space-y-2 text-gray-400">
+                    <li><a href="#" class="hover:text-white">List Property</a></li>
+                    <li><a href="#" class="hover:text-white">Landlord Resources</a></li>
+                    <li><a href="#" class="hover:text-white">Pricing</a></li>
+                    <li><a href="#" class="hover:text-white">Success Stories</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="text-lg font-semibold mb-4">Support</h4>
+                <ul class="space-y-2 text-gray-400">
+                    <li><a href="#" class="hover:text-white">Contact Us</a></li>
+                    <li><a href="#" class="hover:text-white">Help Center</a></li>
+                    <li><a href="#" class="hover:text-white">Privacy Policy</a></li>
+                    <li><a href="#" class="hover:text-white">Terms of Service</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+            <p>&copy; 2024 RentEase. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+</body>
+</html>
