@@ -42,11 +42,13 @@ public class User extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "Status")
-    private UserStatus status;
+    @Builder.Default
+    private UserStatus status = UserStatus.PENDING;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "Role")
-    private UserRole role;
+    @Builder.Default
+    private UserRole role = UserRole.USER;
 
     @OneToMany(mappedBy = "landlord", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<RentalProperty> rentalProperties;

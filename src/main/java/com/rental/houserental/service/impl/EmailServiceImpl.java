@@ -21,21 +21,17 @@ public class EmailServiceImpl implements EmailService {
     private final TemplateEngine templateEngine;
 
     @Override
-    public void sendVerificationEmail(User user, String otpMessage) {
+    public void sendVerificationEmail(User user, String otp) {
         Context context = new Context();
         context.setVariable("user", user);
-        context.setVariable("otpMessage", otpMessage);
-
-        String emailContent = templateEngine.process("email/verification-email", context);
-
+        context.setVariable("otpMessage", otp);
+        String emailContent = templateEngine.process("verify-email", context);
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-
             helper.setTo(user.getEmail());
             helper.setSubject("Verify your RentEase account");
             helper.setText(emailContent, true);
-
             mailSender.send(message);
             log.info("Verification email sent to: {}", user.getEmail());
         } catch (MessagingException e) {

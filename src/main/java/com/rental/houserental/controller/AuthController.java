@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import static com.rental.houserental.constant.Constant.AtrributeNames.*;
+import static com.rental.houserental.constant.Constant.ViewNames.*;
 
 @Controller
 @RequiredArgsConstructor
@@ -32,34 +33,26 @@ public class AuthController {
     public String registerPage(Model model) {
         model.addAttribute(REGISTER_REQUEST, new RegisterRequestDTO());
         model.addAttribute(ERROR, model.getAttribute(ERROR));
-        return "register";
+        return REGISTER;
     }
 
     @PostMapping("/register")
-    public String register(@Valid @ModelAttribute RegisterRequestDTO request, BindingResult result,
+    public String register(@Valid @ModelAttribute(REGISTER_REQUEST) RegisterRequestDTO request,
+                           BindingResult result,
                            RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
-            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.registerRequest", result);
-            redirectAttributes.addFlashAttribute("registerRequest", request);
-            return "redirect:/register";
+            redirectAttributes.addFlashAttribute(BINDING_RESULT_KEY, result);
+            redirectAttributes.addFlashAttribute(REGISTER_REQUEST, request);
+            return REDIRECT_REGISTER;
         }
 
-        if (!request.getPassword().equals(request.getConfirmPassword())) {
-            result.rejectValue("confirmPassword", "error.registerRequest", "Passwords do not match");
-            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.registerRequest", result);
-            redirectAttributes.addFlashAttribute("registerRequest", request);
-            return "redirect:/register";
-        }
+        authService.register(request);
 
-        try {
-            authService.register(request);
-            redirectAttributes.addFlashAttribute("message", "Registration successful! Please check your email for the verification code.");
-            return "redirect:/verify-otp";
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
-            return "redirect:/register";
-        }
+        redirectAttributes.addFlashAttribute(MESSAGE, "Registration successful! Please check your email.");
+        redirectAttributes.addFlashAttribute(EMAIL, request.getEmail());
+        return REDIRECT_VERIFY_OTP;
     }
+
 
     @GetMapping("/verify-otp")
     public String verifyOtpPage(Model model) {
