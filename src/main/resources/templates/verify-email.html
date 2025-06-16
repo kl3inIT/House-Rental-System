@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<h1>Verify your RentEase account</h1>
+<p>Dear [[${user.name}]],</p>
+<p>Your verification code is: <strong th:text="${otpMessage}"></strong></p>
+<p>This code will expire in 10 minutes.</p>
+</body>
+</html>

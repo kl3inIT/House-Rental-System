@@ -1,0 +1,17 @@
+{
+  "name": "houserental",
+  "version": "1.0.0",
+  "description": "House Rental Application",
+  "scripts": {
+    "build:css": "tailwindcss -i ./src/main/resources/static/css/main.css -o ./src/main/resources/static/css/output.css --watch",
+    "build:css:prod": "tailwindcss -i ./src/main/resources/static/css/main.css -o ./src/main/resources/static/css/output.css --minify"
+  },
+  "dependencies": {
+    "@tailwindcss/aspect-ratio": "^0.4.2",
+    "@tailwindcss/forms": "^0.5.7",
+    "@tailwindcss/typography": "^0.5.10",
+    "autoprefixer": "^10.4.17",
+    "postcss": "^8.4.35",
+    "tailwindcss": "^3.4.1"
+  }
+}

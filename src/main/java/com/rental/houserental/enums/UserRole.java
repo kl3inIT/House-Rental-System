@@ -10,7 +10,7 @@ public enum UserRole {
     public static UserRole fromString(String role) {
         try {
             return UserRole.valueOf(role.toUpperCase());
-        } catch (InvalidUserRoleException e) {
+        } catch (IllegalArgumentException e) {
             throw new InvalidUserRoleException(e.getMessage());
         }
     }

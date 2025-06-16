@@ -1,0 +1,54 @@
+services:
+  app:
+    build: .
+    container_name: house-rental-app
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:sqlserver://db:1433;databaseName=HouseRentalDB;encrypt=true;trustServerCertificate=true
+      - SPRING_DATASOURCE_USERNAME=sa
+      - SPRING_DATASOURCE_PASSWORD=Dat12345!
+      - SPRING_REDIS_HOST=redis
+      - SPRING_MAIL_HOST=smtp.gmail.com
+      - SPRING_MAIL_PORT=587
+      - SPRING_MAIL_USERNAME=dathip04@gmail.com
+      - SPRING_MAIL_PASSWORD=mqdh xlvr acoy xitn
+    depends_on:
+      - db
+      - redis
+    networks:
+      - house-rental-network
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: house-rental-db
+    restart: always
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Dat12345!
+      - MSSQL_PID=Express
+    ports:
+      - "1434:1433"  # Host:Container
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    networks:
+      - house-rental-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: house-rental-redis
+    restart: always
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - house-rental-network
+
+networks:
+  house-rental-network:
+    driver: bridge
+
+volumes:
+  sqlserver_data:
+  redis_data:
