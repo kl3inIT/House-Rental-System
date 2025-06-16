@@ -6,8 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.ModelAndView;
 
-import static com.rental.houserental.constant.Constant.ErrorMessages.*;
-import static com.rental.houserental.constant.Constant.AtrributeNames.*;
+import static com.rental.houserental.constant.ErrorMessageConstant.*;
+import static com.rental.houserental.constant.AtrributeNameConstant.*;
 
 import java.util.Map;
 

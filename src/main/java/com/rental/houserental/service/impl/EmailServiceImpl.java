@@ -1,6 +1,7 @@
 package com.rental.houserental.service.impl;
 
 import com.rental.houserental.entity.User;
+import com.rental.houserental.exceptions.auth.FaildToSendEmailException;
 import com.rental.houserental.service.EmailService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -36,7 +37,7 @@ public class EmailServiceImpl implements EmailService {
             log.info("Verification email sent to: {}", user.getEmail());
         } catch (MessagingException e) {
             log.error("Failed to send verification email to: {}", user.getEmail(), e);
-            throw new RuntimeException("Failed to send verification email", e);
+            throw new FaildToSendEmailException("Failed to send verification email to: " + user.getEmail());
         }
     }
 

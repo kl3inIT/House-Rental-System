@@ -38,7 +38,7 @@ public class SecurityConfig {
                         .requestMatchers("/landlord/**").hasRole("LANDLORD")
                         .requestMatchers("/user/**").hasRole("USER")
                         .requestMatchers("/", "/login", "/register", "/verify-email/**",
-                                "/forgot-password", "/reset-password/**",
+                                "/forgot-password", "/reset-password/**","/verify-otp/**",
                                 "/css/**", "/js/**", "/images/**").permitAll()
                         .anyRequest().authenticated()
                 )

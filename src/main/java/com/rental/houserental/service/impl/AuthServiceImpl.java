@@ -32,8 +32,6 @@ public class AuthServiceImpl implements AuthService {
     private final UserService userService;
     private final OtpService otpService;
     private static final String OTP_PREFIX = "otp:";
-    private static final Duration OTP_EXPIRY = Duration.ofMinutes(10); // OTP hết hạn sau 10 phút
-    private static final int OTP_LENGTH = 6;
 
     @Override
     @Transactional
@@ -59,11 +57,11 @@ public class AuthServiceImpl implements AuthService {
         return true;
     }
 
-    @Override
-    @Transactional
-    public void resendVerificationEmail(String email) {
-        sendOtpForVerification(email);
-    }
+//    @Override
+//    @Transactional
+//    public void resendVerificationEmail(String email) {
+//        sendOtpForVerification(email);
+//    }
 
     @Override
     @Transactional

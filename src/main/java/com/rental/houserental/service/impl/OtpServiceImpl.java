@@ -13,15 +13,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
-import java.time.Duration;
 import java.util.Random;
-import static com.rental.houserental.constant.Constant.OtpConstants.*;
+import static com.rental.houserental.constant.OtpConstants.*;
 
 @Service
 @RequiredArgsConstructor
 public class OtpServiceImpl implements OtpService {
 
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, String> redisTemplate;
     private final EmailService emailService;
     private final UserService userService;
      // OTP hết hạn sau 10 phút

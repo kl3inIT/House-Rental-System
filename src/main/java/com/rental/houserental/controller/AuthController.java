@@ -1,5 +1,6 @@
 package com.rental.houserental.controller;
 
+import com.rental.houserental.dto.request.auth.OtpRequestDTO;
 import com.rental.houserental.dto.request.auth.RegisterRequestDTO;
 import com.rental.houserental.service.AuthService;
 import jakarta.validation.Valid;
@@ -13,8 +14,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import static com.rental.houserental.constant.Constant.AtrributeNames.*;
-import static com.rental.houserental.constant.Constant.ViewNames.*;
+import static com.rental.houserental.constant.AtrributeNameConstant.*;
+import static com.rental.houserental.constant.ViewNamesConstant.*;
 
 @Controller
 @RequiredArgsConstructor
@@ -55,26 +56,34 @@ public class AuthController {
 
 
     @GetMapping("/verify-otp")
-    public String verifyOtpPage(Model model) {
-        model.addAttribute("email", model.containsAttribute("email") ? model.getAttribute("email") : "");
-        model.addAttribute("error", model.containsAttribute("error") ? model.getAttribute("error") : null);
+    public String showVerifyOtp(Model model) {
+        model.addAttribute("otpRequest", new OtpRequestDTO());
         return "verify-otp";
     }
 
     @PostMapping("/verify-otp")
-    public String verifyOtp(@RequestParam String email, @RequestParam String otp, RedirectAttributes redirectAttributes) {
+    public String verifyOtp(@Valid @ModelAttribute("otpRequest") OtpRequestDTO request,
+                            BindingResult result,
+                            RedirectAttributes redirectAttributes) {
+
+        if (result.hasErrors()) {
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.otpRequest", result);
+            redirectAttributes.addFlashAttribute("otpRequest", request);
+            return "redirect:/verify-otp";
+        }
+
         try {
-            if (authService.verifyOtp(email, otp)) {
+            if (authService.verifyOtp(request.getEmail(), request.getOtp())) {
                 redirectAttributes.addFlashAttribute("message", "Email verified successfully! You can now login.");
                 return "redirect:/login";
             } else {
                 redirectAttributes.addFlashAttribute("error", "Invalid or expired OTP. Please try again.");
-                redirectAttributes.addFlashAttribute("email", email);
+                redirectAttributes.addFlashAttribute("otpRequest", request);
                 return "redirect:/verify-otp";
             }
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
-            redirectAttributes.addFlashAttribute("email", email);
+            redirectAttributes.addFlashAttribute("otpRequest", request);
             return "redirect:/verify-otp";
         }
     }
@@ -82,7 +91,7 @@ public class AuthController {
     @PostMapping("/resend-verification")
     public String resendVerification(@RequestParam String email, RedirectAttributes redirectAttributes) {
         try {
-            authService.sendOtpForVerification(email);
+//            authService.sendOtpForVerification(email);
             redirectAttributes.addFlashAttribute("message", "Verification code has been resent. Please check your inbox.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());

@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import static com.rental.houserental.constant.Constant.AtrributeNames.*;
-import static com.rental.houserental.constant.Constant.ViewNames.*;
+import static com.rental.houserental.constant.AtrributeNameConstant.*;
+import static com.rental.houserental.constant.ViewNamesConstant.*;
 @ControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {

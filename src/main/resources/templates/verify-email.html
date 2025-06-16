@@ -11,18 +11,21 @@
             margin: 0;
             padding: 0;
         }
+
         .container {
             max-width: 420px;
             margin: 40px auto;
             background: #fff;
             border-radius: 12px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
             padding: 32px 24px 24px 24px;
         }
+
         .brand {
             text-align: center;
             margin-bottom: 24px;
         }
+
         .brand-logo {
             font-size: 2.2rem;
             font-weight: bold;
@@ -30,6 +33,7 @@
             letter-spacing: 1px;
             margin-bottom: 4px;
         }
+
         .title {
             text-align: center;
             font-size: 1.5rem;
@@ -37,12 +41,14 @@
             color: #222;
             margin-bottom: 12px;
         }
+
         .desc {
             text-align: center;
             color: #4b5563;
             font-size: 1rem;
             margin-bottom: 24px;
         }
+
         .otp-box {
             background: #e0e7ff;
             color: #1d4ed8;
@@ -55,21 +61,29 @@
             margin: 0 auto 18px auto;
             width: 80%;
         }
+
         .info {
             color: #6b7280;
             font-size: 0.95rem;
             text-align: center;
             margin-bottom: 18px;
         }
+
         .footer {
             text-align: center;
             color: #9ca3af;
             font-size: 0.85rem;
             margin-top: 32px;
         }
+
         @media (max-width: 600px) {
-            .container { padding: 18px 6px; }
-            .otp-box { font-size: 1.3rem; }
+            .container {
+                padding: 18px 6px;
+            }
+
+            .otp-box {
+                font-size: 1.3rem;
+            }
         }
     </style>
 </head>
@@ -80,10 +94,12 @@
     </div>
     <div class="title">Verify your email address</div>
     <div class="desc">Hi <span th:text="${user.name}"></span>,<br>
-        Thank you for registering! Please use the code below to verify your email address.</div>
+        Thank you for registering! Please use the code below to verify your email address.
+    </div>
     <div class="otp-box" th:text="${otpMessage}">123456</div>
     <div class="info">This code will expire in 10 minutes.<br>
-        If you did not request this, please ignore this email.</div>
+        If you did not request this, please ignore this email.
+    </div>
     <div class="footer">
         &copy; 2025 RentEase. All rights reserved.<br>
         This is an automated message, please do not reply.
