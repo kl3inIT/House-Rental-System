@@ -57,7 +57,7 @@ public class AuthController {
 
     @GetMapping("/verify-otp")
     public String showVerifyOtp(Model model) {
-        model.addAttribute("otpRequest", new OtpRequestDTO());
+        model.addAttribute(OTP_REQUEST, new OtpRequestDTO());
         return "verify-otp";
     }
 
@@ -87,6 +87,7 @@ public class AuthController {
             return "redirect:/verify-otp";
         }
     }
+
 
     @PostMapping("/resend-verification")
     public String resendVerification(@RequestParam String email, RedirectAttributes redirectAttributes) {

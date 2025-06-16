@@ -4,49 +4,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verify OTP - RentEase</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link th:href="@{/css/output.css}" rel="stylesheet"/>
 </head>
 <body class="bg-gray-50 min-h-screen flex items-center justify-center py-12">
-<div class="max-w-md w-full space-y-8 p-8 bg-white shadow-lg rounded-lg">
+<div class="max-w-md w-full space-y-8 p-8 bg-white shadow-xl rounded-xl">
     <div class="text-center">
         <a th:href="@{/}" class="text-3xl font-bold text-blue-600">RentEase</a>
-        <h2 class="mt-6 text-3xl font-extrabold text-gray-900">Verify your email</h2>
-        <p class="mt-2 text-sm text-gray-600">Enter the code sent to your email</p>
+        <h2 class="mt-4 text-2xl font-bold text-gray-900">Verify your email</h2>
+        <p class="mt-1 text-sm text-gray-600">Enter the 6-digit code sent to your email</p>
     </div>
 
+    <!-- Messages -->
     <div th:if="${error}" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-        <span class="block sm:inline" th:text="${error}"></span>
-        <button type="button" class="absolute top-0 right-0 mt-2 mr-2 text-red-700 hover:text-red-500" onclick="this.parentElement.style.display='none';">
-            <i class="fas fa-times"></i>
-        </button>
+        <span th:text="${error}"></span>
     </div>
-    <div th:if="${message}" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
-        <span class="block sm:inline" th:text="${message}"></span>
+    <div th:if="${message}" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative"
+         role="alert">
+        <span th:text="${message}"></span>
     </div>
 
-    <form th:action="@{/verify-otp}" method="post" class="mt-8 space-y-6">
-        <input type="hidden" th:name="email" th:value="${email}" />
+    <form th:action="@{/verify-otp}" th:object="${otpRequest}" method="post" class="space-y-6">
+        <input type="hidden" th:field="*{email}"/>
 
-        <div class="space-y-4">
-            <div>
-                <label for="otp" class="block text-sm font-medium text-gray-700">Verification Code</label>
-                <input id="otp" name="otp" type="text" required
-                       class="appearance-none rounded-md w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                       placeholder="Enter 6-digit code" pattern="[0-9]{6}" title="Please enter a 6-digit code">
-                <span class="text-red-500 text-sm" th:if="${#fields.hasErrors('otp')}" th:errors="*{otp}"></span>
-            </div>
+        <div class="flex justify-center gap-3">
+            <input type="text" maxlength="1" pattern="[0-9]*" inputmode="numeric"
+                   class="otp-input w-12 h-12 text-xl border border-gray-300 rounded-md text-center"/>
+            <input type="text" maxlength="1" pattern="[0-9]*" inputmode="numeric"
+                   class="otp-input w-12 h-12 text-xl border border-gray-300 rounded-md text-center"/>
+            <input type="text" maxlength="1" pattern="[0-9]*" inputmode="numeric"
+                   class="otp-input w-12 h-12 text-xl border border-gray-300 rounded-md text-center"/>
+            <input type="text" maxlength="1" pattern="[0-9]*" inputmode="numeric"
+                   class="otp-input w-12 h-12 text-xl border border-gray-300 rounded-md text-center"/>
+            <input type="text" maxlength="1" pattern="[0-9]*" inputmode="numeric"
+                   class="otp-input w-12 h-12 text-xl border border-gray-300 rounded-md text-center"/>
+            <input type="text" maxlength="1" pattern="[0-9]*" inputmode="numeric"
+                   class="otp-input w-12 h-12 text-xl border border-gray-300 rounded-md text-center"/>
         </div>
+
+        <input type="hidden" id="otp" th:field="*{otp}"/>
+        <span class="text-red-500 text-sm" th:if="${#fields.hasErrors('otp')}" th:errors="*{otp}"></span>
 
         <div>
             <button type="submit"
-                    class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    class="w-full py-2 px-4 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                 Verify Code
             </button>
         </div>
-        <p class="text-sm text-gray-600 text-center">
-            Didn't receive the code? <a th:href="@{/resend-verification(email=${email})}" class="font-medium text-blue-600 hover:text-blue-500">Resend code</a>
+
+        <p class="text-sm text-center text-gray-600">
+            Didn't receive the code?
+            <a th:href="@{'/resend-verification'(email=*{email})}" class="text-blue-600 hover:underline">Resend code</a>
         </p>
     </form>
 </div>
+
+<script th:src="@{/js/verify-otp.js}"></script>
 </body>
 </html>
