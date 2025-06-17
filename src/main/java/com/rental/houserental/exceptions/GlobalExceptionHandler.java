@@ -35,21 +35,21 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(EmailAlreadyExistsException.class)
     public String handleEmailAlreadyExistsException(EmailAlreadyExistsException ex, RedirectAttributes redirectAttributes) {
         log.warn("Email already exists: {}", ex.getMessage());
-        redirectAttributes.addFlashAttribute(MESSAGE, "The email address is already registered. Please use a different email.");
+        redirectAttributes.addFlashAttribute(ERROR, "The email address is already registered. Please use a different email.");
         return REDIRECT_REGISTER;
     }
 
     @ExceptionHandler(PasswordNotMatchException.class)
     public String handlePasswordNotMatchException(PasswordNotMatchException ex, RedirectAttributes redirectAttributes) {
         log.warn("Password mismatch: {}", ex.getMessage());
-        redirectAttributes.addFlashAttribute(MESSAGE, "The passwords do not match. Please try again.");
+        redirectAttributes.addFlashAttribute(ERROR, "The passwords do not match. Please try again.");
         return REDIRECT_REGISTER;
     }
 
     @ExceptionHandler(EmailAlreadyVerifiedException.class)
     public String handleEmailAlreadyVerifiedException(EmailAlreadyVerifiedException ex, RedirectAttributes redirectAttributes) {
         log.warn("Email already verified: {}", ex.getMessage());
-        redirectAttributes.addFlashAttribute(MESSAGE, "This email has already been verified. Please log in.");
+        redirectAttributes.addFlashAttribute(ERROR, "This email has already been verified. Please log in.");
         return REDIRECT_LOGIN;
     }
 

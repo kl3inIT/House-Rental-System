@@ -44,7 +44,7 @@ public class AuthController {
         if (result.hasErrors()) {
             redirectAttributes.addFlashAttribute(BINDING_RESULT_KEY, result);
             redirectAttributes.addFlashAttribute(REGISTER_REQUEST, request);
-            return REDIRECT_REGISTER;
+            return REGISTER;
         }
 
         authService.register(request);
@@ -53,7 +53,6 @@ public class AuthController {
         redirectAttributes.addFlashAttribute(EMAIL, request.getEmail());
         return REDIRECT_VERIFY_OTP;
     }
-
 
     @GetMapping("/verify-otp")
     public String showVerifyOtp(Model model) {

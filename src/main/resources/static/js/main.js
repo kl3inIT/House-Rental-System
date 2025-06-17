@@ -1,63 +1,36 @@
-// Utility function to show/hide elements
-function toggleElement(elementId, show = true) {
+export function toggleElement(elementId, show = true) {
     const element = document.getElementById(elementId);
     if (element) {
         element.style.display = show ? 'block' : 'none';
     }
 }
 
-// Utility function to show flash messages
-function showFlashMessage(message, type = 'success') {
-    const messageContainer = document.getElementById('flash-messages');
-    if (messageContainer) {
-        const messageElement = document.createElement('div');
-        messageElement.className = `bg-${type === 'success' ? 'green' : 'red'}-100 border border-${type === 'success' ? 'green' : 'red'}-400 text-${type === 'success' ? 'green' : 'red'}-700 px-4 py-3 rounded relative`;
-        messageElement.setAttribute('role', 'alert');
-        
-        const messageText = document.createElement('span');
-        messageText.className = 'block sm:inline';
-        messageText.textContent = message;
-        messageElement.appendChild(messageText);
-
-        const closeButton = document.createElement('button');
-        closeButton.className = 'absolute top-0 right-0 mt-2 mr-2 text-gray-500 hover:text-gray-700';
-        closeButton.innerHTML = '<i class="fas fa-times"></i>';
-        closeButton.onclick = () => messageElement.remove();
-        messageElement.appendChild(closeButton);
-
-        messageContainer.appendChild(messageElement);
-
-        // Auto remove after 5 seconds
-        setTimeout(() => {
-            messageElement.remove();
-        }, 5000);
-    }
-}
-
-// Password strength checker
-function checkPasswordStrength(password) {
+export function checkPasswordStrength(password) {
     const strength = {
         length: password.length >= 8,
         hasLetter: /[a-zA-Z]/.test(password),
         hasNumber: /\d/.test(password),
-        hasSpecial: /[!@#$%^&*]/.test(password)
+        hasUppercase: /[A-Z]/.test(password)
     };
-
     const score = Object.values(strength).filter(Boolean).length;
     return {
         score,
         isStrong: score >= 3,
         feedback: {
-            length: password.length < 8 ? 'At least 8 characters' : '',
-            hasLetter: !/[a-zA-Z]/.test(password) ? 'Include letters' : '',
-            hasNumber: !/\d/.test(password) ? 'Include numbers' : '',
-            hasSpecial: !/[!@#$%^&*]/.test(password) ? 'Include special characters' : ''
+            length: !strength.length ? 'At least 8 characters' : '',
+            hasLetter: !strength.hasLetter ? 'Include letters' : '',
+            hasNumber: !strength.hasNumber ? 'Include numbers' : '',
+            hasUppercase: !strength.hasUppercase ? 'Include an uppercase letter' : ''
         }
     };
 }
 
-// Form validation
-function validateForm(formId) {
+export function validateEmail(email) {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+}
+
+export function validateForm(formId) {
     const form = document.getElementById(formId);
     if (!form) return false;
 
@@ -84,7 +57,6 @@ function validateForm(formId) {
     return isValid;
 }
 
-// Mobile menu toggle
 document.addEventListener('DOMContentLoaded', () => {
     const mobileMenuButton = document.querySelector('.mobile-menu-button');
     const mobileMenu = document.querySelector('.mobile-menu');
@@ -95,7 +67,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Initialize tooltips
     const tooltips = document.querySelectorAll('[data-tooltip]');
     tooltips.forEach(tooltip => {
         tooltip.addEventListener('mouseenter', (e) => {
@@ -103,14 +74,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const tooltipElement = document.createElement('div');
             tooltipElement.className = 'absolute z-10 px-2 py-1 text-sm text-white bg-gray-900 rounded shadow-lg';
             tooltipElement.textContent = text;
+            tooltipElement.style.top = '100%';
+            tooltipElement.style.left = '0';
+            tooltipElement.style.marginTop = '0.25rem';
+            tooltipElement.style.whiteSpace = 'nowrap';
+            tooltipElement.setAttribute('data-tooltip-box', '');
             e.target.appendChild(tooltipElement);
         });
 
         tooltip.addEventListener('mouseleave', (e) => {
-            const tooltipElement = e.target.querySelector('div');
+            const tooltipElement = e.target.querySelector('[data-tooltip-box]');
             if (tooltipElement) {
                 tooltipElement.remove();
             }
         });
     });
-}); 
+});
