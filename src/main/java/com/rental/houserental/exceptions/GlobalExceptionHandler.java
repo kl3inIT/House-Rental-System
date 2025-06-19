@@ -1,11 +1,7 @@
 package com.rental.houserental.exceptions;
 
-import com.rental.houserental.exceptions.auth.EmailAlreadyExistsException;
-import com.rental.houserental.exceptions.auth.EmailAlreadyVerifiedException;
-import com.rental.houserental.exceptions.auth.PasswordNotMatchException;
-import com.rental.houserental.exceptions.user.InvalidUserRoleException;
-import com.rental.houserental.exceptions.user.InvalidUserStatusException;
-import com.rental.houserental.exceptions.user.UserNotFoundException;
+import com.rental.houserental.exceptions.auth.*;
+import com.rental.houserental.exceptions.user.*;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -53,11 +49,18 @@ public class GlobalExceptionHandler {
         return REDIRECT_LOGIN;
     }
 
-    @ExceptionHandler(UserNotFoundException.class)
-    public String handleUserNotFoundException(UserNotFoundException ex, Model model) {
-        log.warn("User not found: {}", ex.getMessage());
-        model.addAttribute(MESSAGE, "The user you are looking for does not exist.");
-        return GENERIC_ERROR;
+    @ExceptionHandler(UserSuspendedException.class)
+    public String handleUserSuspendedException(UserSuspendedException ex, RedirectAttributes redirectAttributes) {
+        log.warn("User suspended: {}", ex.getMessage());
+        redirectAttributes.addFlashAttribute(ERROR, "Your account has been temporarily suspended. Please contact support.");
+        return REDIRECT_REGISTER;
+    }
+
+    @ExceptionHandler(UserBannedException.class)
+    public String handleUserBannedException(UserBannedException ex, RedirectAttributes redirectAttributes) {
+        log.warn("User banned: {}", ex.getMessage());
+        redirectAttributes.addFlashAttribute(ERROR, "Your account has been permanently banned. Please contact support.");
+        return REDIRECT_REGISTER;
     }
 
     //generic phải để cuối để bắt hết được lỗi

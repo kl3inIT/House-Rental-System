@@ -2,6 +2,7 @@ package com.rental.houserental.service.impl;
 
 import com.rental.houserental.dto.request.auth.RegisterRequestDTO;
 import com.rental.houserental.entity.User;
+import com.rental.houserental.enums.UserStatus;
 import com.rental.houserental.exceptions.auth.EmailAlreadyExistsException;
 import com.rental.houserental.exceptions.auth.PasswordNotMatchException;
 import com.rental.houserental.exceptions.user.UserNotFoundException;
@@ -30,12 +31,12 @@ public class UserServiceImpl implements UserService {
                 .name(request.getName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
+                .status(UserStatus.PENDING)
                 .build());
     }
 
     public User findByEmail(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException("User not found with email: " + email));
+        return userRepository.findByEmail(email).orElse(null);
     }
 
 }

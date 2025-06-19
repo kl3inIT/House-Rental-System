@@ -10,6 +10,8 @@ public final class AtrributeNameConstant {
     public static final String REGISTER_REQUEST = "registerRequest";
     public static final String BINDING_RESULT_KEY = "org.springframework.validation.BindingResult.registerRequest";
 
+    public static final String OTP_EXPIRE = "otpExpire";
+    public static final String OTP_FAIL_COUNT = "otpFailCount";
     public static final String OTP_REQUEST = "otpRequest";
     public static final String BINDING_RESULT_OTP = "org.springframework.validation.BindingResult.otpRequest";
 }

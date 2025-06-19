@@ -5,6 +5,8 @@ import com.rental.houserental.entity.User;
 import com.rental.houserental.enums.UserStatus;
 import com.rental.houserental.exceptions.auth.EmailAlreadyExistsException;
 import com.rental.houserental.exceptions.auth.PasswordNotMatchException;
+import com.rental.houserental.exceptions.user.UserSuspendedException;
+import com.rental.houserental.exceptions.user.UserBannedException;
 import com.rental.houserental.repository.UserRepository;
 import com.rental.houserental.service.AuthService;
 import com.rental.houserental.service.EmailService;
@@ -36,17 +38,47 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public User register(RegisterRequestDTO request) {
-        User user = userService.createUser(request);
+        User user = userService.findByEmail(request.getEmail());
+        if (user != null) {
+            switch (user.getStatus()) {
+                case ACTIVE -> throw new EmailAlreadyExistsException("Email already exists: " + request.getEmail());
+                case SUSPENDED ->
+                        throw new UserSuspendedException("This account has been temporarily suspended. Please contact support.");
+                case BANNED ->
+                        throw new UserBannedException("This account has been permanently banned. Please contact support.");
+                case PENDING -> {
+                    otpService.sendOtpForVerification(user.getEmail());
+                    return user;
+                }
+            }
+        }
+        user = userService.createUser(request);
         otpService.sendOtpForVerification(user.getEmail());
         return user;
     }
+
 
     @Override
     @Transactional
     public boolean verifyOtp(String email, String otp) {
         String key = OTP_PREFIX + email;
+        String failKey = "otp:fail:" + email;
         String storedOtp = redisTemplate.opsForValue().get(key);
         if (storedOtp == null || !storedOtp.equals(otp)) {
+            String failCountStr = redisTemplate.opsForValue().get(failKey);
+            int failCount = 0;
+            if (failCountStr != null) {
+                try { failCount = Integer.parseInt(failCountStr); } catch (Exception ignored) {}
+            }
+            failCount++;
+            Long expire = redisTemplate.getExpire(key);
+            if (expire == null || expire <= 0) expire = 600L;
+            redisTemplate.opsForValue().set(failKey, String.valueOf(failCount), Duration.ofSeconds(expire));
+            if (failCount >= 3) {
+                redisTemplate.delete(key);
+                redisTemplate.delete(failKey);
+                redisTemplate.delete("otp:exp:" + email);
+            }
             return false;
         }
         User user = userRepository.findByEmail(email)
@@ -54,6 +86,8 @@ public class AuthServiceImpl implements AuthService {
         user.setStatus(UserStatus.ACTIVE);
         userRepository.save(user);
         redisTemplate.delete(key);
+        redisTemplate.delete(failKey);
+        redisTemplate.delete("otp:exp:" + email);
         return true;
     }
 

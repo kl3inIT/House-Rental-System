@@ -3,7 +3,6 @@ package com.rental.houserental.service.impl;
 import com.rental.houserental.entity.User;
 import com.rental.houserental.enums.UserStatus;
 import com.rental.houserental.exceptions.auth.EmailAlreadyVerifiedException;
-import com.rental.houserental.repository.UserRepository;
 import com.rental.houserental.service.EmailService;
 import com.rental.houserental.service.OtpService;
 import com.rental.houserental.service.UserService;
@@ -23,8 +22,6 @@ public class OtpServiceImpl implements OtpService {
     private final RedisTemplate<String, String> redisTemplate;
     private final EmailService emailService;
     private final UserService userService;
-     // OTP hết hạn sau 10 phút
-
     private static final Random RANDOM = new SecureRandom();
 
     @Override
@@ -35,8 +32,12 @@ public class OtpServiceImpl implements OtpService {
             throw new EmailAlreadyVerifiedException("Email already verified");
         }
         String otp = generateOtp();
-        String key = OTP_PREFIX + email;
-        redisTemplate.opsForValue().set(key, otp, OTP_EXPIRY);
+        redisTemplate.opsForValue().set(OTP_PREFIX + email, otp, OTP_EXPIRY);
+        redisTemplate.opsForValue().set(OTP_FAIL_PREFIX + email, "0", OTP_EXPIRY);
+
+        long expiryMillis = System.currentTimeMillis() + OTP_EXPIRY.toMillis();
+        redisTemplate.opsForValue().set(OTP_EXP_PREFIX + email, String.valueOf(expiryMillis), OTP_EXPIRY);
+
         emailService.sendVerificationEmail(user, otp);
     }
 

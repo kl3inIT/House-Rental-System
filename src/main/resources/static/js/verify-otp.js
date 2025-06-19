@@ -15,11 +15,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Chặn nhập ký tự không phải số
         input.addEventListener('keydown', function (e) {
+            // Cho phép Ctrl+V (Windows) hoặc Command+V (Mac)
             if (
-                // Cho phép phím số, Backspace, Tab, mũi tên, Delete
                 !(
                     (e.key >= '0' && e.key <= '9') ||
-                    ["Backspace", "Tab", "ArrowLeft", "ArrowRight", "Delete"].includes(e.key)
+                    ["Backspace", "Tab", "ArrowLeft", "ArrowRight", "Delete"].includes(e.key) ||
+                    (e.ctrlKey && (e.key === 'v' || e.key === 'V')) ||
+                    (e.metaKey && (e.key === 'v' || e.key === 'V'))
                 )
             ) {
                 e.preventDefault();
@@ -82,4 +84,44 @@ document.addEventListener("DOMContentLoaded", function () {
     function updateHiddenInput() {
         hiddenInput.value = Array.from(inputs).map(input => input.value).join('');
     }
+
+    // Hiển thị đồng hồ đếm ngược và số lần nhập sai OTP (từ Thymeleaf, lấy qua data-attribute hoặc hidden input)
+    (function () {
+        const timerSpan = document.getElementById('otp-timer');
+        const attemptsSpan = document.getElementById('otp-attempts');
+        // Lấy giá trị từ attribute data- hoặc hidden input
+        let otpExpire = timerSpan ? timerSpan.getAttribute('data-expire') : null;
+        let otpFailCount = attemptsSpan ? attemptsSpan.getAttribute('data-failcount') : null;
+        if (!otpExpire) {
+            // Thử lấy từ input hidden nếu có
+            const expireInput = document.getElementById('otp-expire');
+            if (expireInput) otpExpire = expireInput.value;
+        }
+        if (!otpFailCount) {
+            const failInput = document.getElementById('otp-failcount');
+            if (failInput) otpFailCount = failInput.value;
+        }
+        if (!timerSpan || !attemptsSpan) return;
+        let timerInterval = null;
+        let attemptsLeft = 3 - (parseInt(otpFailCount) || 0);
+        attemptsSpan.textContent = `Attempts left: ${attemptsLeft}`;
+        if (otpExpire && otpExpire !== '0') {
+            function updateTimer() {
+                const now = Date.now();
+                const diff = parseInt(otpExpire) - now;
+                if (diff > 0) {
+                    const min = Math.floor(diff / 60000);
+                    const sec = Math.floor((diff % 60000) / 1000);
+                    timerSpan.textContent = `OTP expires in: ${min}:${sec.toString().padStart(2, '0')}`;
+                } else {
+                    timerSpan.textContent = 'OTP expired. Please resend.';
+                    clearInterval(timerInterval);
+                }
+            }
+            updateTimer();
+            timerInterval = setInterval(updateTimer, 1000);
+        } else {
+            timerSpan.textContent = 'OTP expired. Please resend.';
+        }
+    })();
 });

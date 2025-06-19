@@ -11,4 +11,5 @@ public final class ViewNamesConstant {
     public static final String REDIRECT_REGISTER = "redirect:/register";
     public static final String REDIRECT_VERIFY_OTP = "redirect:/verify-otp";
 
+
 }

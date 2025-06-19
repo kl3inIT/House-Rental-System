@@ -30,11 +30,9 @@ public enum UserStatus {
         }
     }
 
-
     public boolean isActive() {
         return this == ACTIVE;
     }
-
 
     public static List<Map<String, String>> getStatusList() {
         return Arrays.stream(UserStatus.values())
