@@ -1,6 +1,7 @@
 package com.rental.houserental.controller;
 
 import com.rental.houserental.dto.request.auth.LoginRequestDTO;
+import com.rental.houserental.dto.request.auth.LoginPageRequestDTO;
 import com.rental.houserental.dto.request.auth.OtpRequestDTO;
 import com.rental.houserental.dto.request.auth.RegisterRequestDTO;
 import com.rental.houserental.entity.User;
@@ -30,8 +31,16 @@ public class AuthController {
     private final RedisTemplate<String, String> redisTemplate;
 
     @GetMapping("/login")
-    public String loginPage(Model model) {
-        model.addAttribute(LOGIN_REQUEST, new LoginRequestDTO());
+    public String loginPage(Model model, LoginPageRequestDTO pageRequest) {
+        
+        // Add login request DTO for form binding
+        if (!model.containsAttribute(LOGIN_REQUEST)) {
+            model.addAttribute(LOGIN_REQUEST, new LoginRequestDTO());
+        }
+        
+        // Add page request for message handling
+        model.addAttribute("pageRequest", pageRequest);
+        
         return LOGIN;
     }
 
@@ -105,8 +114,8 @@ public class AuthController {
 
     @PostMapping("/resend-otp")
     public String resendOtp(@RequestParam String email, RedirectAttributes redirectAttributes) {
-        authService.resendOtp(email);
-        redirectAttributes.addFlashAttribute(MESSAGE, "Verification code has been resent. Please check your inbox.");
+            authService.resendOtp(email);
+            redirectAttributes.addFlashAttribute(MESSAGE, "Verification code has been resent. Please check your inbox.");
         return redirectVerifyOtpWithEmail(email);
     }
 

@@ -21,29 +21,49 @@
             </p>
         </div>
 
-        <!-- Spring Security error messages -->
-        <div th:if="${param.error}" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-            <span class="block sm:inline" 
-                  th:text="${param.message != null ? param.message[0] : 'Invalid email or password.'}"></span>
+        <!-- Simple Spring Security Messages -->
+        <div th:if="${pageRequest.hasError()}" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+            <span class="block sm:inline">Invalid email or password. Please try again.</span>
             <button type="button" class="absolute top-0 right-0 mt-2 mr-2 text-red-700 hover:text-red-500"
                     onclick="this.parentElement.style.display='none';">
                 <i class="fas fa-times"></i>
             </button>
         </div>
-        <div th:if="${param.logout}" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+        
+        <div th:if="${pageRequest.hasLogout()}" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
             <span class="block sm:inline">You have been logged out successfully.</span>
             <button type="button" class="absolute top-0 right-0 mt-2 mr-2 text-green-700 hover:text-green-500"
                     onclick="this.parentElement.style.display='none';">
                 <i class="fas fa-times"></i>
             </button>
         </div>
-        <div th:if="${param.expired}" class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative mb-4" role="alert">
+        
+        <div th:if="${pageRequest.hasExpired()}" class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative mb-4" role="alert">
             <span class="block sm:inline">Your session has expired. Please login again.</span>
             <button type="button" class="absolute top-0 right-0 mt-2 mr-2 text-yellow-700 hover:text-yellow-500"
                     onclick="this.parentElement.style.display='none';">
                 <i class="fas fa-times"></i>
             </button>
         </div>
+        
+        <div th:if="${pageRequest.hasDisabled()}" class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative mb-4" role="alert">
+            <span class="block sm:inline">Your account is not activated. Please verify your email first.</span>
+            <button type="button" class="absolute top-0 right-0 mt-2 mr-2 text-yellow-700 hover:text-yellow-500"
+                    onclick="this.parentElement.style.display='none';">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div th:if="${pageRequest.hasLocked()}" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+            <span class="block sm:inline">Your account has been locked. Please contact support.</span>
+            <button type="button" class="absolute top-0 right-0 mt-2 mr-2 text-red-700 hover:text-red-500"
+                    onclick="this.parentElement.style.display='none';">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        
+        <!-- Flash messages from controllers -->
         <div th:if="${message}" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
             <span class="block sm:inline" th:text="${message}"></span>
             <button type="button" class="absolute top-0 right-0 mt-2 mr-2 text-green-700 hover:text-green-500"
@@ -51,6 +71,7 @@
                 <i class="fas fa-times"></i>
             </button>
         </div>
+        
         <div th:if="${error}" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
             <span class="block sm:inline" th:text="${error}"></span>
             <button type="button" class="absolute top-0 right-0 mt-2 mr-2 text-red-700 hover:text-red-500"

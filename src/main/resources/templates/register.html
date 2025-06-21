@@ -38,6 +38,9 @@
         </div>
 
         <form th:action="@{/register}" th:object="${registerRequest}" method="post" class="mt-8 space-y-6" novalidate>
+            <!-- CSRF Token - Required for Spring Security -->
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            
             <div class="space-y-4">
                 <div>
                     <label for="name" class="block text-sm font-medium text-gray-700">Full Name</label>
