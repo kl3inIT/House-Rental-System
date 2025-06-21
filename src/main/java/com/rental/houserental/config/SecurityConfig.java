@@ -37,13 +37,16 @@ public class SecurityConfig {
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/landlord/**").hasRole("LANDLORD")
                         .requestMatchers("/user/**").hasRole("USER")
-                        .requestMatchers("/", "/login", "/register", "/verify-email/**",
+                        .requestMatchers("/", "/login", "/perform-login", "/register", "/verify-email/**",
                                 "/forgot-password", "/reset-password/**","/verify-otp/**", "/resend-otp",
                                 "/css/**", "/js/**", "/images/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
+                        .loginProcessingUrl("/perform-login") // Custom processing URL
+                        .usernameParameter("email") // Use email field instead of username
+                        .passwordParameter("password")
                         .defaultSuccessUrl("/", true)
                         .failureUrl("/login?error=true")
                         .permitAll()
@@ -63,7 +66,10 @@ public class SecurityConfig {
                 )
                 .sessionManagement(session -> session
                         .maximumSessions(1)
+                        .maxSessionsPreventsLogin(false)
                         .expiredUrl("/login?expired")
+                        .and()
+                        .sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.IF_REQUIRED)
                 );
 
         return http.build();

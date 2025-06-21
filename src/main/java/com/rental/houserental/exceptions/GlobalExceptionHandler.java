@@ -80,6 +80,13 @@ public class GlobalExceptionHandler {
         return REDIRECT_LOGIN;
     }
 
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public String handleInvalidCredentialsException(InvalidCredentialsException ex, RedirectAttributes redirectAttributes) {
+        log.warn("Invalid credentials: {}", ex.getMessage());
+        redirectAttributes.addFlashAttribute(ERROR, "Invalid email or password. Please try again.");
+        return REDIRECT_LOGIN;
+    }
+
     //generic phải để cuối để bắt hết được lỗi
     @ExceptionHandler(Exception.class)
     public String handleGenericException(Exception ex, Model model) {

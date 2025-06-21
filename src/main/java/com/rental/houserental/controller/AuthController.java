@@ -32,46 +32,7 @@ public class AuthController {
     @GetMapping("/login")
     public String loginPage(Model model) {
         model.addAttribute(LOGIN_REQUEST, new LoginRequestDTO());
-        
-        if (model.containsAttribute(ERROR)) {
-            model.addAttribute(ERROR, model.getAttribute(ERROR));
-        } else {
-            model.addAttribute(ERROR, null);
-        }
-
-        if (model.containsAttribute(MESSAGE)) {
-            model.addAttribute(MESSAGE, model.getAttribute(MESSAGE));
-        } else {
-            model.addAttribute(MESSAGE, null);
-        }
-
         return LOGIN;
-    }
-
-    @PostMapping("/login")
-    public String login(@Valid @ModelAttribute(LOGIN_REQUEST) LoginRequestDTO request,
-                        BindingResult result,
-                        RedirectAttributes redirectAttributes) {
-        if (result.hasErrors()) {
-            redirectAttributes.addFlashAttribute(BINDING_RESULT_LOGIN, result);
-            redirectAttributes.addFlashAttribute(LOGIN_REQUEST, request);
-            return REDIRECT_LOGIN;
-        }
-
-        try {
-            boolean loginSuccess = authService.login(request);
-            if (loginSuccess) {
-                // Redirect based on user role (will be handled by SecurityConfig)
-                return "redirect:/";
-            } else {
-                redirectAttributes.addFlashAttribute(ERROR, "Login failed. Please try again.");
-                return REDIRECT_LOGIN;
-            }
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute(ERROR, e.getMessage());
-            redirectAttributes.addFlashAttribute(LOGIN_REQUEST, request);
-            return REDIRECT_LOGIN;
-        }
     }
 
     @GetMapping("/register")

@@ -1,7 +1,6 @@
 server:
   port: 8080
   servlet:
-    context-path: /house-rental
     session:
       timeout: 30m
       cookie:
