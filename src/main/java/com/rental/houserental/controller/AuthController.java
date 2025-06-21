@@ -1,11 +1,10 @@
 package com.rental.houserental.controller;
 
+import com.rental.houserental.dto.request.auth.LoginRequestDTO;
 import com.rental.houserental.dto.request.auth.OtpRequestDTO;
 import com.rental.houserental.dto.request.auth.RegisterRequestDTO;
 import com.rental.houserental.entity.User;
 import com.rental.houserental.enums.UserStatus;
-import com.rental.houserental.exceptions.auth.EmailAlreadyVerifiedException;
-import com.rental.houserental.exceptions.user.UserNotFoundException;
 import com.rental.houserental.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,9 +31,47 @@ public class AuthController {
 
     @GetMapping("/login")
     public String loginPage(Model model) {
-        model.addAttribute("error", model.containsAttribute("error") ? model.getAttribute("error") : null);
-        model.addAttribute("message", model.containsAttribute("message") ? model.getAttribute("message") : null);
-        return "login";
+        model.addAttribute(LOGIN_REQUEST, new LoginRequestDTO());
+        
+        if (model.containsAttribute(ERROR)) {
+            model.addAttribute(ERROR, model.getAttribute(ERROR));
+        } else {
+            model.addAttribute(ERROR, null);
+        }
+
+        if (model.containsAttribute(MESSAGE)) {
+            model.addAttribute(MESSAGE, model.getAttribute(MESSAGE));
+        } else {
+            model.addAttribute(MESSAGE, null);
+        }
+
+        return LOGIN;
+    }
+
+    @PostMapping("/login")
+    public String login(@Valid @ModelAttribute(LOGIN_REQUEST) LoginRequestDTO request,
+                        BindingResult result,
+                        RedirectAttributes redirectAttributes) {
+        if (result.hasErrors()) {
+            redirectAttributes.addFlashAttribute(BINDING_RESULT_LOGIN, result);
+            redirectAttributes.addFlashAttribute(LOGIN_REQUEST, request);
+            return REDIRECT_LOGIN;
+        }
+
+        try {
+            boolean loginSuccess = authService.login(request);
+            if (loginSuccess) {
+                // Redirect based on user role (will be handled by SecurityConfig)
+                return "redirect:/";
+            } else {
+                redirectAttributes.addFlashAttribute(ERROR, "Login failed. Please try again.");
+                return REDIRECT_LOGIN;
+            }
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute(ERROR, e.getMessage());
+            redirectAttributes.addFlashAttribute(LOGIN_REQUEST, request);
+            return REDIRECT_LOGIN;
+        }
     }
 
     @GetMapping("/register")
@@ -51,7 +88,7 @@ public class AuthController {
         if (result.hasErrors()) {
             redirectAttributes.addFlashAttribute(BINDING_RESULT_KEY, result);
             redirectAttributes.addFlashAttribute(REGISTER_REQUEST, request);
-            return REGISTER;
+            return REDIRECT_REGISTER;
         }
 
         User user = authService.register(request);
@@ -60,13 +97,12 @@ public class AuthController {
         } else {
             redirectAttributes.addFlashAttribute(MESSAGE, "Registration successful! Please check your email.");
         }
-        return "redirect:/verify-otp?email=" + request.getEmail();
-
+        return redirectVerifyOtpWithEmail(request.getEmail());
     }
 
     @GetMapping("/verify-otp")
     public String showVerifyOtp(Model model, @RequestParam(required = false) String email) {
-        //kiem tra xem co otp Request neu nguoi dung reload trang
+        // Kiểm tra xem có OTP Request nếu người dùng reload trang
         OtpRequestDTO otpRequest = (OtpRequestDTO) model.asMap().get(OTP_REQUEST);
         if (otpRequest == null) {
             otpRequest = new OtpRequestDTO();
@@ -94,7 +130,7 @@ public class AuthController {
         if (result.hasErrors()) {
             redirectAttributes.addFlashAttribute(BINDING_RESULT_OTP, result);
             redirectAttributes.addFlashAttribute(OTP_REQUEST, request);
-            return "redirect:/verify-otp?email=" + email;
+            return redirectVerifyOtpWithEmail(email);
         }
         if (authService.verifyOtp(email, request.getOtp())) {
             redirectAttributes.addFlashAttribute(MESSAGE, "Email verified successfully! You can now login.");
@@ -102,7 +138,7 @@ public class AuthController {
         } else {
             redirectAttributes.addFlashAttribute(ERROR, "Invalid or expired OTP. Please try again.");
             redirectAttributes.addFlashAttribute(OTP_REQUEST, request);
-            return "redirect:/verify-otp?email=" + email;
+            return redirectVerifyOtpWithEmail(email);
         }
     }
 
@@ -110,45 +146,44 @@ public class AuthController {
     public String resendOtp(@RequestParam String email, RedirectAttributes redirectAttributes) {
         authService.resendOtp(email);
         redirectAttributes.addFlashAttribute(MESSAGE, "Verification code has been resent. Please check your inbox.");
-        return "redirect:/verify-otp?email=" + email;
+        return redirectVerifyOtpWithEmail(email);
     }
 
     @GetMapping("/forgot-password")
     public String forgotPasswordPage(Model model) {
-        model.addAttribute("error", model.containsAttribute("error") ? model.getAttribute("error") : null);
-        model.addAttribute("message", model.containsAttribute("message") ? model.getAttribute("message") : null);
-        return "forgot-password";
+        model.addAttribute(ERROR, model.containsAttribute(ERROR) ? model.getAttribute(ERROR) : null);
+        model.addAttribute(MESSAGE, model.containsAttribute(MESSAGE) ? model.getAttribute(MESSAGE) : null);
+        return FORGOT_PASSWORD;
     }
 
     @PostMapping("/forgot-password")
     public String forgotPassword(@RequestParam String email, RedirectAttributes redirectAttributes) {
         try {
             authService.forgotPassword(email);
-            redirectAttributes.addFlashAttribute("message", "Password reset instructions have been sent to your email.");
+            redirectAttributes.addFlashAttribute(MESSAGE, "Password reset instructions have been sent to your email.");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
-            return "redirect:/forgot-password";
+            redirectAttributes.addFlashAttribute(ERROR, e.getMessage());
+            return REDIRECT_FORGOT_PASSWORD;
         }
-        return "redirect:/login";
+        return REDIRECT_LOGIN;
     }
 
     @GetMapping("/reset-password")
     public String resetPasswordPage(@RequestParam String token, Model model) {
         model.addAttribute("token", token);
-        model.addAttribute("error", model.containsAttribute("error") ? model.getAttribute("error") : null);
-        return "reset-password";
+        model.addAttribute(ERROR, model.containsAttribute(ERROR) ? model.getAttribute(ERROR) : null);
+        return RESET_PASSWORD;
     }
 
     @PostMapping("/reset-password")
     public String resetPassword(@RequestParam String token, @RequestParam String newPassword, RedirectAttributes redirectAttributes) {
         try {
             authService.resetPassword(token, newPassword);
-            redirectAttributes.addFlashAttribute("message", "Password has been reset successfully. You can now login with your new password.");
+            redirectAttributes.addFlashAttribute(MESSAGE, "Password has been reset successfully. You can now login with your new password.");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
-            return "redirect:/reset-password?token=" + token;
+            redirectAttributes.addFlashAttribute(ERROR, e.getMessage());
+            return redirectResetPasswordWithToken(token);
         }
-        return "redirect:/login";
+        return REDIRECT_LOGIN;
     }
-
 }

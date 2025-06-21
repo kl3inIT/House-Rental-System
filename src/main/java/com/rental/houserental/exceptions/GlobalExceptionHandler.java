@@ -67,7 +67,17 @@ public class GlobalExceptionHandler {
     public String handleUserNotFoundException(UserNotFoundException ex, RedirectAttributes redirectAttributes) {
         log.warn("User not found: {}", ex.getMessage());
         redirectAttributes.addFlashAttribute(ERROR, "User not found. Please register first.");
-        return REDIRECT_REGISTER;
+        
+        // Use the redirectPath from the exception if available, otherwise default to register
+        String redirectPath = ex.getRedirectPath();
+        return redirectPath != null ? redirectPath : REDIRECT_REGISTER;
+    }
+
+    @ExceptionHandler(UserNotVerifiedException.class)
+    public String handleUserNotVerifiedException(UserNotVerifiedException ex, RedirectAttributes redirectAttributes) {
+        log.warn("User not verified: {}", ex.getMessage());
+        redirectAttributes.addFlashAttribute(ERROR, "Please verify your email before logging in.");
+        return REDIRECT_LOGIN;
     }
 
     //generic phải để cuối để bắt hết được lỗi

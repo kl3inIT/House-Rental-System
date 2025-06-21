@@ -3,6 +3,7 @@ package com.rental.houserental.service.impl;
 import com.rental.houserental.entity.User;
 import com.rental.houserental.enums.UserStatus;
 import com.rental.houserental.exceptions.auth.EmailAlreadyVerifiedException;
+import com.rental.houserental.exceptions.user.UserNotFoundException;
 import com.rental.houserental.service.EmailService;
 import com.rental.houserental.service.OtpService;
 import com.rental.houserental.service.UserService;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.security.SecureRandom;
 import java.util.Random;
 import static com.rental.houserental.constant.OtpConstants.*;
+import static com.rental.houserental.constant.ViewNamesConstant.*;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +30,9 @@ public class OtpServiceImpl implements OtpService {
     @Transactional
     public void sendOtpForVerification(String email) {
         User user = userService.findByEmail(email);
+        if (user == null) {
+            throw new UserNotFoundException("User not found with email: " + email, REDIRECT_VERIFY_OTP);
+        }
         if (user.getStatus() == UserStatus.ACTIVE) {
             throw new EmailAlreadyVerifiedException("Email already verified");
         }
