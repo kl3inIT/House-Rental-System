@@ -1,4 +1,4 @@
-package com.rental.houserental.config;
+package com.rental.houserental.security;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

@@ -1,4 +1,4 @@
-package com.rental.houserental.service.impl;
+package com.rental.houserental.security;
 
 import com.rental.houserental.entity.User;
 import com.rental.houserental.enums.UserStatus;

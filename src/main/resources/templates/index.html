@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/main}">
 <head>
@@ -10,9 +11,19 @@
     <!-- Hero Section -->
     <section class="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-20">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h1 class="text-4xl md:text-6xl font-bold mb-6">Find Your Perfect Home</h1>
-            <p class="text-xl md:text-2xl mb-8 text-blue-100">Discover amazing rental properties in your desired
-                location</p>
+            <!-- Welcome message for authenticated users -->
+            <div sec:authorize="isAuthenticated()" class="mb-4">
+                <p class="text-blue-100 text-lg">Welcome back, <span sec:authentication="name" class="font-semibold"></span>!</p>
+            </div>
+            
+            <h1 class="text-4xl md:text-6xl font-bold mb-6">
+                <span sec:authorize="!isAuthenticated()">Find Your Perfect Home</span>
+                <span sec:authorize="isAuthenticated()">Continue Your Search</span>
+            </h1>
+            <p class="text-xl md:text-2xl mb-8 text-blue-100">
+                <span sec:authorize="!isAuthenticated()">Discover amazing rental properties in your desired location</span>
+                <span sec:authorize="isAuthenticated()">Explore new listings and manage your favorites</span>
+            </p>
             <form class="bg-white rounded-lg shadow-xl p-6 max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
                     <label class="block text-gray-700 text-sm font-medium mb-2">Location</label>
@@ -41,11 +52,48 @@
                 </div>
                 <div class="flex items-end">
                     <button type="submit"
-                            class="w-full bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 font-medium">
+                            class="w-full bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 font-medium transition-colors duration-200">
                         <i class="fas fa-search mr-2"></i>Search
                     </button>
                 </div>
             </form>
+        </div>
+    </section>
+
+    <!-- Quick Actions for Authenticated Users -->
+    <section sec:authorize="isAuthenticated()" class="py-8 bg-blue-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- User Quick Actions -->
+                <div sec:authorize="hasRole('USER')" class="bg-white p-6 rounded-lg shadow-md text-center hover:shadow-lg transition-shadow duration-300">
+                    <i class="fas fa-heart text-blue-600 text-3xl mb-3"></i>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Saved Properties</h3>
+                    <p class="text-gray-600 mb-4">View your favorite listings</p>
+                    <a th:href="@{/user/favorites}" class="inline-block bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200">
+                        View Favorites
+                    </a>
+                </div>
+                
+                <!-- Landlord Quick Actions -->
+                <div sec:authorize="hasRole('LANDLORD')" class="bg-white p-6 rounded-lg shadow-md text-center hover:shadow-lg transition-shadow duration-300">
+                    <i class="fas fa-plus-circle text-green-600 text-3xl mb-3"></i>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Add Property</h3>
+                    <p class="text-gray-600 mb-4">List a new rental property</p>
+                    <a th:href="@{/landlord/properties/add}" class="inline-block bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors duration-200">
+                        Add Property
+                    </a>
+                </div>
+                
+                <!-- Admin Quick Actions -->
+                <div sec:authorize="hasRole('ADMIN')" class="bg-white p-6 rounded-lg shadow-md text-center hover:shadow-lg transition-shadow duration-300">
+                    <i class="fas fa-chart-line text-purple-600 text-3xl mb-3"></i>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Analytics</h3>
+                    <p class="text-gray-600 mb-4">View platform statistics</p>
+                    <a th:href="@{/admin/analytics}" class="inline-block bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors duration-200">
+                        View Analytics
+                    </a>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -62,9 +110,15 @@
                 <div class="bg-white rounded-lg shadow-md hover:shadow-xl overflow-hidden transition-shadow duration-300">
                     <img src="/placeholder.svg?height=200&width=300" alt="Property" class="w-full h-48 object-cover">
                     <div class="p-6">
-                        <div class="flex justify-between mb-2">
+                        <div class="flex justify-between items-start mb-2">
                             <h3 class="text-xl font-semibold text-gray-900">Modern Apartment</h3>
-                            <span class="text-2xl font-bold text-blue-600">$1,800</span>
+                            <div class="flex items-center space-x-2">
+                                <span class="text-2xl font-bold text-blue-600">$1,800</span>
+                                <!-- Heart icon for authenticated users -->
+                                <button sec:authorize="isAuthenticated()" class="text-gray-400 hover:text-red-500 transition-colors duration-200 p-1">
+                                    <i class="far fa-heart text-lg"></i>
+                                </button>
+                            </div>
                         </div>
                         <p class="text-gray-600 mb-2"><i class="fas fa-map-marker-alt mr-1"></i> Downtown, New York</p>
                         <p class="text-gray-700 mb-4">Spacious 2-bedroom apartment with city views and modern
@@ -112,6 +166,102 @@
                     </div>
                     <h3 class="text-xl font-semibold text-gray-900 mb-2">24/7 Support</h3>
                     <p class="text-gray-600">Our support team is ready to assist you anytime, anywhere.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call-to-Action for Non-authenticated Users -->
+    <section sec:authorize="!isAuthenticated()" class="bg-blue-600 py-16">
+        <div class="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-white mb-4">Ready to Find Your Perfect Home?</h2>
+            <p class="text-xl text-blue-100 mb-8">Join thousands of satisfied renters who found their dream properties with RentEase</p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a th:href="@{/register}" 
+                   class="bg-white text-blue-600 px-8 py-3 rounded-md font-semibold hover:bg-gray-100 transition-colors duration-200 shadow-sm">
+                    <i class="fas fa-user-plus mr-2"></i>Get Started - It's Free
+                </a>
+                <a th:href="@{/properties}" 
+                   class="border border-white text-white px-8 py-3 rounded-md font-semibold hover:bg-blue-700 transition-colors duration-200">
+                    <i class="fas fa-search mr-2"></i>Browse Properties
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Recent Activity for Authenticated Users -->
+    <section sec:authorize="isAuthenticated()" class="py-16 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Your Recent Activity</h2>
+                <p class="text-gray-600 text-lg">Stay updated with your latest actions and recommendations</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Recent Searches -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900">
+                            <i class="fas fa-clock text-blue-600 mr-2"></i>Recent Searches
+                        </h3>
+                        <a th:href="@{/user/search-history}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                            View All
+                        </a>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-md">
+                            <div>
+                                <p class="font-medium text-gray-900">2-bedroom apartments</p>
+                                <p class="text-sm text-gray-600">Downtown, New York • $1,500-$2,500</p>
+                            </div>
+                            <button class="text-blue-600 hover:text-blue-800">
+                                <i class="fas fa-redo"></i>
+                            </button>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-md">
+                            <div>
+                                <p class="font-medium text-gray-900">Studio apartments</p>
+                                <p class="text-sm text-gray-600">Brooklyn, NY • Under $1,500</p>
+                            </div>
+                            <button class="text-blue-600 hover:text-blue-800">
+                                <i class="fas fa-redo"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recommendations -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900">
+                            <i class="fas fa-thumbs-up text-green-600 mr-2"></i>Recommended for You
+                        </h3>
+                        <a th:href="@{/user/recommendations}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                            View All
+                        </a>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex items-center p-3 bg-gray-50 rounded-md">
+                            <img src="/placeholder.svg?height=60&width=80" alt="Property" class="w-16 h-12 object-cover rounded mr-3">
+                            <div class="flex-1">
+                                <p class="font-medium text-gray-900">Luxury Downtown Loft</p>
+                                <p class="text-sm text-gray-600">$2,200/month • 95% match</p>
+                            </div>
+                            <button class="text-red-500 hover:text-red-700">
+                                <i class="far fa-heart"></i>
+                            </button>
+                        </div>
+                        <div class="flex items-center p-3 bg-gray-50 rounded-md">
+                            <img src="/placeholder.svg?height=60&width=80" alt="Property" class="w-16 h-12 object-cover rounded mr-3">
+                            <div class="flex-1">
+                                <p class="font-medium text-gray-900">Modern Studio</p>
+                                <p class="text-sm text-gray-600">$1,800/month • 88% match</p>
+                            </div>
+                            <button class="text-red-500 hover:text-red-700">
+                                <i class="far fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
