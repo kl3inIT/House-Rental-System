@@ -132,8 +132,12 @@
         }
 
         @keyframes shimmer {
-            0% { left: -100%; }
-            100% { left: 100%; }
+            0% {
+                left: -100%;
+            }
+            100% {
+                left: 100%;
+            }
         }
 
         .info-section {
@@ -251,51 +255,53 @@
     </style>
 </head>
 <body>
-    <div class="email-container">
-        <div class="email-content">
-            <!-- Brand Section -->
-            <div class="brand-section">
-                <div class="brand-logo">RentEase</div>
-                <div class="brand-tagline">Your Trusted Rental Platform</div>
+<div class="email-container">
+    <div class="email-content">
+        <!-- Brand Section -->
+        <div class="brand-section">
+            <div class="brand-logo">RentEase</div>
+            <div class="brand-tagline">Your Trusted Rental Platform</div>
+        </div>
+
+        <!-- Main Content -->
+        <h1 class="title">Verify your email address</h1>
+        <div class="description">
+            Hi <span class="user-name" th:text="${user.name}">User</span>,<br>
+            Thank you for registering with RentEase! Please use the verification code below to complete your account
+            setup.
+        </div>
+
+        <!-- OTP Section -->
+        <div class="otp-section">
+            <div class="otp-label">Verification Code</div>
+            <div class="otp-box" th:text="${otpMessage}">123456</div>
+        </div>
+
+        <!-- Info Section -->
+        <div class="info-section">
+            <div class="info-text">
+                <span class="info-icon">⏰</span>This code will expire in <strong>5 minutes</strong><br>
+                <span class="info-icon">📧</span>If you didn't request this, please ignore this email
             </div>
-            
-            <!-- Main Content -->
-            <h1 class="title">Verify your email address</h1>
-            <div class="description">
-                Hi <span class="user-name" th:text="${user.name}">User</span>,<br>
-                Thank you for registering with RentEase! Please use the verification code below to complete your account setup.
+        </div>
+
+        <!-- Security Section -->
+        <div class="security-section">
+            <div class="security-title">Security Notice</div>
+            <div class="security-text">
+                Never share this code with anyone. RentEase will never ask for your verification code via phone or
+                email.
             </div>
-            
-            <!-- OTP Section -->
-            <div class="otp-section">
-                <div class="otp-label">Verification Code</div>
-                <div class="otp-box" th:text="${otpMessage}">123456</div>
-            </div>
-            
-            <!-- Info Section -->
-            <div class="info-section">
-                <div class="info-text">
-                    <span class="info-icon">⏰</span>This code will expire in <strong>5 minutes</strong><br>
-                    <span class="info-icon">📧</span>If you didn't request this, please ignore this email
-                </div>
-            </div>
-            
-            <!-- Security Section -->
-            <div class="security-section">
-                <div class="security-title">Security Notice</div>
-                <div class="security-text">
-                    Never share this code with anyone. RentEase will never ask for your verification code via phone or email.
-                </div>
-            </div>
-            
-            <!-- Footer Section -->
-            <div class="footer-section">
-                <div class="footer-text">
-                    &copy; 2025 <a href="#" class="footer-link">RentEase</a>. All rights reserved.<br>
-                    This is an automated message, please do not reply to this email.
-                </div>
+        </div>
+
+        <!-- Footer Section -->
+        <div class="footer-section">
+            <div class="footer-text">
+                &copy; 2025 <a href="#" class="footer-link">RentEase</a>. All rights reserved.<br>
+                This is an automated message, please do not reply to this email.
             </div>
         </div>
     </div>
+</div>
 </body>
 </html>
