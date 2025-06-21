@@ -4,7 +4,8 @@ import com.rental.houserental.dto.request.auth.OtpRequestDTO;
 import com.rental.houserental.dto.request.auth.RegisterRequestDTO;
 import com.rental.houserental.entity.User;
 import com.rental.houserental.enums.UserStatus;
-import com.rental.houserental.exceptions.auth.EmailAlreadyExistsException;
+import com.rental.houserental.exceptions.auth.EmailAlreadyVerifiedException;
+import com.rental.houserental.exceptions.user.UserNotFoundException;
 import com.rental.houserental.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,14 +17,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import static com.rental.houserental.constant.AtrributeNameConstant.*;
 import static com.rental.houserental.constant.ViewNamesConstant.*;
@@ -34,8 +28,7 @@ import static com.rental.houserental.constant.OtpConstants.*;
 public class AuthController {
 
     private final AuthService authService;
-    @Autowired
-    private RedisTemplate<String, String> redisTemplate;
+    private final RedisTemplate<String, String> redisTemplate;
 
     @GetMapping("/login")
     public String loginPage(Model model) {
@@ -114,13 +107,9 @@ public class AuthController {
     }
 
     @PostMapping("/resend-otp")
-    public String resendVerification(@RequestParam String email, RedirectAttributes redirectAttributes) {
-        try {
-            authService.resendOtp(email);
-            redirectAttributes.addFlashAttribute(MESSAGE, "Verification code has been resent. Please check your inbox.");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute(ERROR, e.getMessage());
-        }
+    public String resendOtp(@RequestParam String email, RedirectAttributes redirectAttributes) {
+        authService.resendOtp(email);
+        redirectAttributes.addFlashAttribute(MESSAGE, "Verification code has been resent. Please check your inbox.");
         return "redirect:/verify-otp?email=" + email;
     }
 
