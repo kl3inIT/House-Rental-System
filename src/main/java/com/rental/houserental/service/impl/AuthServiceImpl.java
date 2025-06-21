@@ -4,7 +4,9 @@ import com.rental.houserental.dto.request.auth.RegisterRequestDTO;
 import com.rental.houserental.entity.User;
 import com.rental.houserental.enums.UserStatus;
 import com.rental.houserental.exceptions.auth.EmailAlreadyExistsException;
+import com.rental.houserental.exceptions.auth.EmailAlreadyVerifiedException;
 import com.rental.houserental.exceptions.auth.PasswordNotMatchException;
+import com.rental.houserental.exceptions.user.UserNotFoundException;
 import com.rental.houserental.exceptions.user.UserSuspendedException;
 import com.rental.houserental.exceptions.user.UserBannedException;
 import com.rental.houserental.repository.UserRepository;
@@ -20,7 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
-import java.util.Random;
+import static com.rental.houserental.constant.OtpConstants.*;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +35,6 @@ public class AuthServiceImpl implements AuthService {
     private final RedisTemplate<String, String> redisTemplate;
     private final UserService userService;
     private final OtpService otpService;
-    private static final String OTP_PREFIX = "otp:";
 
     @Override
     @Transactional
@@ -57,45 +58,52 @@ public class AuthServiceImpl implements AuthService {
         return user;
     }
 
-
     @Override
     @Transactional
     public boolean verifyOtp(String email, String otp) {
         String key = OTP_PREFIX + email;
-        String failKey = "otp:fail:" + email;
+        String failKey = OTP_FAIL_PREFIX + email;
         String storedOtp = redisTemplate.opsForValue().get(key);
         if (storedOtp == null || !storedOtp.equals(otp)) {
             String failCountStr = redisTemplate.opsForValue().get(failKey);
             int failCount = 0;
             if (failCountStr != null) {
-                try { failCount = Integer.parseInt(failCountStr); } catch (Exception ignored) {}
+                try {
+                    failCount = Integer.parseInt(failCountStr);
+                } catch (NumberFormatException ignored) {
+                    log.warn("Failed to parse failCountStr: {}", failCountStr);
+                }
             }
             failCount++;
-            Long expire = redisTemplate.getExpire(key);
-            if (expire == null || expire <= 0) expire = 600L;
+            long expire = redisTemplate.getExpire(key);
+            if (expire <= 0) expire = 600L;
             redisTemplate.opsForValue().set(failKey, String.valueOf(failCount), Duration.ofSeconds(expire));
             if (failCount >= 3) {
                 redisTemplate.delete(key);
                 redisTemplate.delete(failKey);
-                redisTemplate.delete("otp:exp:" + email);
+                redisTemplate.delete(OTP_EXP_PREFIX + email);
             }
             return false;
         }
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userService.findByEmail(email);
         user.setStatus(UserStatus.ACTIVE);
         userRepository.save(user);
         redisTemplate.delete(key);
         redisTemplate.delete(failKey);
-        redisTemplate.delete("otp:exp:" + email);
+        redisTemplate.delete(OTP_EXP_PREFIX + email);
         return true;
     }
 
-//    @Override
-//    @Transactional
-//    public void resendVerificationEmail(String email) {
-//        sendOtpForVerification(email);
-//    }
+    @Override
+    @Transactional
+    public void resendOtp(String email) {
+        User user = userService.findByEmail(email);
+        if (user.getStatus() == UserStatus.ACTIVE) {
+            throw new EmailAlreadyVerifiedException("Email already verified");
+        }
+        // Gửi lại OTP (sẽ reset fail count về 0)
+        otpService.sendOtpForVerification(email);
+    }
 
     @Override
     @Transactional

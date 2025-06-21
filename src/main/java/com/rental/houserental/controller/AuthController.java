@@ -77,18 +77,20 @@ public class AuthController {
         OtpRequestDTO otpRequest = (OtpRequestDTO) model.asMap().get(OTP_REQUEST);
         if (otpRequest == null) {
             otpRequest = new OtpRequestDTO();
-            if (email != null) otpRequest.setEmail(email);
+        }
+        // Nếu có email từ query param, dùng nó (ưu tiên cao nhất)
+        if (email != null && !email.isEmpty()) {
+            otpRequest.setEmail(email);
         }
         model.addAttribute(OTP_REQUEST, otpRequest);
         String usedEmail = otpRequest.getEmail();
-        if (usedEmail != null) {
+        if (usedEmail != null && !usedEmail.isEmpty()) {
             String expStr = redisTemplate.opsForValue().get(OTP_EXP_PREFIX + usedEmail);
             String failStr = redisTemplate.opsForValue().get(OTP_FAIL_PREFIX + usedEmail);
             model.addAttribute(OTP_EXPIRE, expStr);
             model.addAttribute(OTP_FAIL_COUNT, failStr);
-            model.addAttribute(EMAIL, usedEmail);
         }
-        return "verify-otp";
+        return VERIFY_OTP;
     }
 
     @PostMapping("/verify-otp")
@@ -111,13 +113,13 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/resend-verification")
+    @PostMapping("/resend-otp")
     public String resendVerification(@RequestParam String email, RedirectAttributes redirectAttributes) {
         try {
-            authService.register(new RegisterRequestDTO(null, email, "dummyPass", "dummyPass"));
-            redirectAttributes.addFlashAttribute("message", "Verification code has been resent. Please check your inbox.");
+            authService.resendOtp(email);
+            redirectAttributes.addFlashAttribute(MESSAGE, "Verification code has been resent. Please check your inbox.");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            redirectAttributes.addFlashAttribute(ERROR, e.getMessage());
         }
         return "redirect:/verify-otp?email=" + email;
     }

@@ -23,6 +23,7 @@
         <span th:text="${message}"></span>
     </div>
 
+    <!-- OTP Verification Form -->
     <form th:action="@{/verify-otp}" th:object="${otpRequest}" method="post" class="space-y-6">
         <input type="hidden" th:field="*{email}" id="email-hidden"/>
 
@@ -52,12 +53,18 @@
             <span id="otp-timer" class="text-sm text-gray-500" th:attr="data-expire=${otpExpire}"></span>
             <span id="otp-attempts" class="text-sm text-red-500" th:attr="data-failcount=${otpFailCount}"></span>
         </div>
-
-        <p class="text-sm text-center text-gray-600">
-            Didn't receive the code?
-            <a th:href="@{'/resend-verification'(email=*{email})}" class="text-blue-600 hover:underline">Resend code</a>
-        </p>
     </form>
+
+    <!-- Resend OTP Form -->
+    <div class="text-center">
+        <p class="text-sm text-gray-600 mb-2">Didn't receive the code?</p>
+        <form th:action="@{/resend-otp}" method="post">
+            <input type="hidden" name="email" th:value="${otpRequest.email}" />
+            <button type="submit" class="text-blue-600 hover:underline bg-transparent border-none cursor-pointer text-sm">
+                Resend code
+            </button>
+        </form>
+    </div>
 </div>
 
 <script th:src="@{/js/verify-otp.js}"></script>

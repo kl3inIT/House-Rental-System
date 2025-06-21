@@ -63,6 +63,13 @@ public class GlobalExceptionHandler {
         return REDIRECT_REGISTER;
     }
 
+    @ExceptionHandler(UserNotFoundException.class)
+    public String handleUserNotFoundException(UserNotFoundException ex, RedirectAttributes redirectAttributes) {
+        log.warn("User not found: {}", ex.getMessage());
+        redirectAttributes.addFlashAttribute(ERROR, "User not found. Please register first.");
+        return REDIRECT_REGISTER;
+    }
+
     //generic phải để cuối để bắt hết được lỗi
     @ExceptionHandler(Exception.class)
     public String handleGenericException(Exception ex, Model model) {
