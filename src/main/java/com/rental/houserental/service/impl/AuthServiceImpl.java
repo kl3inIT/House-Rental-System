@@ -59,14 +59,18 @@ public class AuthServiceImpl implements AuthService {
         return user;
     }
 
-    
 
     @Override
     public boolean verifyOtp(String email, String otp) {
         String key = OTP_PREFIX + email;
         String failKey = OTP_FAIL_PREFIX + email;
         String storedOtp = redisTemplate.opsForValue().get(key);
-        if (storedOtp == null || !storedOtp.equals(otp)) {
+
+        if (storedOtp == null) {
+            throw new OtpNotFoundException("OTP not found for email: " + email, email);
+        }
+
+        if (!storedOtp.equals(otp)) {
             String failCountStr = redisTemplate.opsForValue().get(failKey);
             int failCount = 0;
             if (failCountStr != null) {
@@ -80,19 +84,27 @@ public class AuthServiceImpl implements AuthService {
             long expire = redisTemplate.getExpire(key);
             if (expire <= 0) expire = 600L;
             redisTemplate.opsForValue().set(failKey, String.valueOf(failCount), Duration.ofSeconds(expire));
+
             if (failCount >= 3) {
+                // Delete all OTP related keys when max attempts reached
                 redisTemplate.delete(key);
                 redisTemplate.delete(failKey);
                 redisTemplate.delete(OTP_EXP_PREFIX + email);
+                throw new MaxAttemptsReachedException("Maximum OTP attempts reached for email: " + email, email);
             }
-            return false;
+
+            throw new InvalidOtpException("Invalid OTP for email: " + email, email);
         }
+
+        // Valid OTP - verify user
         User user = userService.findByEmail(email);
         if (user == null) {
             throw new UserNotFoundException("User not found with email: " + email, REDIRECT_VERIFY_OTP);
         }
         user.setStatus(UserStatus.ACTIVE);
         userRepository.save(user);
+
+        // Clean up all OTP related keys
         redisTemplate.delete(key);
         redisTemplate.delete(failKey);
         redisTemplate.delete(OTP_EXP_PREFIX + email);

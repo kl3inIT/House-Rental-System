@@ -32,15 +32,15 @@ public class AuthController {
 
     @GetMapping("/login")
     public String loginPage(Model model, LoginPageRequestDTO pageRequest) {
-        
+
         // Add login request DTO for form binding
         if (!model.containsAttribute(LOGIN_REQUEST)) {
             model.addAttribute(LOGIN_REQUEST, new LoginRequestDTO());
         }
-        
+
         // Add page request for message handling
         model.addAttribute("pageRequest", pageRequest);
-        
+
         return LOGIN;
     }
 
@@ -72,7 +72,7 @@ public class AuthController {
 
     @GetMapping("/verify-otp")
     public String showVerifyOtp(Model model, @RequestParam(required = false) String email) {
-        // Kiểm tra xem có OTP Request nếu người dùng reload trang
+        // Kiểm tra xem có OTP Request nếu người dùng reload trang hoặc redirect từ exception
         OtpRequestDTO otpRequest = (OtpRequestDTO) model.asMap().get(OTP_REQUEST);
         if (otpRequest == null) {
             otpRequest = new OtpRequestDTO();
@@ -82,12 +82,14 @@ public class AuthController {
             otpRequest.setEmail(email);
         }
         model.addAttribute(OTP_REQUEST, otpRequest);
+
         String usedEmail = otpRequest.getEmail();
         if (usedEmail != null && !usedEmail.isEmpty()) {
             String expStr = redisTemplate.opsForValue().get(OTP_EXP_PREFIX + usedEmail);
             String failStr = redisTemplate.opsForValue().get(OTP_FAIL_PREFIX + usedEmail);
+
             model.addAttribute(OTP_EXPIRE, expStr);
-            model.addAttribute(OTP_FAIL_COUNT, failStr);
+            model.addAttribute(OTP_FAIL_COUNT, failStr != null ? failStr : "0");
         }
         return VERIFY_OTP;
     }
@@ -102,20 +104,22 @@ public class AuthController {
             redirectAttributes.addFlashAttribute(OTP_REQUEST, request);
             return redirectVerifyOtpWithEmail(email);
         }
+
         if (authService.verifyOtp(email, request.getOtp())) {
             redirectAttributes.addFlashAttribute(MESSAGE, "Email verified successfully! You can now login.");
             return REDIRECT_LOGIN;
-        } else {
-            redirectAttributes.addFlashAttribute(ERROR, "Invalid or expired OTP. Please try again.");
-            redirectAttributes.addFlashAttribute(OTP_REQUEST, request);
-            return redirectVerifyOtpWithEmail(email);
         }
+
+        // This should not be reached as exceptions will be thrown for invalid cases
+        redirectAttributes.addFlashAttribute(ERROR, "An unexpected error occurred. Please try again.");
+        redirectAttributes.addFlashAttribute(OTP_REQUEST, request);
+        return redirectVerifyOtpWithEmail(email);
     }
 
     @PostMapping("/resend-otp")
     public String resendOtp(@RequestParam String email, RedirectAttributes redirectAttributes) {
-            authService.resendOtp(email);
-            redirectAttributes.addFlashAttribute(MESSAGE, "Verification code has been resent. Please check your inbox.");
+        authService.resendOtp(email);
+        redirectAttributes.addFlashAttribute(MESSAGE, "Verification code has been resent. Please check your inbox.");
         return redirectVerifyOtpWithEmail(email);
     }
 

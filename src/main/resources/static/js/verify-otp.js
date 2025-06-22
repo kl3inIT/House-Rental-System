@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
     const inputs = document.querySelectorAll('.otp-input');
     const hiddenInput = document.getElementById('otp');
+    const submitButton = document.getElementById('verify-button');
 
     if (inputs.length > 0) inputs[0].focus();
 
@@ -85,13 +86,15 @@ document.addEventListener("DOMContentLoaded", function () {
         hiddenInput.value = Array.from(inputs).map(input => input.value).join('');
     }
 
-    // Hiển thị đồng hồ đếm ngược và số lần nhập sai OTP (từ Thymeleaf, lấy qua data-attribute hoặc hidden input)
+    // Hiển thị đồng hồ đếm ngược và số lần nhập sai OTP
     (function () {
         const timerSpan = document.getElementById('otp-timer');
         const attemptsSpan = document.getElementById('otp-attempts');
+        
         // Lấy giá trị từ attribute data- hoặc hidden input
         let otpExpire = timerSpan ? timerSpan.getAttribute('data-expire') : null;
         let otpFailCount = attemptsSpan ? attemptsSpan.getAttribute('data-failcount') : null;
+        
         if (!otpExpire) {
             // Thử lấy từ input hidden nếu có
             const expireInput = document.getElementById('otp-expire');
@@ -101,11 +104,36 @@ document.addEventListener("DOMContentLoaded", function () {
             const failInput = document.getElementById('otp-failcount');
             if (failInput) otpFailCount = failInput.value;
         }
+        
         if (!timerSpan || !attemptsSpan) return;
+        
         let timerInterval = null;
-        let attemptsLeft = 3 - (parseInt(otpFailCount) || 0);
+        let failCount = parseInt(otpFailCount) || 0;
+        let attemptsLeft = Math.max(0, 3 - failCount);
+        
+        // Update attempts display - luôn hiển thị số attempts còn lại
         attemptsSpan.textContent = `Attempts left: ${attemptsLeft}`;
-        if (otpExpire && otpExpire !== '0') {
+        if (attemptsLeft > 0) {
+            attemptsSpan.className = 'text-sm text-yellow-600';
+        } else {
+            attemptsSpan.className = 'text-sm text-red-600 font-medium';
+            
+            // Disable form when no attempts left
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.textContent = 'Request New Code';
+                submitButton.className = 'w-full py-2 px-4 bg-gray-400 text-white font-medium rounded-md cursor-not-allowed';
+            }
+            
+            // Disable OTP inputs
+            inputs.forEach(input => {
+                input.disabled = true;
+                input.className += ' bg-gray-100 cursor-not-allowed';
+            });
+        }
+        
+        // Timer logic
+        if (otpExpire && otpExpire !== '0' && attemptsLeft > 0) {
             function updateTimer() {
                 const now = Date.now();
                 const diff = parseInt(otpExpire) - now;
@@ -115,13 +143,22 @@ document.addEventListener("DOMContentLoaded", function () {
                     timerSpan.textContent = `OTP expires in: ${min}:${sec.toString().padStart(2, '0')}`;
                 } else {
                     timerSpan.textContent = 'OTP expired. Please resend.';
+                    timerSpan.className = 'text-sm text-red-500';
                     clearInterval(timerInterval);
+                    
+                    // Disable form when expired
+                    if (submitButton) {
+                        submitButton.disabled = true;
+                        submitButton.textContent = 'Request New Code';
+                        submitButton.className = 'w-full py-2 px-4 bg-gray-400 text-white font-medium rounded-md cursor-not-allowed';
+                    }
                 }
             }
             updateTimer();
             timerInterval = setInterval(updateTimer, 1000);
         } else {
             timerSpan.textContent = 'OTP expired. Please resend.';
+            timerSpan.className = 'text-sm text-red-500';
         }
     })();
 });
