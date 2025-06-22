@@ -87,6 +87,28 @@ public class GlobalExceptionHandler {
         return REDIRECT_LOGIN;
     }
 
+    @ExceptionHandler(OtpNotFoundException.class)
+    public String handleOtpNotFoundException(OtpNotFoundException ex, RedirectAttributes redirectAttributes) {
+        log.warn("OTP not found: {}", ex.getMessage());
+        redirectAttributes.addFlashAttribute(ERROR, "Verification code not found or expired. Please request a new code.");
+        return redirectVerifyOtpWithEmail(ex.getEmail());
+    }
+
+    @ExceptionHandler(InvalidOtpException.class)
+    public String handleInvalidOtpException(InvalidOtpException ex, RedirectAttributes redirectAttributes) {
+        log.warn("Invalid OTP: {}", ex.getMessage());
+        redirectAttributes.addFlashAttribute(ERROR, "Invalid verification code. Please try again.");
+        return redirectVerifyOtpWithEmail(ex.getEmail());
+    }
+
+    @ExceptionHandler(MaxAttemptsReachedException.class)
+    public String handleMaxAttemptsReachedException(MaxAttemptsReachedException ex, RedirectAttributes redirectAttributes) {
+        log.warn("Max attempts reached: {}", ex.getMessage());
+        redirectAttributes.addFlashAttribute(ERROR, "Too many incorrect attempts. Please request a new verification code.");
+        
+        return redirectVerifyOtpWithEmail(ex.getEmail());
+    }
+
     //generic phải để cuối để bắt hết được lỗi
     @ExceptionHandler(Exception.class)
     public String handleGenericException(Exception ex, Model model) {
