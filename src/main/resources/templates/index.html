@@ -60,43 +60,6 @@
         </div>
     </section>
 
-    <!-- Quick Actions for Authenticated Users -->
-    <section sec:authorize="isAuthenticated()" class="py-8 bg-blue-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- User Quick Actions -->
-                <div sec:authorize="hasRole('USER')" class="bg-white p-6 rounded-lg shadow-md text-center hover:shadow-lg transition-shadow duration-300">
-                    <i class="fas fa-heart text-blue-600 text-3xl mb-3"></i>
-                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Saved Properties</h3>
-                    <p class="text-gray-600 mb-4">View your favorite listings</p>
-                    <a th:href="@{/user/favorites}" class="inline-block bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200">
-                        View Favorites
-                    </a>
-                </div>
-                
-                <!-- Landlord Quick Actions -->
-                <div sec:authorize="hasRole('LANDLORD')" class="bg-white p-6 rounded-lg shadow-md text-center hover:shadow-lg transition-shadow duration-300">
-                    <i class="fas fa-plus-circle text-green-600 text-3xl mb-3"></i>
-                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Add Property</h3>
-                    <p class="text-gray-600 mb-4">List a new rental property</p>
-                    <a th:href="@{/landlord/properties/add}" class="inline-block bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors duration-200">
-                        Add Property
-                    </a>
-                </div>
-                
-                <!-- Admin Quick Actions -->
-                <div sec:authorize="hasRole('ADMIN')" class="bg-white p-6 rounded-lg shadow-md text-center hover:shadow-lg transition-shadow duration-300">
-                    <i class="fas fa-chart-line text-purple-600 text-3xl mb-3"></i>
-                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Analytics</h3>
-                    <p class="text-gray-600 mb-4">View platform statistics</p>
-                    <a th:href="@{/admin/analytics}" class="inline-block bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors duration-200">
-                        View Analytics
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <!-- Featured Properties -->
     <section class="py-16">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -108,7 +71,9 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <!-- Example card -->
                 <div class="bg-white rounded-lg shadow-md hover:shadow-xl overflow-hidden transition-shadow duration-300">
-                    <img src="/placeholder.svg?height=200&width=300" alt="Property" class="w-full h-48 object-cover">
+                    <div class="w-full h-48 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+                        <i class="fas fa-home text-4xl text-gray-400"></i>
+                    </div>
                     <div class="p-6">
                         <div class="flex justify-between items-start mb-2">
                             <h3 class="text-xl font-semibold text-gray-900">Modern Apartment</h3>
@@ -242,7 +207,9 @@
                     </div>
                     <div class="space-y-3">
                         <div class="flex items-center p-3 bg-gray-50 rounded-md">
-                            <img src="/placeholder.svg?height=60&width=80" alt="Property" class="w-16 h-12 object-cover rounded mr-3">
+                            <div class="w-16 h-12 bg-gradient-to-br from-blue-200 to-blue-300 rounded mr-3 flex items-center justify-center">
+                                <i class="fas fa-building text-blue-500 text-sm"></i>
+                            </div>
                             <div class="flex-1">
                                 <p class="font-medium text-gray-900">Luxury Downtown Loft</p>
                                 <p class="text-sm text-gray-600">$2,200/month • 95% match</p>
@@ -252,7 +219,9 @@
                             </button>
                         </div>
                         <div class="flex items-center p-3 bg-gray-50 rounded-md">
-                            <img src="/placeholder.svg?height=60&width=80" alt="Property" class="w-16 h-12 object-cover rounded mr-3">
+                            <div class="w-16 h-12 bg-gradient-to-br from-green-200 to-green-300 rounded mr-3 flex items-center justify-center">
+                                <i class="fas fa-home text-green-500 text-sm"></i>
+                            </div>
                             <div class="flex-1">
                                 <p class="font-medium text-gray-900">Modern Studio</p>
                                 <p class="text-sm text-gray-600">$1,800/month • 88% match</p>
