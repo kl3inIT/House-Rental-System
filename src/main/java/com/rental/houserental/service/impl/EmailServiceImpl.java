@@ -26,7 +26,7 @@ public class EmailServiceImpl implements EmailService {
         Context context = new Context();
         context.setVariable("user", user);
         context.setVariable("otpMessage", otp);
-        String emailContent = templateEngine.process("verify-email", context);
+        String emailContent = templateEngine.process("email/verify-email", context);
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -60,7 +60,7 @@ public class EmailServiceImpl implements EmailService {
             log.info("Password reset email sent to: {}", to);
         } catch (MessagingException e) {
             log.error("Failed to send password reset email to: {}", to, e);
-            throw new RuntimeException("Failed to send password reset email", e);
+            throw new FaildToSendEmailException("Failed to send password reset email");
         }
     }
 }

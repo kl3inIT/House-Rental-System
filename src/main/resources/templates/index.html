@@ -13,9 +13,10 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <!-- Welcome message for authenticated users -->
             <div sec:authorize="isAuthenticated()" class="mb-4">
-                <p class="text-blue-100 text-lg">Welcome back, <span sec:authentication="name" class="font-semibold"></span>!</p>
+                <p class="text-blue-100 text-lg">Welcome back, <span sec:authentication="name"
+                                                                     class="font-semibold"></span>!</p>
             </div>
-            
+
             <h1 class="text-4xl md:text-6xl font-bold mb-6">
                 <span sec:authorize="!isAuthenticated()">Find Your Perfect Home</span>
                 <span sec:authorize="isAuthenticated()">Continue Your Search</span>
@@ -80,7 +81,8 @@
                             <div class="flex items-center space-x-2">
                                 <span class="text-2xl font-bold text-blue-600">$1,800</span>
                                 <!-- Heart icon for authenticated users -->
-                                <button sec:authorize="isAuthenticated()" class="text-gray-400 hover:text-red-500 transition-colors duration-200 p-1">
+                                <button sec:authorize="isAuthenticated()"
+                                        class="text-gray-400 hover:text-red-500 transition-colors duration-200 p-1">
                                     <i class="far fa-heart text-lg"></i>
                                 </button>
                             </div>
@@ -140,13 +142,14 @@
     <section sec:authorize="!isAuthenticated()" class="bg-blue-600 py-16">
         <div class="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
             <h2 class="text-3xl font-bold text-white mb-4">Ready to Find Your Perfect Home?</h2>
-            <p class="text-xl text-blue-100 mb-8">Join thousands of satisfied renters who found their dream properties with RentEase</p>
+            <p class="text-xl text-blue-100 mb-8">Join thousands of satisfied renters who found their dream properties
+                with RentEase</p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a th:href="@{/register}" 
+                <a th:href="@{/register}"
                    class="bg-white text-blue-600 px-8 py-3 rounded-md font-semibold hover:bg-gray-100 transition-colors duration-200 shadow-sm">
                     <i class="fas fa-user-plus mr-2"></i>Get Started - It's Free
                 </a>
-                <a th:href="@{/properties}" 
+                <a th:href="@{/properties}"
                    class="border border-white text-white px-8 py-3 rounded-md font-semibold hover:bg-blue-700 transition-colors duration-200">
                     <i class="fas fa-search mr-2"></i>Browse Properties
                 </a>
@@ -169,7 +172,8 @@
                         <h3 class="text-lg font-semibold text-gray-900">
                             <i class="fas fa-clock text-blue-600 mr-2"></i>Recent Searches
                         </h3>
-                        <a th:href="@{/user/search-history}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                        <a th:href="@{/user/search-history}"
+                           class="text-blue-600 hover:text-blue-800 text-sm font-medium">
                             View All
                         </a>
                     </div>
@@ -201,7 +205,8 @@
                         <h3 class="text-lg font-semibold text-gray-900">
                             <i class="fas fa-thumbs-up text-green-600 mr-2"></i>Recommended for You
                         </h3>
-                        <a th:href="@{/user/recommendations}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                        <a th:href="@{/user/recommendations}"
+                           class="text-blue-600 hover:text-blue-800 text-sm font-medium">
                             View All
                         </a>
                     </div>
