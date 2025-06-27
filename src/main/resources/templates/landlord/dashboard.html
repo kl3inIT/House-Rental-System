@@ -1,259 +1,187 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Landlord Dashboard - RentEase</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
-<body class="bg-gray-50">
-<!-- Navigation -->
-<nav class="bg-white shadow-lg sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-            <div class="flex items-center">
-                <a href="../index.html" class="text-2xl font-bold text-blue-600">RentEase</a>
-                <span class="ml-4 px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">Landlord</span>
-            </div>
-            <div class="hidden md:flex items-center space-x-8">
-                <a href="#" class="text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
-                <a href="listings.html" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">My Properties</a>
-                <a href="requests.html" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Requests</a>
-                <div class="relative">
-                    <button class="flex items-center text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
-                        <div class="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center text-white text-sm font-semibold mr-2">
-                            S
-                        </div>
-                        Sarah Johnson
-                        <i class="fas fa-chevron-down ml-1"></i>
-                    </button>
+<body>
+<main layout:fragment="content">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Welcome Section -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2" 
+                th:text="'Welcome back, ' + ${#authentication.name} + '!'">Welcome back!</h1>
+            <p class="text-gray-600">Here's what's happening with your properties today.</p>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-200">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                        <i class="fas fa-home text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Total Properties</p>
+                        <p class="text-2xl font-bold text-gray-900" th:text="${dashboardStats.totalProperties ?: 0}">0</p>
+                    </div>
                 </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-200">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-green-100 text-green-600">
+                        <i class="fas fa-check-circle text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Occupied</p>
+                        <p class="text-2xl font-bold text-gray-900" th:text="${dashboardStats.occupiedProperties ?: 0}">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-200">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
+                        <i class="fas fa-clock text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Pending Requests</p>
+                        <p class="text-2xl font-bold text-gray-900" th:text="${dashboardStats.pendingRequests ?: 0}">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-200">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-purple-100 text-purple-600">
+                        <i class="fas fa-dollar-sign text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Monthly Revenue</p>
+                        <p class="text-2xl font-bold text-gray-900" th:text="'$' + ${#numbers.formatDecimal(dashboardStats.monthlyRevenue ?: 0, 1, 'COMMA', 0, 'POINT')}">$0</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Recent Requests -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-bold text-gray-900">Recent Requests</h2>
+                    <a th:href="@{/landlord/requests}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">View All</a>
+                </div>
+
+                <div class="space-y-4" th:if="${recentRequests != null and !#lists.isEmpty(recentRequests)}">
+                    <div th:each="request : ${recentRequests}" class="border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow duration-200">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <h3 class="font-semibold text-gray-900" th:text="${request.tenantName}">Tenant Name</h3>
+                                <p class="text-sm text-gray-600" th:text="${request.propertyName}">Property Name</p>
+                            </div>
+                            <span th:class="'px-2 py-1 text-xs rounded-full ' + (${request.status == 'PENDING'} ? 'bg-yellow-100 text-yellow-800' : (${request.status == 'APPROVED'} ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'))"
+                                  th:text="${request.status}">Status</span>
+                        </div>
+                        <p class="text-sm text-gray-700 mb-3" th:text="${request.message}">Request message</p>
+                        <div class="flex space-x-2" th:if="${request.status == 'PENDING'}">
+                            <button class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition-colors duration-200">Accept</button>
+                            <button class="px-3 py-1 bg-gray-600 text-white text-sm rounded hover:bg-gray-700 transition-colors duration-200">Decline</button>
+                            <button class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors duration-200">Message</button>
+                        </div>
+                        <div class="flex space-x-2" th:unless="${request.status == 'PENDING'}">
+                            <button class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors duration-200">View Details</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Empty state -->
+                <div th:if="${recentRequests == null or #lists.isEmpty(recentRequests)}" class="text-center py-8">
+                    <i class="fas fa-inbox text-4xl text-gray-300 mb-4"></i>
+                    <p class="text-gray-500">No recent requests</p>
+                </div>
+            </div>
+
+            <!-- Property Performance -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-bold text-gray-900">Property Performance</h2>
+                    <select class="text-sm border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option>Last 30 days</option>
+                        <option>Last 3 months</option>
+                        <option>Last year</option>
+                    </select>
+                </div>
+
+                <div class="space-y-4" th:if="${propertyPerformance != null and !#lists.isEmpty(propertyPerformance)}">
+                    <div th:each="property : ${propertyPerformance}" class="border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow duration-200">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <h3 class="font-semibold text-gray-900" th:text="${property.name}">Property Name</h3>
+                                <p class="text-sm text-gray-600" th:text="${property.address}">Property Address</p>
+                            </div>
+                            <span th:class="'text-lg font-bold ' + (${property.isOccupied} ? 'text-green-600' : 'text-blue-600')"
+                                  th:text="'$' + ${#numbers.formatDecimal(property.rent, 1, 'COMMA', 0, 'POINT')}">$0</span>
+                        </div>
+                        <div class="flex justify-between text-sm text-gray-600 mb-2">
+                            <span th:text="'Occupancy: ' + ${property.isOccupied ? '100%' : '0% (Available)'}">Occupancy status</span>
+                            <span th:text="'Views: ' + ${property.monthlyViews} + ' this month'">Views count</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div th:class="'h-2 rounded-full transition-all duration-300 ' + (${property.isOccupied} ? 'bg-green-600' : 'bg-yellow-500')"
+                                 th:style="'width: ' + (${property.isOccupied} ? '100' : ${property.interestLevel}) + '%'"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Empty state -->
+                <div th:if="${propertyPerformance == null or #lists.isEmpty(propertyPerformance)}" class="text-center py-8">
+                    <i class="fas fa-chart-line text-4xl text-gray-300 mb-4"></i>
+                    <p class="text-gray-500">No properties to display</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="mt-8 bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-bold text-gray-900 mb-6">Quick Actions</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <a th:href="@{/landlord/properties/new}" 
+                   class="flex items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all duration-200 group">
+                    <div class="text-center">
+                        <i class="fas fa-plus text-2xl text-gray-400 group-hover:text-blue-500 mb-2 transition-colors duration-200"></i>
+                        <p class="text-sm font-medium text-gray-600 group-hover:text-blue-600">Add New Property</p>
+                    </div>
+                </a>
+
+                <a th:href="@{/landlord/properties}" 
+                   class="flex items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all duration-200 group">
+                    <div class="text-center">
+                        <i class="fas fa-edit text-2xl text-gray-400 group-hover:text-blue-500 mb-2 transition-colors duration-200"></i>
+                        <p class="text-sm font-medium text-gray-600 group-hover:text-blue-600">Manage Properties</p>
+                    </div>
+                </a>
+
+                <a th:href="@{/landlord/requests}" 
+                   class="flex items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all duration-200 group">
+                    <div class="text-center">
+                        <i class="fas fa-envelope text-2xl text-gray-400 group-hover:text-blue-500 mb-2 transition-colors duration-200"></i>
+                        <p class="text-sm font-medium text-gray-600 group-hover:text-blue-600">View All Requests</p>
+                    </div>
+                </a>
+
+                <a th:href="@{/user/profile}" 
+                   class="flex items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all duration-200 group">
+                    <div class="text-center">
+                        <i class="fas fa-user text-2xl text-gray-400 group-hover:text-blue-500 mb-2 transition-colors duration-200"></i>
+                        <p class="text-sm font-medium text-gray-600 group-hover:text-blue-600">Update Profile</p>
+                    </div>
+                </a>
             </div>
         </div>
     </div>
-</nav>
-
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <!-- Welcome Section -->
-    <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">Welcome back, Sarah!</h1>
-        <p class="text-gray-600">Here's what's happening with your properties today.</p>
-    </div>
-
-    <!-- Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <div class="flex items-center">
-                <div class="p-3 rounded-full bg-blue-100 text-blue-600">
-                    <i class="fas fa-home text-xl"></i>
-                </div>
-                <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600">Total Properties</p>
-                    <p class="text-2xl font-bold text-gray-900">12</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <div class="flex items-center">
-                <div class="p-3 rounded-full bg-green-100 text-green-600">
-                    <i class="fas fa-check-circle text-xl"></i>
-                </div>
-                <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600">Occupied</p>
-                    <p class="text-2xl font-bold text-gray-900">9</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <div class="flex items-center">
-                <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
-                    <i class="fas fa-clock text-xl"></i>
-                </div>
-                <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600">Pending Requests</p>
-                    <p class="text-2xl font-bold text-gray-900">5</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <div class="flex items-center">
-                <div class="p-3 rounded-full bg-purple-100 text-purple-600">
-                    <i class="fas fa-dollar-sign text-xl"></i>
-                </div>
-                <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600">Monthly Revenue</p>
-                    <p class="text-2xl font-bold text-gray-900">$18,400</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <!-- Recent Requests -->
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-bold text-gray-900">Recent Requests</h2>
-                <a href="requests.html" class="text-blue-600 hover:text-blue-800 text-sm">View All</a>
-            </div>
-
-            <div class="space-y-4">
-                <!-- Request 1 -->
-                <div class="border border-gray-200 rounded-lg p-4">
-                    <div class="flex justify-between items-start mb-2">
-                        <div>
-                            <h3 class="font-semibold text-gray-900">Michael Chen</h3>
-                            <p class="text-sm text-gray-600">Downtown Apartment - Unit 4B</p>
-                        </div>
-                        <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">Pending</span>
-                    </div>
-                    <p class="text-sm text-gray-700 mb-3">Interested in viewing the property this weekend. Available Saturday afternoon.</p>
-                    <div class="flex space-x-2">
-                        <button class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700">Accept</button>
-                        <button class="px-3 py-1 bg-gray-600 text-white text-sm rounded hover:bg-gray-700">Decline</button>
-                        <button class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700">Message</button>
-                    </div>
-                </div>
-
-                <!-- Request 2 -->
-                <div class="border border-gray-200 rounded-lg p-4">
-                    <div class="flex justify-between items-start mb-2">
-                        <div>
-                            <h3 class="font-semibold text-gray-900">Emily Rodriguez</h3>
-                            <p class="text-sm text-gray-600">Suburban House - 123 Oak St</p>
-                        </div>
-                        <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">Pending</span>
-                    </div>
-                    <p class="text-sm text-gray-700 mb-3">Looking to move in next month. Has excellent references and stable income.</p>
-                    <div class="flex space-x-2">
-                        <button class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700">Accept</button>
-                        <button class="px-3 py-1 bg-gray-600 text-white text-sm rounded hover:bg-gray-700">Decline</button>
-                        <button class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700">Message</button>
-                    </div>
-                </div>
-
-                <!-- Request 3 -->
-                <div class="border border-gray-200 rounded-lg p-4">
-                    <div class="flex justify-between items-start mb-2">
-                        <div>
-                            <h3 class="font-semibold text-gray-900">David Kim</h3>
-                            <p class="text-sm text-gray-600">Studio Apartment - Unit 2A</p>
-                        </div>
-                        <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Approved</span>
-                    </div>
-                    <p class="text-sm text-gray-700 mb-3">Application approved. Lease signing scheduled for tomorrow.</p>
-                    <div class="flex space-x-2">
-                        <button class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700">View Details</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Property Performance -->
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-bold text-gray-900">Property Performance</h2>
-                <select class="text-sm border border-gray-300 rounded px-2 py-1">
-                    <option>Last 30 days</option>
-                    <option>Last 3 months</option>
-                    <option>Last year</option>
-                </select>
-            </div>
-
-            <div class="space-y-4">
-                <!-- Property 1 -->
-                <div class="border border-gray-200 rounded-lg p-4">
-                    <div class="flex justify-between items-start mb-2">
-                        <div>
-                            <h3 class="font-semibold text-gray-900">Downtown Apartment</h3>
-                            <p class="text-sm text-gray-600">123 Main St, Unit 4B</p>
-                        </div>
-                        <span class="text-lg font-bold text-green-600">$1,800</span>
-                    </div>
-                    <div class="flex justify-between text-sm text-gray-600 mb-2">
-                        <span>Occupancy: 100%</span>
-                        <span>Views: 45 this month</span>
-                    </div>
-                    <div class="w-full bg-gray-200 rounded-full h-2">
-                        <div class="bg-green-600 h-2 rounded-full" style="width: 100%"></div>
-                    </div>
-                </div>
-
-                <!-- Property 2 -->
-                <div class="border border-gray-200 rounded-lg p-4">
-                    <div class="flex justify-between items-start mb-2">
-                        <div>
-                            <h3 class="font-semibold text-gray-900">Suburban House</h3>
-                            <p class="text-sm text-gray-600">456 Oak Ave</p>
-                        </div>
-                        <span class="text-lg font-bold text-blue-600">$2,200</span>
-                    </div>
-                    <div class="flex justify-between text-sm text-gray-600 mb-2">
-                        <span>Occupancy: 0% (Available)</span>
-                        <span>Views: 23 this month</span>
-                    </div>
-                    <div class="w-full bg-gray-200 rounded-full h-2">
-                        <div class="bg-yellow-500 h-2 rounded-full" style="width: 60%"></div>
-                    </div>
-                </div>
-
-                <!-- Property 3 -->
-                <div class="border border-gray-200 rounded-lg p-4">
-                    <div class="flex justify-between items-start mb-2">
-                        <div>
-                            <h3 class="font-semibold text-gray-900">Studio Apartment</h3>
-                            <p class="text-sm text-gray-600">789 Pine St, Unit 2A</p>
-                        </div>
-                        <span class="text-lg font-bold text-green-600">$1,200</span>
-                    </div>
-                    <div class="flex justify-between text-sm text-gray-600 mb-2">
-                        <span>Occupancy: 100%</span>
-                        <span>Views: 31 this month</span>
-                    </div>
-                    <div class="w-full bg-gray-200 rounded-full h-2">
-                        <div class="bg-green-600 h-2 rounded-full" style="width: 100%"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Quick Actions -->
-    <div class="mt-8 bg-white rounded-lg shadow-md p-6">
-        <h2 class="text-xl font-bold text-gray-900 mb-6">Quick Actions</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <a href="new-listing.html" class="flex items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors">
-                <div class="text-center">
-                    <i class="fas fa-plus text-2xl text-gray-400 mb-2"></i>
-                    <p class="text-sm font-medium text-gray-600">Add New Property</p>
-                </div>
-            </a>
-
-            <a href="listings.html" class="flex items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors">
-                <div class="text-center">
-                    <i class="fas fa-edit text-2xl text-gray-400 mb-2"></i>
-                    <p class="text-sm font-medium text-gray-600">Edit Properties</p>
-                </div>
-            </a>
-
-            <a href="requests.html" class="flex items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors">
-                <div class="text-center">
-                    <i class="fas fa-envelope text-2xl text-gray-400 mb-2"></i>
-                    <p class="text-sm font-medium text-gray-600">View All Requests</p>
-                </div>
-            </a>
-
-            <a href="profile.html" class="flex items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors">
-                <div class="text-center">
-                    <i class="fas fa-user text-2xl text-gray-400 mb-2"></i>
-                    <p class="text-sm font-medium text-gray-600">Update Profile</p>
-                </div>
-            </a>
-        </div>
-    </div>
-</div>
+</main>
 </body>
 </html>

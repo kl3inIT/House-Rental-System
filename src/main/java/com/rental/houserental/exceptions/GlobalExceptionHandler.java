@@ -1,6 +1,8 @@
 package com.rental.houserental.exceptions;
 
 import com.rental.houserental.exceptions.auth.*;
+import com.rental.houserental.exceptions.category.CategoryNotFoundException;
+import com.rental.houserental.exceptions.property.InvalidPropertyStatusException;
 import com.rental.houserental.exceptions.user.*;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -130,6 +132,21 @@ public class GlobalExceptionHandler {
         redirectAttributes.addFlashAttribute(ERROR, "Failed to send email. Please try again later or contact support.");
         return REDIRECT_FORGOT_PASSWORD;
     }
+
+    @ExceptionHandler(InvalidPropertyStatusException.class)
+    public String handleInvalidPropertyStatusException(InvalidPropertyStatusException ex, Model model) {
+        log.warn("Invalid property status: {}", ex.getMessage());
+        model.addAttribute(MESSAGE, "The specified property status is not valid.");
+        return GENERIC_ERROR;
+    }
+
+    @ExceptionHandler(CategoryNotFoundException.class)
+    public String handleCategoryNotFoundException(CategoryNotFoundException ex, Model model) {
+        log.warn("Category not found: {}", ex.getMessage());
+        model.addAttribute(MESSAGE, "The specified category does not exist.");
+        return GENERIC_ERROR;
+    }
+
 
     //generic phải để cuối để bắt hết được lỗi
     @ExceptionHandler(Exception.class)
