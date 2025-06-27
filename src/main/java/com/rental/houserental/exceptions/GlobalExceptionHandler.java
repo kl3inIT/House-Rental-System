@@ -10,6 +10,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import static com.rental.houserental.constant.AtrributeNameConstant.*;
 import static com.rental.houserental.constant.ViewNamesConstant.*;
+
 @ControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
@@ -67,7 +68,7 @@ public class GlobalExceptionHandler {
     public String handleUserNotFoundException(UserNotFoundException ex, RedirectAttributes redirectAttributes) {
         log.warn("User not found: {}", ex.getMessage());
         redirectAttributes.addFlashAttribute(ERROR, "User not found. Please register first.");
-        
+
         // Use the redirectPath from the exception if available, otherwise default to register
         String redirectPath = ex.getRedirectPath();
         return redirectPath != null ? redirectPath : REDIRECT_REGISTER;
@@ -105,8 +106,29 @@ public class GlobalExceptionHandler {
     public String handleMaxAttemptsReachedException(MaxAttemptsReachedException ex, RedirectAttributes redirectAttributes) {
         log.warn("Max attempts reached: {}", ex.getMessage());
         redirectAttributes.addFlashAttribute(ERROR, "Too many incorrect attempts. Please request a new verification code.");
-        
+
         return redirectVerifyOtpWithEmail(ex.getEmail());
+    }
+
+    @ExceptionHandler(TooManyPasswordResetAttemptsException.class)
+    public String handleTooManyPasswordResetAttemptsException(TooManyPasswordResetAttemptsException ex, RedirectAttributes redirectAttributes) {
+        log.warn("Too many password reset attempts: {}", ex.getMessage());
+        redirectAttributes.addFlashAttribute(ERROR, "Too many password reset requests. Please try again in 15 minutes.");
+        return REDIRECT_FORGOT_PASSWORD;
+    }
+
+    @ExceptionHandler(InvalidResetTokenException.class)
+    public String handleInvalidResetTokenException(InvalidResetTokenException ex, RedirectAttributes redirectAttributes) {
+        log.warn("Invalid reset token: {}", ex.getMessage());
+        redirectAttributes.addFlashAttribute(ERROR, "Invalid or expired reset link. Please request a new password reset.");
+        return REDIRECT_FORGOT_PASSWORD;
+    }
+
+    @ExceptionHandler(FaildToSendEmailException.class)
+    public String handleFaildToSendEmailException(FaildToSendEmailException ex, RedirectAttributes redirectAttributes) {
+        log.error("Failed to send email: {}", ex.getMessage());
+        redirectAttributes.addFlashAttribute(ERROR, "Failed to send email. Please try again later or contact support.");
+        return REDIRECT_FORGOT_PASSWORD;
     }
 
     //generic phải để cuối để bắt hết được lỗi

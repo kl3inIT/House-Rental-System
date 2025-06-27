@@ -7,7 +7,7 @@ export function toggleElement(elementId, show = true) {
 
 export function checkPasswordStrength(password) {
     const strength = {
-        length: password.length >= 8,
+        length: password.length >= 6,
         hasLetter: /[a-zA-Z]/.test(password),
         hasNumber: /\d/.test(password),
         hasUppercase: /[A-Z]/.test(password)
@@ -17,7 +17,7 @@ export function checkPasswordStrength(password) {
         score,
         isStrong: score >= 3,
         feedback: {
-            length: !strength.length ? 'At least 8 characters' : '',
+            length: !strength.length ? 'At least 6 characters' : '',
             hasLetter: !strength.hasLetter ? 'Include letters' : '',
             hasNumber: !strength.hasNumber ? 'Include numbers' : '',
             hasUppercase: !strength.hasUppercase ? 'Include an uppercase letter' : ''
