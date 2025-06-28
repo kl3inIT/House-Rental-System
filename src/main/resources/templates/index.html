@@ -67,7 +67,7 @@
                 <p class="text-gray-600 text-lg">Discover our handpicked selection of premium rental properties</p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <!-- Featured Properties from Database -->
                 <div th:each="property, iterStat : ${featuredProperties}" 
                      class="bg-white rounded-lg shadow-md hover:shadow-lg overflow-hidden transition-shadow duration-300">
@@ -127,11 +127,11 @@
                         <div class="flex items-center space-x-4 text-sm text-gray-600">
                             <span class="flex items-center">
                                 <i class="fas fa-bed mr-1 text-xs"></i>
-                                <span th:text="${property.bedrooms == 0 ? 'Studio' : property.bedrooms + ' phòng ngủ'}">Beds</span>
+                                <span th:text="${property.bedrooms == 0 ? 'Studio' : property.bedrooms + ' bedrooms'}">Beds</span>
                             </span>
                             <span class="flex items-center">
                                 <i class="fas fa-bath mr-1 text-xs"></i>
-                                <span th:text="${property.bathrooms + ' - ' + (property.bathrooms + 1) + ' khách'}">Baths</span>
+                                <span th:text="${property.bathrooms + ' bathrooms'}">Baths</span>
                             </span>
                         </div>
                         
