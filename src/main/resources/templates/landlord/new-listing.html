@@ -156,7 +156,7 @@
             <div class="bg-white rounded-lg shadow-md p-6">
                 <h2 class="text-xl font-semibold text-gray-900 mb-6">Property Images</h2>
 
-                <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center" id="upload-area">
                     <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"></i>
                     <p class="text-lg text-gray-600 mb-2">Drag and drop images here, or click to select</p>
                     <p class="text-sm text-gray-500 mb-4">Upload up to 10 images (JPG, PNG, max 5MB each)</p>
@@ -174,9 +174,34 @@
                 <div class="validation-error text-red-600 text-sm mt-2 hidden"></div>
 
                 <!-- Preview area for selected images -->
-                <div id="image-preview" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mt-4 hidden">
-                    <!-- Images will be previewed here via JavaScript -->
+                <div id="image-preview" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4 hidden">
+                    <!-- Images will be previewed here via JavaScript with individual remove buttons -->
                 </div>
+
+                <!-- Template for image preview item (hidden, used by JavaScript) -->
+                <template id="image-preview-template">
+                    <div class="relative group bg-gray-100 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+                        <img class="w-full h-80 object-cover rounded-lg" alt="Preview">
+                        
+                        <!-- Beautiful modern remove button -->
+                        <button type="button" 
+                                class="remove-image-btn absolute -top-2 -right-2 w-7 h-7 bg-red-600 hover:bg-red-700 focus:bg-red-700 text-white rounded-full flex items-center justify-center transition-all duration-300 ease-out shadow-lg hover:shadow-xl border-2 border-white opacity-100 group-hover:scale-110 z-50 focus:outline-none focus:ring-3 focus:ring-red-400 hover:rotate-90 transform-gpu"
+                                title="Remove image"
+                                aria-label="Remove image">
+                            <i class="fas fa-times text-sm font-bold drop-shadow-sm" aria-hidden="true"></i>
+                        </button>
+                        
+                        <!-- Image number badge -->
+                        <div class="absolute bottom-1 left-1 bg-white bg-opacity-90 text-gray-700 text-xs px-1.5 py-0.5 rounded font-medium shadow-sm">
+                            #<span class="image-number">1</span>
+                        </div>
+                        
+                        <!-- File size -->
+                        <div class="absolute bottom-1 right-1 bg-black bg-opacity-70 text-white text-xs px-1.5 py-0.5 rounded shadow-sm">
+                            <span class="file-size">0 KB</span>
+                        </div>
+                    </div>
+                </template>
             </div>
 
             <!-- Submit Buttons -->

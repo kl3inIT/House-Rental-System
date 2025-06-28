@@ -1,6 +1,7 @@
 package com.rental.houserental.service.impl;
 
 import com.rental.houserental.dto.request.property.CreatePropertyRequestDTO;
+import com.rental.houserental.dto.response.FeaturedPropertyResponseDTO;
 import com.rental.houserental.entity.PropertyImage;
 import com.rental.houserental.entity.RentalProperty;
 import com.rental.houserental.entity.User;
@@ -14,12 +15,15 @@ import com.rental.houserental.service.PropertyService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -72,5 +76,33 @@ public class PropertyServiceImpl implements PropertyService {
 
         log.info("Successfully created property with ID: {}", savedProperty.getId());
         return savedProperty;
+    }
+
+    @Override
+    public List<FeaturedPropertyResponseDTO> getFeaturedProperties(int limit) {
+        log.info("Fetching {} featured properties", limit);
+        
+        Pageable pageable = PageRequest.of(0, limit);
+        List<RentalProperty> properties = propertyRepository.findByPropertyStatusWithImages(
+            PropertyStatus.AVAILABLE, pageable);
+        
+        List<FeaturedPropertyResponseDTO> result = properties.stream()
+                .map(this::convertToFeaturedDTO)
+                .collect(Collectors.toList());
+                
+        log.info("Found {} featured properties", result.size());
+        return result;
+    }
+    
+    private FeaturedPropertyResponseDTO convertToFeaturedDTO(RentalProperty property) {
+        return FeaturedPropertyResponseDTO.builder()
+                .id(property.getId())
+                .title(property.getTitle())
+                .price(property.getMonthlyRent())
+                .bedrooms(property.getBedrooms())
+                .bathrooms(property.getBathrooms())
+                .location(property.getCity() + ", " + property.getProvince())
+                .imageUrl(property.getMainImageUrl())
+                .build();
     }
 }

@@ -69,9 +69,13 @@ pids/
 *.pid.lock
 
 
-# Production build files
-src/main/resources/static/css/output.css
+# Production build files - main.css is built from input.css
+src/main/resources/static/css/main.css
 src/main/resources/static/css/main.css.map
+
+# Frontend Maven Plugin
+node/
+.node/
 
 # Temporary files
 *.tmp
