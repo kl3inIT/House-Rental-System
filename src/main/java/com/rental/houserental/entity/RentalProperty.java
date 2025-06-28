@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.Set;
 
 @Entity
@@ -31,25 +30,19 @@ public class RentalProperty extends BaseEntity {
     private Integer bedrooms;
 
     @Column(name = "Bathrooms", nullable = false)
-    private Double bathrooms;
+    private Integer bathrooms;
 
-    @Column(name = "StreetAddress", nullable = false)
+    @Column(name = "StreetAddress", nullable = false, columnDefinition = "NVARCHAR(255)")
     private String streetAddress;
 
-    @Column(name = "City", nullable = false)
+    @Column(name = "City", nullable = false, columnDefinition = "NVARCHAR(100)")
     private String city;
 
-    @Column(name = "Province", nullable = false)
+    @Column(name = "Province", nullable = false, columnDefinition = "NVARCHAR(100)")
     private String province;
 
     @Column(name = "Description", nullable = false, columnDefinition = "TEXT")
     private String description;
-
-    @Column(name = "SecurityDeposit", precision = 10, scale = 2)
-    private BigDecimal securityDeposit;
-
-    @Column(name = "MinLeaseDuration")
-    private Integer minLeaseDuration;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "PropertyStatus")

@@ -2,6 +2,7 @@ package com.rental.houserental.service.impl;
 
 import com.rental.houserental.entity.PropertyImage;
 import com.rental.houserental.entity.RentalProperty;
+import com.rental.houserental.exceptions.property.ImageUploadException;
 import com.rental.houserental.repository.ImageRepository;
 import com.rental.houserental.service.ImageService;
 import com.rental.houserental.service.S3Service;
@@ -14,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -27,7 +29,7 @@ public class ImageServiceImpl implements ImageService {
     @Override
     public List<PropertyImage> uploadPropertyImages(List<MultipartFile> files, RentalProperty property) {
         List<PropertyImage> uploadedImages = new ArrayList<>();
-        
+
         for (int i = 0; i < files.size(); i++) {
             MultipartFile file = files.get(i);
             if (!file.isEmpty()) {
@@ -36,7 +38,7 @@ public class ImageServiceImpl implements ImageService {
                 uploadedImages.add(image);
             }
         }
-        
+
         log.info("Uploaded {} images for property ID: {}", uploadedImages.size(), property.getId());
         return uploadedImages;
     }
@@ -67,12 +69,12 @@ public class ImageServiceImpl implements ImageService {
 
             PropertyImage savedImage = imageRepository.save(image);
             log.info("Successfully uploaded image {} for property {}", savedImage.getId(), property.getId());
-            
+
             return savedImage;
-            
+
         } catch (Exception e) {
             log.error("Failed to upload image for property {}: {}", property.getId(), e.getMessage());
-            throw new RuntimeException("Failed to upload image", e);
+            throw new ImageUploadException("Failed to upload image for property " + property.getId(), e);
         }
     }
 
@@ -88,9 +90,9 @@ public class ImageServiceImpl implements ImageService {
 
             // Delete from database
             imageRepository.delete(image);
-            
+
             log.info("Successfully deleted image with ID: {}", imageId);
-            
+
         } catch (Exception e) {
             log.error("Failed to delete image {}: {}", imageId, e.getMessage());
             throw new RuntimeException("Failed to delete image", e);
@@ -108,7 +110,7 @@ public class ImageServiceImpl implements ImageService {
         // Set this image as main
         image.setIsMainImage(true);
         imageRepository.save(image);
-        
+
         log.info("Set image {} as main image for property {}", imageId, image.getRentalProperty().getId());
     }
 
@@ -119,7 +121,7 @@ public class ImageServiceImpl implements ImageService {
 
         image.setDisplayOrder(newOrder);
         imageRepository.save(image);
-        
+
         log.info("Updated display order for image {} to {}", imageId, newOrder);
     }
 
@@ -136,9 +138,9 @@ public class ImageServiceImpl implements ImageService {
     }
 
     private Integer getNextDisplayOrder(Long propertyId) {
-        Integer maxOrder = imageRepository.findMaxDisplayOrderByPropertyId(propertyId);
-        return maxOrder != null ? maxOrder + 1 : 0;
+        return Optional.ofNullable(imageRepository.findMaxDisplayOrderByPropertyId(propertyId))
+                .map(order -> order + 1)
+                .orElse(0);
     }
-
 
 } 

@@ -4,7 +4,6 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/main}">
 <head>
-
     <title>Add New Property - RentEase</title>
 </head>
 <body class="bg-gray-50">
@@ -13,10 +12,11 @@
         <!-- Header -->
         <div class="mb-8">
             <h1 class="text-3xl font-bold text-gray-900">Add New Property</h1>
-            <p class="text-gray-600 mt-2">Fill in the details to create your property (will be saved as draft)</p>
+            <p class="text-gray-600 mt-2">Fill in the details to list your property</p>
         </div>
 
-        <form th:action="@{/landlord/properties}" th:object="${property}" method="post" enctype="multipart/form-data" class="space-y-8">
+        <form th:action="@{/landlord/properties}" th:object="${property}" method="post" enctype="multipart/form-data"
+              class="space-y-8" id="property-form" novalidate>
             <!-- CSRF Token -->
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 
@@ -28,29 +28,40 @@
                     <div class="md:col-span-2">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Property Title *</label>
                         <input type="text" th:field="*{title}" required placeholder="e.g., Modern Downtown Apartment"
+                               data-validate="required,maxLength:255"
                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        <div th:if="${#fields.hasErrors('title')}" class="text-red-600 text-sm mt-1" th:errors="*{title}"></div>
+                        <div class="validation-error text-red-600 text-sm mt-1 hidden"></div>
+                        <div th:if="${#fields.hasErrors('title')}" class="text-red-600 text-sm mt-1"
+                             th:errors="*{title}"></div>
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Category *</label>
-                        <select th:field="*{categoryId}" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <select th:field="*{categoryId}" required data-validate="required"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                             <option value="">Select category</option>
-                            <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"></option>
+                            <option th:each="category : ${categories}" th:value="${category.id}"
+                                    th:text="${category.name}"></option>
                         </select>
-                        <div th:if="${#fields.hasErrors('categoryId')}" class="text-red-600 text-sm mt-1" th:errors="*{categoryId}"></div>
+                        <div class="validation-error text-red-600 text-sm mt-1 hidden"></div>
+                        <div th:if="${#fields.hasErrors('categoryId')}" class="text-red-600 text-sm mt-1"
+                             th:errors="*{categoryId}"></div>
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Monthly Rent ($) *</label>
-                        <input type="number" th:field="*{monthlyRent}" required placeholder="1800" step="0.01"
+                        <input type="number" th:field="*{monthlyRent}" required placeholder="1800" step="0.01" min="0"
+                               data-validate="required,number,min:0"
                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        <div th:if="${#fields.hasErrors('monthlyRent')}" class="text-red-600 text-sm mt-1" th:errors="*{monthlyRent}"></div>
+                        <div class="validation-error text-red-600 text-sm mt-1 hidden"></div>
+                        <div th:if="${#fields.hasErrors('monthlyRent')}" class="text-red-600 text-sm mt-1"
+                             th:errors="*{monthlyRent}"></div>
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Bedrooms *</label>
-                        <select th:field="*{bedrooms}" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <select th:field="*{bedrooms}" required data-validate="required"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                             <option value="">Select bedrooms</option>
                             <option value="0">Studio</option>
                             <option value="1">1 Bedroom</option>
@@ -58,25 +69,26 @@
                             <option value="3">3 Bedrooms</option>
                             <option value="4">4+ Bedrooms</option>
                         </select>
-                        <div th:if="${#fields.hasErrors('bedrooms')}" class="text-red-600 text-sm mt-1" th:errors="*{bedrooms}"></div>
+                        <div class="validation-error text-red-600 text-sm mt-1 hidden"></div>
+                        <div th:if="${#fields.hasErrors('bedrooms')}" class="text-red-600 text-sm mt-1"
+                             th:errors="*{bedrooms}"></div>
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Bathrooms *</label>
-                        <select th:field="*{bathrooms}" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <select th:field="*{bathrooms}" required data-validate="required"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                             <option value="">Select bathrooms</option>
-                            <option value="1.0">1 Bathroom</option>
-                            <option value="1.5">1.5 Bathrooms</option>
-                            <option value="2.0">2 Bathrooms</option>
-                            <option value="2.5">2.5 Bathrooms</option>
-                            <option value="3.0">3+ Bathrooms</option>
+                            <option value="1">1 Bathroom</option>
+                            <option value="2">2 Bathrooms</option>
+                            <option value="3">3 Bathrooms</option>
+                            <option value="4">4 Bathrooms</option>
+                            <option value="5">5+ Bathrooms</option>
                         </select>
-                        <div th:if="${#fields.hasErrors('bathrooms')}" class="text-red-600 text-sm mt-1" th:errors="*{bathrooms}"></div>
+                        <div class="validation-error text-red-600 text-sm mt-1 hidden"></div>
+                        <div th:if="${#fields.hasErrors('bathrooms')}" class="text-red-600 text-sm mt-1"
+                             th:errors="*{bathrooms}"></div>
                     </div>
-
-
-
-
                 </div>
             </div>
 
@@ -88,27 +100,34 @@
                     <div class="md:col-span-2">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Street Address *</label>
                         <input type="text" th:field="*{streetAddress}" required placeholder="123 Main Street"
+                               data-validate="required,maxLength:255"
                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        <div th:if="${#fields.hasErrors('streetAddress')}" class="text-red-600 text-sm mt-1" th:errors="*{streetAddress}"></div>
+                        <div class="validation-error text-red-600 text-sm mt-1 hidden"></div>
+                        <div th:if="${#fields.hasErrors('streetAddress')}" class="text-red-600 text-sm mt-1"
+                             th:errors="*{streetAddress}"></div>
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Tỉnh/Thành phố *</label>
-                        <select th:field="*{province}" required id="province-select" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <select th:field="*{province}" required id="province-select" data-validate="required"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                             <option value="">Chọn tỉnh/thành phố</option>
                         </select>
-                        <div th:if="${#fields.hasErrors('province')}" class="text-red-600 text-sm mt-1" th:errors="*{province}"></div>
+                        <div class="validation-error text-red-600 text-sm mt-1 hidden"></div>
+                        <div th:if="${#fields.hasErrors('province')}" class="text-red-600 text-sm mt-1"
+                             th:errors="*{province}"></div>
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Quận/Huyện *</label>
-                        <select th:field="*{city}" required id="district-select" disabled class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100">
+                        <select th:field="*{city}" required id="district-select" disabled data-validate="required"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100">
                             <option value="">Chọn tỉnh/thành phố trước</option>
                         </select>
-                        <div th:if="${#fields.hasErrors('city')}" class="text-red-600 text-sm mt-1" th:errors="*{city}"></div>
+                        <div class="validation-error text-red-600 text-sm mt-1 hidden"></div>
+                        <div th:if="${#fields.hasErrors('city')}" class="text-red-600 text-sm mt-1"
+                             th:errors="*{city}"></div>
                     </div>
-
-
                 </div>
             </div>
 
@@ -118,9 +137,18 @@
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Property Description *</label>
-                    <textarea rows="6" th:field="*{description}" required placeholder="Describe your property in detail. Include features, amenities, and what makes it special..."
+                    <textarea rows="6" th:field="*{description}" required
+                              data-validate="required,maxLength:2000"
+                              placeholder="Describe your property in detail. Include features, amenities, and what makes it special..."
                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
-                    <div th:if="${#fields.hasErrors('description')}" class="text-red-600 text-sm mt-1" th:errors="*{description}"></div>
+                    <div class="flex justify-between items-center mt-1">
+                        <div class="validation-error text-red-600 text-sm hidden"></div>
+                        <div class="text-sm text-gray-500">
+                            <span id="description-count">0</span>/2000 characters
+                        </div>
+                    </div>
+                    <div th:if="${#fields.hasErrors('description')}" class="text-red-600 text-sm mt-1"
+                         th:errors="*{description}"></div>
                 </div>
             </div>
 
@@ -132,50 +160,33 @@
                     <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"></i>
                     <p class="text-lg text-gray-600 mb-2">Drag and drop images here, or click to select</p>
                     <p class="text-sm text-gray-500 mb-4">Upload up to 10 images (JPG, PNG, max 5MB each)</p>
-                    <input type="file" multiple accept="image/*" name="imageFiles" class="hidden" id="image-upload">
-                    <label for="image-upload" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 cursor-pointer transition-colors duration-200">
-                        Select Images
+                    <p id="file-count" class="text-sm text-blue-600 mb-4 hidden">
+                        <span id="selected-count">0</span> images selected
+                    </p>
+                    <input type="file" multiple accept="image/*" name="imageFiles" class="hidden" id="image-upload"
+                           data-validate="imageFiles">
+                    <label for="image-upload"
+                           class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 cursor-pointer transition-colors duration-200">
+                        <span id="upload-text">Select Images</span>
                     </label>
                 </div>
-                
+
+                <div class="validation-error text-red-600 text-sm mt-2 hidden"></div>
+
                 <!-- Preview area for selected images -->
                 <div id="image-preview" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mt-4 hidden">
                     <!-- Images will be previewed here via JavaScript -->
                 </div>
             </div>
 
-            <!-- Lease Terms -->
-            <div class="bg-white rounded-lg shadow-md p-6">
-                <h2 class="text-xl font-semibold text-gray-900 mb-6">Lease Terms</h2>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Security Deposit ($)</label>
-                        <input type="number" th:field="*{securityDeposit}" placeholder="1800" step="0.01"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        <div th:if="${#fields.hasErrors('securityDeposit')}" class="text-red-600 text-sm mt-1" th:errors="*{securityDeposit}"></div>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Minimum Lease Duration (months)</label>
-                        <select th:field="*{minLeaseDuration}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            <option value="">Select duration</option>
-                            <option value="6">6 months</option>
-                            <option value="12">12 months</option>
-                            <option value="18">18 months</option>
-                            <option value="24">24 months</option>
-                        </select>
-                        <div th:if="${#fields.hasErrors('minLeaseDuration')}" class="text-red-600 text-sm mt-1" th:errors="*{minLeaseDuration}"></div>
-                    </div>
-                </div>
-            </div>
-
             <!-- Submit Buttons -->
             <div class="flex flex-col sm:flex-row gap-4">
-                <button type="submit" class="flex-1 bg-blue-600 text-white py-3 px-6 rounded-md hover:bg-blue-700 font-medium transition-colors duration-200">
+                <button type="submit" id="submit-btn"
+                        class="flex-1 bg-blue-600 text-white py-3 px-6 rounded-md hover:bg-blue-700 font-medium transition-colors duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed">
                     <i class="fas fa-save mr-2"></i>Create Property
                 </button>
-                <a th:href="@{/landlord/dashboard}" class="flex-1 text-center border border-gray-300 text-gray-700 py-3 px-6 rounded-md hover:bg-gray-50 font-medium transition-colors duration-200">
+                <a th:href="@{/landlord/dashboard}"
+                   class="flex-1 text-center border border-gray-300 text-gray-700 py-3 px-6 rounded-md hover:bg-gray-50 font-medium transition-colors duration-200">
                     Cancel
                 </a>
             </div>

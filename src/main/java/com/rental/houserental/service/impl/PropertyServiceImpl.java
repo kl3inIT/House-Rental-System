@@ -1,10 +1,11 @@
 package com.rental.houserental.service.impl;
 
-import com.rental.houserental.dto.request.CreatePropertyRequest;
+import com.rental.houserental.dto.request.property.CreatePropertyRequestDTO;
 import com.rental.houserental.entity.PropertyImage;
 import com.rental.houserental.entity.RentalProperty;
 import com.rental.houserental.entity.User;
 import com.rental.houserental.enums.PropertyStatus;
+import com.rental.houserental.exceptions.property.ImageUploadException;
 import com.rental.houserental.repository.PropertyRepository;
 
 import com.rental.houserental.service.CategoryService;
@@ -30,8 +31,8 @@ public class PropertyServiceImpl implements PropertyService {
     private final CategoryService categoryService;
 
     @Override
-    public RentalProperty createProperty(CreatePropertyRequest request, User landlord, 
-                                       MultipartFile[] imageFiles) {
+    public RentalProperty createProperty(CreatePropertyRequestDTO request, User landlord,
+                                         MultipartFile[] imageFiles) {
         log.info("Creating property for landlord: {}", landlord.getEmail());
 
         RentalProperty property = RentalProperty.builder()
@@ -44,8 +45,6 @@ public class PropertyServiceImpl implements PropertyService {
                 .city(request.getCity())
                 .province(request.getProvince())
                 .description(request.getDescription())
-                .securityDeposit(request.getSecurityDeposit())
-                .minLeaseDuration(request.getMinLeaseDuration())
                 .propertyStatus(PropertyStatus.DRAFT)
                 .landlord(landlord)
                 .images(new HashSet<>())
@@ -53,16 +52,21 @@ public class PropertyServiceImpl implements PropertyService {
 
         RentalProperty savedProperty = propertyRepository.save(property);
 
-        // Handle image uploads
         if (imageFiles != null && imageFiles.length > 0) {
             try {
                 List<MultipartFile> fileList = Arrays.asList(imageFiles);
                 List<PropertyImage> propertyImages = imageService.uploadPropertyImages(fileList, savedProperty);
-                savedProperty.setImages(new HashSet<>(propertyImages));
+                for (PropertyImage image : propertyImages) {
+                    image.setRentalProperty(savedProperty);
+                }
+                savedProperty.getImages().addAll(propertyImages);
                 savedProperty = propertyRepository.save(savedProperty);
                 log.info("Uploaded {} images for property: {}", propertyImages.size(), savedProperty.getId());
             } catch (Exception e) {
                 log.error("Failed to upload images for property: {}", savedProperty.getId(), e);
+                // Delete the property since image upload failed
+                propertyRepository.delete(savedProperty);
+                throw new ImageUploadException("Failed to upload images for property. Property creation cancelled.", e);
             }
         }
 

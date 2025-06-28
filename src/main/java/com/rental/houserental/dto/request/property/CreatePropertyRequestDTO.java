@@ -1,16 +1,16 @@
-package com.rental.houserental.dto.request;
+package com.rental.houserental.dto.request.property;
 
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 
-@Data
-@NoArgsConstructor
+@Getter
+@Setter
+@Builder
 @AllArgsConstructor
-public class CreatePropertyRequest {
+@NoArgsConstructor
+public class CreatePropertyRequestDTO {
 
     @NotBlank(message = "Property title is required")
     @Size(max = 255, message = "Title must be less than 255 characters")
@@ -30,9 +30,9 @@ public class CreatePropertyRequest {
     private Integer bedrooms;
 
     @NotNull(message = "Number of bathrooms is required")
-    @DecimalMin(value = "0.5", message = "Bathrooms must be at least 0.5")
-    @DecimalMax(value = "10.0", message = "Bathrooms must be 10.0 or less")
-    private Double bathrooms;
+    @Min(value = 1, message = "Bathrooms must be at least 1")
+    @Max(value = 10, message = "Bathrooms must be 10 or less")
+    private Integer bathrooms;
 
     @NotBlank(message = "Street address is required")
     @Size(max = 255, message = "Street address must be less than 255 characters")
@@ -49,12 +49,4 @@ public class CreatePropertyRequest {
     @NotBlank(message = "Property description is required")
     @Size(max = 2000, message = "Description must be less than 2000 characters")
     private String description;
-
-    @DecimalMin(value = "0.0", message = "Security deposit must be 0 or greater")
-    @Digits(integer = 10, fraction = 2, message = "Invalid security deposit amount")
-    private BigDecimal securityDeposit;
-
-    @Min(value = 1, message = "Minimum lease duration must be at least 1 month")
-    @Max(value = 60, message = "Minimum lease duration must be 60 months or less")
-    private Integer minLeaseDuration;
-} 
+}

@@ -1,5 +1,7 @@
 package com.rental.houserental.service.impl;
 
+import com.rental.houserental.exceptions.property.FileDeleteException;
+import com.rental.houserental.exceptions.property.ImageUploadException;
 import com.rental.houserental.service.S3Service;
 import com.rental.houserental.utils.ImageUtils;
 import lombok.RequiredArgsConstructor;
@@ -54,7 +56,7 @@ public class S3ServiceImpl implements S3Service {
             return uploadFile(objectKey, file.getContentType(), file.getBytes());
         } catch (IOException e) {
             log.error("Failed to upload property image for property {}: {}", propertyId, e.getMessage());
-            throw new RuntimeException("Failed to upload image", e);
+            throw new ImageUploadException("Failed to upload image for property " + propertyId, e);
         }
     }
 
@@ -87,7 +89,7 @@ public class S3ServiceImpl implements S3Service {
             log.info("Successfully deleted file: {}", objectKey);
         } catch (Exception e) {
             log.error("Failed to delete file {}: {}", objectKey, e.getMessage());
-            throw new RuntimeException("Failed to delete file", e);
+            throw new FileDeleteException("Failed to delete file: " + objectKey, e);
         }
     }
 
