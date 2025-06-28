@@ -310,7 +310,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const img = document.createElement('img');
             img.src = e.target.result;
             img.alt = `Property image ${index + 1}`;
-            img.className = 'w-full h-80 object-cover rounded-lg';
+            img.className = 'w-full h-24 object-cover rounded-lg';
             
             // Create beautiful modern remove button
             const removeBtn = document.createElement('button');

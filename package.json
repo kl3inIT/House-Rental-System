@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "description": "House Rental Application",
   "scripts": {
-    "build:css": "tailwindcss -i ./src/main/resources/static/css/main.css -o ./src/main/resources/static/css/output.css --watch",
-    "build:css:prod": "tailwindcss -i ./src/main/resources/static/css/main.css -o ./src/main/resources/static/css/output.css --minify"
+    "build:css": "tailwindcss -i ./src/main/resources/static/css/input.css -o ./src/main/resources/static/css/main.css --watch",
+    "build:css:prod": "tailwindcss -i ./src/main/resources/static/css/input.css -o ./src/main/resources/static/css/main.css --minify",
+    "dev": "npm run build:css"
   },
   "dependencies": {
     "@tailwindcss/line-clamp": "^0.4.4",
