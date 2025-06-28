@@ -23,7 +23,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -81,19 +80,19 @@ public class PropertyServiceImpl implements PropertyService {
     @Override
     public List<FeaturedPropertyResponseDTO> getFeaturedProperties(int limit) {
         log.info("Fetching {} featured properties", limit);
-        
+
         Pageable pageable = PageRequest.of(0, limit);
-        List<RentalProperty> properties = propertyRepository.findByPropertyStatusWithImages(
-            PropertyStatus.AVAILABLE, pageable);
-        
+        List<RentalProperty> properties = propertyRepository.findFeaturedProperties(
+                PropertyStatus.AVAILABLE, pageable);
+
         List<FeaturedPropertyResponseDTO> result = properties.stream()
                 .map(this::convertToFeaturedDTO)
-                .collect(Collectors.toList());
-                
+                .toList();
+
         log.info("Found {} featured properties", result.size());
         return result;
     }
-    
+
     private FeaturedPropertyResponseDTO convertToFeaturedDTO(RentalProperty property) {
         return FeaturedPropertyResponseDTO.builder()
                 .id(property.getId())

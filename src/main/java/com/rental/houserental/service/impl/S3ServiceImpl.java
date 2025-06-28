@@ -52,7 +52,7 @@ public class S3ServiceImpl implements S3Service {
         try {
             String fileName = ImageUtils.generateUniqueFileName(file.getOriginalFilename());
             String objectKey = String.format("properties/%d/%s", propertyId, fileName);
-            
+
             return uploadFile(objectKey, file.getContentType(), file.getBytes());
         } catch (IOException e) {
             log.error("Failed to upload property image for property {}: {}", propertyId, e.getMessage());
@@ -76,7 +76,6 @@ public class S3ServiceImpl implements S3Service {
     }
 
 
-
     @Override
     public void deleteFile(String objectKey) {
         try {
@@ -98,9 +97,6 @@ public class S3ServiceImpl implements S3Service {
         return String.format("https://%s.s3.%s.amazonaws.com/%s", bucketName, region, objectKey);
     }
 
-    private String extractObjectKeyFromUrl(String url) {
-        return ImageUtils.extractObjectKeyFromS3Url(url);
-    }
 
 
 }

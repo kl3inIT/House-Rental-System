@@ -68,8 +68,8 @@ public final class ImageUtils {
         if (s3Url == null || s3Url.trim().isEmpty()) {
             return "";
         }
-        
-        String[] parts = s3Url.split(".amazonaws.com/");
+
+        String[] parts = s3Url.split("\\.amazonaws\\.com/");
         return parts.length > 1 ? parts[1] : "";
     }
 
