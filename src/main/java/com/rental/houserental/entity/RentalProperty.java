@@ -47,7 +47,7 @@ public class RentalProperty extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "PropertyStatus")
     @Builder.Default
-    private PropertyStatus propertyStatus = PropertyStatus.AVAILABLE;
+    private PropertyStatus propertyStatus = PropertyStatus.DRAFT;
 
     @ManyToOne
     @JoinColumn(name = "LandlordId", nullable = false)
