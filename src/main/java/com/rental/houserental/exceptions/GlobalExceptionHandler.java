@@ -1,6 +1,10 @@
 package com.rental.houserental.exceptions;
 
 import com.rental.houserental.exceptions.auth.*;
+import com.rental.houserental.exceptions.category.CategoryNotFoundException;
+import com.rental.houserental.exceptions.property.InvalidPropertyStatusException;
+import com.rental.houserental.exceptions.property.ImageUploadException;
+import com.rental.houserental.exceptions.property.FileDeleteException;
 import com.rental.houserental.exceptions.user.*;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -131,11 +135,40 @@ public class GlobalExceptionHandler {
         return REDIRECT_FORGOT_PASSWORD;
     }
 
+    @ExceptionHandler(InvalidPropertyStatusException.class)
+    public String handleInvalidPropertyStatusException(InvalidPropertyStatusException ex, Model model) {
+        log.warn("Invalid property status: {}", ex.getMessage());
+        model.addAttribute(MESSAGE, "The specified property status is not valid.");
+        return GENERIC_ERROR;
+    }
+
+    @ExceptionHandler(CategoryNotFoundException.class)
+    public String handleCategoryNotFoundException(CategoryNotFoundException ex, Model model) {
+        log.warn("Category not found: {}", ex.getMessage());
+        model.addAttribute(MESSAGE, "The specified category does not exist.");
+        return GENERIC_ERROR;
+    }
+
+    @ExceptionHandler(ImageUploadException.class)
+    public String handleImageUploadException(ImageUploadException ex, RedirectAttributes redirectAttributes) {
+        log.error("Image upload failed: {}", ex.getMessage());
+        redirectAttributes.addFlashAttribute(ERROR, "Failed to upload images. Property was not created. Please try again.");
+        return REDIRECT_LANDLORD_NEW_LISTING;
+    }
+
+    @ExceptionHandler(FileDeleteException.class)
+    public String handleFileDeleteException(FileDeleteException ex, Model model) {
+        log.error("File deletion failed: {}", ex.getMessage());
+        model.addAttribute(MESSAGE, "Failed to delete file. Please try again later.");
+        return GENERIC_ERROR;
+    }
+
+
     //generic phải để cuối để bắt hết được lỗi
     @ExceptionHandler(Exception.class)
     public String handleGenericException(Exception ex, Model model) {
         log.error("Unexpected error: {}", ex.getMessage());
         model.addAttribute(MESSAGE, "An unexpected error occurred. Please try again later.");
-        return "error/500"; //
+        return ERROR_500;
     }
 }
