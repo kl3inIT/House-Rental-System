@@ -10,18 +10,13 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FeaturedPropertyResponseDTO {
-    
+
     private Long id;
     private String title;
     private BigDecimal price; // monthlyRent
     private Integer bedrooms;
     private Integer bathrooms;
     private String location; // city + province
-    private String description;
     private String imageUrl; // main image URL
-    
-    // For JSON response to match frontend expectations
-    public String getFormattedPrice() {
-        return price.toString();
-    }
+
 } 

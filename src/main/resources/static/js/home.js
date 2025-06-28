@@ -97,4 +97,23 @@ function showNotification(message, type = 'info') {
          }, 3000);
 }
 
-// No need for custom CSS - using Tailwind line-clamp utilities
+// Add CSS utilities for the property cards
+const style = document.createElement('style');
+style.textContent = `
+    .line-clamp-1 {
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+`;
+document.head.appendChild(style);
+
+// TODO: Image carousel functionality for multiple property images
+function initializeImageCarousels() {
+    document.querySelectorAll('.property-carousel').forEach(carousel => {
+        const leftBtn = carousel.querySelector('.carousel-left');
+        const rightBtn = carousel.querySelector('.carousel-right');
+        // Implementation for when we have multiple images per property
+    });
+}

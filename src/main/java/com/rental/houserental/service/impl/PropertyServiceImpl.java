@@ -102,7 +102,6 @@ public class PropertyServiceImpl implements PropertyService {
                 .bedrooms(property.getBedrooms())
                 .bathrooms(property.getBathrooms())
                 .location(property.getCity() + ", " + property.getProvince())
-                .description(property.getDescription())
                 .imageUrl(property.getMainImageUrl())
                 .build();
     }

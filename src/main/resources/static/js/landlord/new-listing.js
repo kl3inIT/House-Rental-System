@@ -7,8 +7,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const descriptionTextarea = document.querySelector('textarea[name="description"]');
     const descriptionCount = document.getElementById('description-count');
     
-    // Store selected files
+    // Store selected files with unique IDs
     let selectedFiles = [];
+    let fileIdCounter = 0;
 
     // Initialize validation
     initializeFormValidation();
@@ -43,6 +44,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Trigger the change event
                 handleImageUpload({ target: imageUpload });
+            }
+        });
+    }
+
+    // Set up event delegation for remove buttons
+    if (imagePreview) {
+        imagePreview.addEventListener('click', function(e) {
+            if (e.target.closest('.remove-image-btn')) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const button = e.target.closest('.remove-image-btn');
+                const fileId = parseInt(button.getAttribute('data-file-id'));
+                removeImagePreview(fileId);
             }
         });
     }
@@ -214,7 +229,10 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        const filesToAdd = files.slice(0, remainingSlots);
+        const filesToAdd = files.slice(0, remainingSlots).map(file => ({
+            file: file,
+            id: ++fileIdCounter
+        }));
         
         if (files.length > remainingSlots) {
             showFieldError(event.target, `You can only upload ${remainingSlots} more images (10 maximum total).`, errorContainer);
@@ -225,7 +243,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Validate all selected files
         const tempInput = document.createElement('input');
         tempInput.type = 'file';
-        tempInput.files = createFileList(selectedFiles);
+        tempInput.files = createFileList(selectedFiles.map(item => item.file));
         
         const error = validateImageFiles(tempInput);
         if (error) {
@@ -249,7 +267,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function updateFileInput() {
         const fileInput = document.getElementById('image-upload');
-        fileInput.files = createFileList(selectedFiles);
+        fileInput.files = createFileList(selectedFiles.map(item => item.file));
     }
     
     function updateImagePreview() {
@@ -264,30 +282,10 @@ document.addEventListener('DOMContentLoaded', function() {
             imagePreview.classList.remove('hidden');
             fileCount.classList.remove('hidden');
             selectedCount.textContent = selectedFiles.length;
-            uploadText.textContent = 'Add More Images';
+            uploadText.textContent = selectedFiles.length >= 10 ? 'Maximum reached' : 'Add More Images';
             
-            selectedFiles.forEach((file, index) => {
-                    const reader = new FileReader();
-                    
-                    reader.onload = function(e) {
-                        const imgContainer = document.createElement('div');
-                        imgContainer.className = 'relative group';
-                        imgContainer.innerHTML = `
-                        <img src="${e.target.result}" alt="Preview ${index + 1}" class="w-full h-24 object-cover rounded-md">
-                        <button type="button" class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity" onclick="removeImagePreview(this, ${index});" data-index="${index}">
-                                ×
-                            </button>
-                        <div class="absolute bottom-1 left-1 bg-black bg-opacity-50 text-white text-xs px-1 rounded">
-                            ${(file.size / 1024 / 1024).toFixed(1)}MB
-                        </div>
-                        <div class="absolute top-1 left-1 bg-white bg-opacity-90 text-gray-800 text-sm px-2 py-1 rounded-full border border-gray-300 shadow-sm font-medium">
-                            ${index + 1}
-                        </div>
-                        `;
-                        imagePreview.appendChild(imgContainer);
-                    };
-                    
-                    reader.readAsDataURL(file);
+            selectedFiles.forEach((fileItem, index) => {
+                createImagePreviewItem(fileItem.file, index, fileItem.id);
             });
         } else {
             imagePreview.classList.add('hidden');
@@ -295,9 +293,104 @@ document.addEventListener('DOMContentLoaded', function() {
             uploadText.textContent = 'Select Images';
         }
         
-        // Disable upload button if max files reached
+        // Update upload button state
+        updateUploadButtonState();
+    }
+    
+    function createImagePreviewItem(file, index, fileId) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            // Create container - removed overflow-hidden to prevent clipping of remove button
+            const container = document.createElement('div');
+            container.className = 'relative group bg-gray-100 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200';
+            container.setAttribute('data-file-id', fileId);
+            
+            // Create image element with rounded corners
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.alt = `Property image ${index + 1}`;
+            img.className = 'w-full h-80 object-cover rounded-lg';
+            
+            // Create beautiful modern remove button
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'remove-image-btn absolute -top-2 -right-2 w-7 h-7 bg-red-600 hover:bg-red-700 focus:bg-red-700 text-white rounded-full flex items-center justify-center transition-all duration-300 ease-out shadow-lg hover:shadow-xl border-2 border-white opacity-100 group-hover:scale-110 z-50 focus:outline-none focus:ring-3 focus:ring-red-400 hover:rotate-90 transform-gpu';
+            removeBtn.setAttribute('data-file-id', fileId);
+            removeBtn.setAttribute('aria-label', `Remove image ${index + 1}`);
+            removeBtn.setAttribute('title', `Remove image ${index + 1}`);
+            
+            // Use FontAwesome icon with better styling
+            const icon = document.createElement('i');
+            icon.className = 'fas fa-times text-sm font-bold drop-shadow-sm';
+            icon.setAttribute('aria-hidden', 'true');
+            removeBtn.appendChild(icon);
+            
+            // Create image number badge
+            const numberBadge = document.createElement('div');
+            numberBadge.className = 'absolute bottom-1 left-1 bg-white bg-opacity-90 text-gray-700 text-xs px-1.5 py-0.5 rounded font-medium shadow-sm';
+            numberBadge.innerHTML = `#${index + 1}`;
+            numberBadge.setAttribute('aria-label', `Image ${index + 1}`);
+            
+            // Create file size badge
+            const sizeBadge = document.createElement('div');
+            sizeBadge.className = 'absolute bottom-1 right-1 bg-black bg-opacity-70 text-white text-xs px-1.5 py-0.5 rounded shadow-sm';
+            sizeBadge.innerHTML = `${(file.size / 1024 / 1024).toFixed(1)} MB`;
+            sizeBadge.setAttribute('aria-label', `File size ${(file.size / 1024 / 1024).toFixed(1)} megabytes`);
+            
+            // Add all elements to container
+            container.appendChild(img);
+            container.appendChild(removeBtn);
+            container.appendChild(numberBadge);
+            container.appendChild(sizeBadge);
+            
+            imagePreview.appendChild(container);
+        };
+        
+        reader.onerror = function() {
+            console.error('Error reading file:', file.name);
+            showNotification(`Failed to load image: ${file.name}`, 'error');
+        };
+        
+        reader.readAsDataURL(file);
+    }
+    
+    function removeImagePreview(fileId) {
+        // Find and remove file from selectedFiles array by ID
+        const initialLength = selectedFiles.length;
+        selectedFiles = selectedFiles.filter(item => item.id !== fileId);
+        
+        // Check if file was actually removed
+        if (selectedFiles.length === initialLength) {
+            console.warn('File not found for removal:', fileId);
+            return;
+        }
+        
+        // Update file input
+        updateFileInput();
+        
+        // Refresh preview (this will renumber all items)
+        updateImagePreview();
+        
+        // Show notification
+        showNotification('Image removed successfully', 'success');
+        
+        // Clear any validation errors if files are now within limits
+        const fileInput = document.getElementById('image-upload');
+        if (selectedFiles.length <= 10) {
+            clearFieldError(fileInput);
+        }
+        
+        // If no files left, clear the file input value
+        if (selectedFiles.length === 0) {
+            fileInput.value = '';
+        }
+    }
+    
+    function updateUploadButtonState() {
         const uploadButton = document.querySelector('label[for="image-upload"]');
         const fileInput = document.getElementById('image-upload');
+        const uploadText = document.getElementById('upload-text');
         
         if (selectedFiles.length >= 10) {
             uploadButton.classList.add('bg-gray-400', 'cursor-not-allowed');
@@ -422,22 +515,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 5000);
     }
 
-    // Make functions globally available
-    window.removeImagePreview = function(button, index) {
-        // Remove file from selectedFiles array
-        selectedFiles.splice(index, 1);
-        
-        // Update file input and preview
-        updateFileInput();
-        updateImagePreview();
-        
-        // Clear any validation errors
-        const fileInput = document.getElementById('image-upload');
-        clearFieldError(fileInput);
-    };
-    
     // Make helper functions globally available for debugging
     window.getSelectedFiles = function() {
+        return selectedFiles.map(item => item.file);
+    };
+    
+    window.getSelectedFilesWithIds = function() {
         return selectedFiles;
     };
     
@@ -445,10 +528,14 @@ document.addEventListener('DOMContentLoaded', function() {
         selectedFiles = [];
         updateFileInput();
         updateImagePreview();
+        
+        // Clear the file input value
+        const fileInput = document.getElementById('image-upload');
+        if (fileInput) {
+            fileInput.value = '';
+            clearFieldError(fileInput);
+        }
     };
-
-    // Update the existing updateFileList function to match new naming
-    window.updateFileList = window.removeImagePreview;
 });
 
 // Vietnamese location API functionality
