@@ -57,7 +57,6 @@ public class RentalProperty extends BaseEntity {
     @OrderBy("displayOrder ASC, createdAt ASC")
     private Set<PropertyImage> images;
 
-    // Utility methods for images
     public PropertyImage getMainImage() {
         return images.stream()
                 .filter(PropertyImage::getIsMainImage)

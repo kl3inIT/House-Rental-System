@@ -94,6 +94,10 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     private FeaturedPropertyResponseDTO convertToFeaturedDTO(RentalProperty property) {
+        List<String> imageUrls = property.getImages().stream()
+                .map(PropertyImage::getImageUrl)
+                .toList();
+        
         return FeaturedPropertyResponseDTO.builder()
                 .id(property.getId())
                 .title(property.getTitle())
@@ -101,7 +105,9 @@ public class PropertyServiceImpl implements PropertyService {
                 .bedrooms(property.getBedrooms())
                 .bathrooms(property.getBathrooms())
                 .location(property.getCity() + ", " + property.getProvince())
-                .imageUrl(property.getMainImageUrl())
+                .mainImageUrl(property.getMainImageUrl())
+                .imageUrls(imageUrls)
+                .imageCount(imageUrls.size())
                 .build();
     }
 }

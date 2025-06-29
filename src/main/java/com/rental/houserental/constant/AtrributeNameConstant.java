@@ -12,8 +12,7 @@ public final class AtrributeNameConstant {
     public static final String ERROR_MESSAGE = "errorMessage";
     public static final String WARNING_MESSAGE = "warningMessage";
     public static final String INFO_MESSAGE = "infoMessage";
-    
-    // Legacy support (for GlobalExceptionHandler)
+
     public static final String ERROR = "error";
     
     public static final String STATUS = "status";
@@ -35,4 +34,5 @@ public final class AtrributeNameConstant {
     public static final String BINDING_RESULT_OTP = "org.springframework.validation.BindingResult.otpRequest";
 
     public static final String CATEGORIES = "categories";
+    public static final String FEATURED_PROPERTIES = "featuredProperties";
 }
