@@ -2,7 +2,6 @@ package com.rental.houserental.controller.landlord;
 
 import com.rental.houserental.dto.request.property.CreatePropertyRequestDTO;
 import com.rental.houserental.entity.User;
-import com.rental.houserental.exceptions.property.ImageUploadException;
 import com.rental.houserental.service.CategoryService;
 import com.rental.houserental.service.PropertyService;
 import com.rental.houserental.service.UserService;
@@ -25,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 
 import static com.rental.houserental.constant.AtrributeNameConstant.*;
-import static com.rental.houserental.constant.ErrorMessageConstant.*;
 import static com.rental.houserental.constant.ViewNamesConstant.*;
 
 @Controller
