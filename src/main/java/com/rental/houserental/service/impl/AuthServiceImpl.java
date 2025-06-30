@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
-
+import java.util.UUID;
 import static com.rental.houserental.constant.OtpConstants.*;
 import static com.rental.houserental.constant.ViewNamesConstant.*;
 
@@ -86,7 +86,6 @@ public class AuthServiceImpl implements AuthService {
             redisTemplate.opsForValue().set(failKey, String.valueOf(failCount), Duration.ofSeconds(expire));
 
             if (failCount >= 3) {
-                // Delete all OTP related keys when max attempts reached
                 redisTemplate.delete(key);
                 redisTemplate.delete(failKey);
                 redisTemplate.delete(OTP_EXP_PREFIX + email);
@@ -96,7 +95,6 @@ public class AuthServiceImpl implements AuthService {
             throw new InvalidOtpException("Invalid OTP for email: " + email, email);
         }
 
-        // Valid OTP - verify user
         User user = userService.findByEmail(email);
         if (user == null) {
             throw new UserNotFoundException("User not found with email: " + email, REDIRECT_VERIFY_OTP);
@@ -125,35 +123,106 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    @Transactional
     public void forgotPassword(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        log.info("Password reset requested for email: {}", email);
+        
+        // Rate limiting check - allow max 3 requests per 15 minutes
+        String rateLimitKey = "reset_rate_limit:" + email;
+        String attempts = redisTemplate.opsForValue().get(rateLimitKey);
+        
+        if (attempts != null && Integer.parseInt(attempts) >= 3) {
+            log.warn("Rate limit exceeded for password reset: {}", email);
+            throw new TooManyPasswordResetAttemptsException("Too many password reset requests. Please try again later.");
+        }
+        
+        // Increment rate limit counter
+        redisTemplate.opsForValue().increment(rateLimitKey);
+        redisTemplate.expire(rateLimitKey, Duration.ofMinutes(15));
+        
+        // Check if user exists and validate business rules
+        User user = userService.findByEmail(email);
+        
+        if (user != null) {
+            // Business logic validation similar to register flow
+            if (user.getStatus() == UserStatus.SUSPENDED) {
+                throw new UserSuspendedException("Your account has been temporarily suspended. Please contact support to restore access.");
+            }
+            
+            if (user.getStatus() == UserStatus.BANNED) {
+                throw new UserBannedException("Your account has been permanently banned. Please contact support.");
+            }
+            
+            // Generate secure token
+            String token = UUID.randomUUID().toString().replace("-", "") +
+                          System.currentTimeMillis();
+            String key = "reset:" + token;
+            
+            // Store token with 30 minutes expiration
+            redisTemplate.opsForValue().set(key, email, Duration.ofMinutes(30));
+            
+            // Store token usage flag (one-time use)
+            redisTemplate.opsForValue().set("reset_used:" + token, "false", Duration.ofMinutes(30));
+            
+            String resetLink = "http://localhost:8080/reset-password?token=" + token;
+            emailService.sendPasswordResetEmail(email, resetLink);
+            
+            log.info("Password reset email sent to: {}", email);
+        } else {
+            log.warn("Password reset requested for non-existent email: {}", email);
+            // Still simulate sending email to avoid timing attacks
+            try {
+                Thread.sleep(100); // Random delay 100-300ms
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
 
-        String token = java.util.UUID.randomUUID().toString();
-        String key = "reset:" + token;
-        redisTemplate.opsForValue().set(key, email, Duration.ofHours(1));
-
-        String resetLink = "http://localhost:8080/reset-password?token=" + token;
-        emailService.sendPasswordResetEmail(email, resetLink);
     }
 
     @Override
     public void resetPassword(String token, String newPassword) {
-        String key = "reset:" + token;
-        String email = redisTemplate.opsForValue().get(key);
-
-        if (email == null) {
-            throw new RuntimeException("Invalid or expired reset token");
+        log.info("Password reset attempted with token: {}", token.substring(0, 8) + "...");
+        
+        // Validate input
+        if (token.trim().isEmpty()) {
+            throw new InvalidResetTokenException("Invalid reset token");
         }
-
+        
+        String key = "reset:" + token;
+        String usedKey = "reset_used:" + token;
+        
+        // Check if token exists
+        String email = redisTemplate.opsForValue().get(key);
+        if (email == null) {
+            log.warn("Invalid or expired reset token used: {}", token.substring(0, 8) + "...");
+            throw new InvalidResetTokenException("Invalid or expired reset token");
+        }
+        
+        // Check if token has been used (one-time use)
+        String tokenUsed = redisTemplate.opsForValue().get(usedKey);
+        if ("true".equals(tokenUsed)) {
+            log.warn("Reset token already used: {}", token.substring(0, 8) + "...");
+            throw new InvalidResetTokenException("Reset token has already been used");
+        }
+        
+        // Mark token as used immediately to prevent race conditions
+        redisTemplate.opsForValue().set(usedKey, "true", Duration.ofMinutes(30));
+        
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found", REDIRECT_FORGOT_PASSWORD));
 
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
 
+        // Clean up tokens
         redisTemplate.delete(key);
+        redisTemplate.delete(usedKey);
+        
+        // Clear rate limiting after successful reset
+        String rateLimitKey = "reset_rate_limit:" + email;
+        redisTemplate.delete(rateLimitKey);
+        
+        log.info("Password successfully reset for user: {}", email);
     }
 
 

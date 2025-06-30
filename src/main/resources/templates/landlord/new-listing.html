@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
+<head>
+    <title>Add New Property - RentEase</title>
+</head>
+<body class="bg-gray-50">
+<main layout:fragment="content">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Add New Property</h1>
+            <p class="text-gray-600 mt-2">Fill in the details to list your property</p>
+        </div>
+
+        <form th:action="@{/landlord/properties}" th:object="${property}" method="post" enctype="multipart/form-data"
+              class="space-y-8" id="property-form" novalidate>
+            <!-- CSRF Token -->
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+            <!-- Basic Information -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-semibold text-gray-900 mb-6">Basic Information</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Property Title *</label>
+                        <input type="text" th:field="*{title}" required placeholder="e.g., Modern Downtown Apartment"
+                               data-validate="required,maxLength:255"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <div class="validation-error text-red-600 text-sm mt-1 hidden"></div>
+                        <div th:if="${#fields.hasErrors('title')}" class="text-red-600 text-sm mt-1"
+                             th:errors="*{title}"></div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Category *</label>
+                        <select th:field="*{categoryId}" required data-validate="required"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Select category</option>
+                            <option th:each="category : ${categories}" th:value="${category.id}"
+                                    th:text="${category.name}"></option>
+                        </select>
+                        <div class="validation-error text-red-600 text-sm mt-1 hidden"></div>
+                        <div th:if="${#fields.hasErrors('categoryId')}" class="text-red-600 text-sm mt-1"
+                             th:errors="*{categoryId}"></div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Monthly Rent ($) *</label>
+                        <input type="number" th:field="*{monthlyRent}" required placeholder="1800" step="0.01" min="0"
+                               data-validate="required,number,min:0"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <div class="validation-error text-red-600 text-sm mt-1 hidden"></div>
+                        <div th:if="${#fields.hasErrors('monthlyRent')}" class="text-red-600 text-sm mt-1"
+                             th:errors="*{monthlyRent}"></div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Bedrooms *</label>
+                        <select th:field="*{bedrooms}" required data-validate="required"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Select bedrooms</option>
+                            <option value="0">Studio</option>
+                            <option value="1">1 Bedroom</option>
+                            <option value="2">2 Bedrooms</option>
+                            <option value="3">3 Bedrooms</option>
+                            <option value="4">4+ Bedrooms</option>
+                        </select>
+                        <div class="validation-error text-red-600 text-sm mt-1 hidden"></div>
+                        <div th:if="${#fields.hasErrors('bedrooms')}" class="text-red-600 text-sm mt-1"
+                             th:errors="*{bedrooms}"></div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Bathrooms *</label>
+                        <select th:field="*{bathrooms}" required data-validate="required"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Select bathrooms</option>
+                            <option value="1">1 Bathroom</option>
+                            <option value="2">2 Bathrooms</option>
+                            <option value="3">3 Bathrooms</option>
+                            <option value="4">4 Bathrooms</option>
+                            <option value="5">5+ Bathrooms</option>
+                        </select>
+                        <div class="validation-error text-red-600 text-sm mt-1 hidden"></div>
+                        <div th:if="${#fields.hasErrors('bathrooms')}" class="text-red-600 text-sm mt-1"
+                             th:errors="*{bathrooms}"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Location -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-semibold text-gray-900 mb-6">Location</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Street Address *</label>
+                        <input type="text" th:field="*{streetAddress}" required placeholder="123 Main Street"
+                               data-validate="required,maxLength:255"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <div class="validation-error text-red-600 text-sm mt-1 hidden"></div>
+                        <div th:if="${#fields.hasErrors('streetAddress')}" class="text-red-600 text-sm mt-1"
+                             th:errors="*{streetAddress}"></div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Tỉnh/Thành phố *</label>
+                        <select th:field="*{province}" required id="province-select" data-validate="required"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Chọn tỉnh/thành phố</option>
+                        </select>
+                        <div class="validation-error text-red-600 text-sm mt-1 hidden"></div>
+                        <div th:if="${#fields.hasErrors('province')}" class="text-red-600 text-sm mt-1"
+                             th:errors="*{province}"></div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Quận/Huyện *</label>
+                        <select th:field="*{city}" required id="district-select" disabled data-validate="required"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100">
+                            <option value="">Chọn tỉnh/thành phố trước</option>
+                        </select>
+                        <div class="validation-error text-red-600 text-sm mt-1 hidden"></div>
+                        <div th:if="${#fields.hasErrors('city')}" class="text-red-600 text-sm mt-1"
+                             th:errors="*{city}"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Description -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-semibold text-gray-900 mb-6">Description</h2>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Property Description *</label>
+                    <textarea rows="6" th:field="*{description}" required
+                              data-validate="required,maxLength:2000"
+                              placeholder="Describe your property in detail. Include features, amenities, and what makes it special..."
+                              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                    <div class="flex justify-between items-center mt-1">
+                        <div class="validation-error text-red-600 text-sm hidden"></div>
+                        <div class="text-sm text-gray-500">
+                            <span id="description-count">0</span>/2000 characters
+                        </div>
+                    </div>
+                    <div th:if="${#fields.hasErrors('description')}" class="text-red-600 text-sm mt-1"
+                         th:errors="*{description}"></div>
+                </div>
+            </div>
+
+            <!-- Images -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-semibold text-gray-900 mb-6">Property Images</h2>
+
+                <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center" id="upload-area">
+                    <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"></i>
+                    <p class="text-lg text-gray-600 mb-2">Drag and drop images here, or click to select</p>
+                    <p class="text-sm text-gray-500 mb-4">Upload up to 10 images (JPG, PNG, max 5MB each)</p>
+                    <p id="file-count" class="text-sm text-blue-600 mb-4 hidden">
+                        <span id="selected-count">0</span> images selected
+                    </p>
+                    <input type="file" multiple accept="image/*" name="imageFiles" class="hidden" id="image-upload"
+                           data-validate="imageFiles">
+                    <label for="image-upload"
+                           class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 cursor-pointer transition-colors duration-200">
+                        <span id="upload-text">Select Images</span>
+                    </label>
+                </div>
+
+                <div class="validation-error text-red-600 text-sm mt-2 hidden"></div>
+
+                <!-- Preview area for selected images -->
+                <div id="image-preview" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4 hidden">
+                    <!-- Images will be previewed here via JavaScript with individual remove buttons -->
+                </div>
+
+                <!-- Template for image preview item (hidden, used by JavaScript) -->
+                <template id="image-preview-template">
+                    <div class="relative group bg-gray-100 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+                        <img class="w-full h-80 object-cover rounded-lg" alt="Preview">
+                        
+                        <!-- Beautiful modern remove button -->
+                        <button type="button" 
+                                class="remove-image-btn absolute -top-2 -right-2 w-7 h-7 bg-red-600 hover:bg-red-700 focus:bg-red-700 text-white rounded-full flex items-center justify-center transition-all duration-300 ease-out shadow-lg hover:shadow-xl border-2 border-white opacity-100 group-hover:scale-110 z-50 focus:outline-none focus:ring-3 focus:ring-red-400 hover:rotate-90 transform-gpu"
+                                title="Remove image"
+                                aria-label="Remove image">
+                            <i class="fas fa-times text-sm font-bold drop-shadow-sm" aria-hidden="true"></i>
+                        </button>
+                        
+                        <!-- Image number badge -->
+                        <div class="absolute bottom-1 left-1 bg-white bg-opacity-90 text-gray-700 text-xs px-1.5 py-0.5 rounded font-medium shadow-sm">
+                            #<span class="image-number">1</span>
+                        </div>
+                        
+                        <!-- File size -->
+                        <div class="absolute bottom-1 right-1 bg-black bg-opacity-70 text-white text-xs px-1.5 py-0.5 rounded shadow-sm">
+                            <span class="file-size">0 KB</span>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+            <!-- Submit Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4">
+                <button type="submit" id="submit-btn"
+                        class="flex-1 bg-blue-600 text-white py-3 px-6 rounded-md hover:bg-blue-700 font-medium transition-colors duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed">
+                    <i class="fas fa-save mr-2"></i>Create Property
+                </button>
+                <a th:href="@{/landlord/dashboard}"
+                   class="flex-1 text-center border border-gray-300 text-gray-700 py-3 px-6 rounded-md hover:bg-gray-50 font-medium transition-colors duration-200">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- JavaScript for Vietnamese location and image preview -->
+    <script th:src="@{/js/landlord/new-listing.js}"></script>
+</main>
+</body>
+</html>

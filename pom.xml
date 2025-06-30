@@ -28,6 +28,7 @@
     </scm>
     <properties>
         <java.version>21</java.version>
+        <aws.sdk.version>2.20.156</aws.sdk.version>
     </properties>
     <dependencies>
         <dependency>
@@ -106,6 +107,17 @@
             <artifactId>thymeleaf-layout-dialect</artifactId>
             <version>3.2.1</version>
         </dependency>
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>s3</artifactId>
+            <version>${aws.sdk.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>s3-transfer-manager</artifactId>
+            <version>${aws.sdk.version}</version>
+        </dependency>
 
     </dependencies>
     <build>
@@ -132,7 +144,7 @@
                 </configuration>
             </plugin>
 
-            <!-- Spring Boot Maven Plugin -->
+
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
