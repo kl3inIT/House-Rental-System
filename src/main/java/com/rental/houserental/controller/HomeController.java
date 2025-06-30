@@ -8,7 +8,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import java.math.BigDecimal;
 import java.util.List;
 import static com.rental.houserental.constant.AtrributeNameConstant.*;
 import static com.rental.houserental.constant.ViewNamesConstant.*;
@@ -38,5 +40,19 @@ public class HomeController {
         model.addAttribute("cityCount", "100+");
 
         return INDEX;
+    }
+
+    @GetMapping("/properties/search")
+    public String searchProperties(
+        @RequestParam(required = false) String location,
+        @RequestParam(required = false) Long propertyType,
+        @RequestParam(required = false) BigDecimal maxPrice,
+        @RequestParam(required = false) Integer bedrooms,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size,
+        Model model
+    ) {
+        // Search logic here
+        return "search-properties";
     }
 }
