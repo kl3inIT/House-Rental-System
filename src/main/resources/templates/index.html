@@ -72,9 +72,8 @@
                 <div th:each="property, iterStat : ${featuredProperties}" 
                      class="bg-white rounded-lg shadow-md hover:shadow-lg overflow-hidden transition-shadow duration-300">
                     
-                    <!-- Image Carousel -->
-                    <div class="relative h-48 bg-gray-200 overflow-hidden group property-carousel" 
-                         th:data-property-id="${property.id}">
+                    <!-- Property Image -->
+                    <div class="relative h-48 bg-gray-200 overflow-hidden group">
                         <!-- Property ID Badge -->
                         <div class="absolute top-3 left-3 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs font-medium z-10">
                             R<span th:text="${property.id}">123</span>
@@ -82,61 +81,23 @@
                         
                         <!-- Heart Icon -->
                         <button sec:authorize="isAuthenticated()"
-                                class="absolute top-3 right-3 z-10 w-8 h-8 bg-white bg-opacity-80 hover:bg-white rounded-full flex items-center justify-center transition-all duration-200 shadow-sm favorite-btn"
+                                class="absolute top-3 right-3 z-20 w-8 h-8 bg-white bg-opacity-80 hover:bg-white rounded-full flex items-center justify-center transition-all duration-200 shadow-sm favorite-btn"
                                 th:data-property-id="${property.id}"
                                 title="Add to favorites">
                             <i class="far fa-heart text-gray-600 hover:text-red-500 text-sm"></i>
                         </button>
                         
-                        <!-- Images Container -->
-                        <div class="carousel-container relative w-full h-full">
-                            <!-- Debug Info -->
-                            <div style="position: absolute; top: 50px; left: 10px; background: rgba(0,0,0,0.7); color: white; padding: 5px; font-size: 10px; z-index: 30;">
-                                Images: <span th:text="${property.imageCount}">0</span>
-                                <br>URLs: <span th:text="${#lists.size(property.imageUrls)}">0</span>
-                                <br><button onclick="console.log('Manual debug click!'); window.debugCarousel(this);" style="color: yellow;">DEBUG</button>
-                            </div>
-                            
-                            <!-- No Images Placeholder -->
-                            <div th:if="${#lists.isEmpty(property.imageUrls)}" 
-                                 class="carousel-slide active w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
-                                <i class="fas fa-home text-4xl text-gray-400"></i>
-                            </div>
-                            
-                            <!-- Property Images -->
-                            <div th:each="imageUrl, imageStat : ${property.imageUrls}" 
-                                 class="carousel-slide absolute inset-0 w-full h-full transition-opacity duration-300"
-                                 th:class="${imageStat.index == 0 ? 'active opacity-100' : 'opacity-0'}"
-                                 th:data-slide-index="${imageStat.index}">
-                                <img th:src="${imageUrl}" 
-                                     th:alt="${property.title + ' - Image ' + (imageStat.index + 1)}" 
-                                     class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                                     loading="lazy"
-                                     onerror="console.log('Failed to load image:', this.src)">
-                            </div>
+                        <!-- Single Image or Placeholder -->
+                        <div th:if="${#lists.isEmpty(property.imageUrls)}" 
+                             class="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+                            <i class="fas fa-home text-4xl text-gray-400"></i>
                         </div>
                         
-                        <!-- Navigation Arrows -->
-                        <button th:if="${property.imageCount > 0}"
-                                class="carousel-prev absolute left-2 top-1/2 transform -translate-y-1/2 w-8 h-8 bg-white bg-opacity-90 hover:bg-white rounded-full flex items-center justify-center transition-all duration-200 shadow-md"
-                                style="z-index: 999 !important; pointer-events: auto !important; position: absolute !important;">
-                            <i class="fas fa-chevron-left text-gray-600 text-sm" style="pointer-events: none;"></i>
-                        </button>
-                        <button th:if="${property.imageCount > 0}"
-                                class="carousel-next absolute right-2 top-1/2 transform -translate-y-1/2 w-8 h-8 bg-white bg-opacity-90 hover:bg-white rounded-full flex items-center justify-center transition-all duration-200 shadow-md"
-                                style="z-index: 999 !important; pointer-events: auto !important; position: absolute !important;">
-                            <i class="fas fa-chevron-right text-gray-600 text-sm" style="pointer-events: none;"></i>
-                        </button>
-                        
-                        <!-- Image Dots Indicator -->
-                        <div th:if="${property.imageCount > 0}" 
-                             class="carousel-dots absolute bottom-3 left-1/2 transform -translate-x-1/2 flex space-x-1">
-                            <button th:each="imageUrl, imageStat : ${property.imageUrls}"
-                                    class="carousel-dot w-2 h-2 rounded-full transition-all duration-200"
-                                    th:class="${imageStat.index == 0 ? 'bg-white bg-opacity-80' : 'bg-white bg-opacity-50'}"
-                                    th:data-slide="${imageStat.index}">
-                            </button>
-                        </div>
+                        <img th:if="${!#lists.isEmpty(property.imageUrls)}"
+                             th:src="${property.imageUrls[0]}" 
+                             th:alt="${property.title}" 
+                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                             loading="lazy">
                     </div>
                     
                     <!-- Property Info -->
