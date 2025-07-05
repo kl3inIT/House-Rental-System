@@ -1,4 +1,4 @@
-package com.rental.houserental.dto.response;
+package com.rental.houserental.dto.response.property;
 
 import lombok.*;
 

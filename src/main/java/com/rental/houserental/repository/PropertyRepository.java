@@ -5,13 +5,14 @@ import com.rental.houserental.enums.PropertyStatus;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public interface PropertyRepository extends JpaRepository<RentalProperty, Long> {
+public interface PropertyRepository extends JpaRepository<RentalProperty, Long>, JpaSpecificationExecutor<RentalProperty> {
 
     @Query("""
             SELECT p FROM RentalProperty p 
@@ -20,4 +21,5 @@ public interface PropertyRepository extends JpaRepository<RentalProperty, Long> 
             ORDER BY p.createdAt DESC
             """)
     List<RentalProperty> findFeaturedProperties(@Param("status") PropertyStatus status, Pageable pageable);
+
 }

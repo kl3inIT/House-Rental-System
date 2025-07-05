@@ -1,36 +1,34 @@
-// Simple page functionality
+// Search properties functionality
 document.addEventListener('DOMContentLoaded', function() {
-    initializeFavorites();
-    initializeHomeSearch();
+    initializeLocationAutocomplete();
+    initializeFilterHandlers();
 });
 
-// Simple favorites
-function initializeFavorites() {
-    document.querySelectorAll('.favorite-btn').forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.stopPropagation();
-            
-            const icon = this.querySelector('i');
-            const isFavorite = icon.classList.contains('fas');
-            
-            if (isFavorite) {
-                icon.className = 'far fa-heart text-gray-600 hover:text-red-500 text-sm';
-            } else {
-                icon.className = 'fas fa-heart text-red-500 text-sm';
-            }
-        });
+function clearAllFilters() {
+    // Clear all checkboxes
+    document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+        checkbox.checked = false;
     });
+    
+    // Clear form inputs
+    document.querySelector('input[name="location"]').value = '';
+    document.querySelector('select[name="propertyType"]').value = '';
+    document.querySelector('select[name="maxPrice"]').value = '';
+    document.querySelector('select[name="minBedrooms"]').value = '';
+    
+    // Submit the form to refresh results
+    document.querySelector('form').submit();
 }
 
-// Home search functionality
-function initializeHomeSearch() {
-    const locationInput = document.querySelector('form[th\\:action*="search"] input[name="location"]');
+function initializeLocationAutocomplete() {
+    const locationInput = document.querySelector('input[name="location"]');
     if (!locationInput) return;
 
     // Create autocomplete container
     const autocompleteContainer = document.createElement('div');
     autocompleteContainer.className = 'absolute z-50 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto hidden';
-    autocompleteContainer.id = 'home-location-autocomplete';
+    autocompleteContainer.id = 'location-autocomplete';
+    locationInput.parentElement.style.position = 'relative';
     locationInput.parentElement.appendChild(autocompleteContainer);
 
     let searchTimeout;
@@ -46,13 +44,13 @@ function initializeHomeSearch() {
 
         // Hide autocomplete if query is too short
         if (query.length < 2) {
-            hideHomeAutocomplete();
+            hideAutocomplete();
             return;
         }
 
         // Debounce search
         searchTimeout = setTimeout(() => {
-            searchHomeLocations(query);
+            searchLocations(query);
         }, 300);
     });
 
@@ -63,21 +61,21 @@ function initializeHomeSearch() {
             case 'ArrowDown':
                 e.preventDefault();
                 selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
-                updateHomeSelection(items);
+                updateSelection(items);
                 break;
             case 'ArrowUp':
                 e.preventDefault();
                 selectedIndex = Math.max(selectedIndex - 1, -1);
-                updateHomeSelection(items);
+                updateSelection(items);
                 break;
             case 'Enter':
                 e.preventDefault();
                 if (selectedIndex >= 0 && items[selectedIndex]) {
-                    selectHomeLocation(items[selectedIndex].textContent);
+                    selectLocation(items[selectedIndex].textContent);
                 }
                 break;
             case 'Escape':
-                hideHomeAutocomplete();
+                hideAutocomplete();
                 break;
         }
     });
@@ -85,13 +83,13 @@ function initializeHomeSearch() {
     // Hide autocomplete when clicking outside
     document.addEventListener('click', function(e) {
         if (!locationInput.contains(e.target) && !autocompleteContainer.contains(e.target)) {
-            hideHomeAutocomplete();
+            hideAutocomplete();
         }
     });
 }
 
-async function searchHomeLocations(query) {
-    const autocompleteContainer = document.getElementById('home-location-autocomplete');
+async function searchLocations(query) {
+    const autocompleteContainer = document.getElementById('location-autocomplete');
     
     try {
         // Search provinces first
@@ -141,20 +139,20 @@ async function searchHomeLocations(query) {
             });
         });
 
-        displayHomeAutocompleteResults(allResults);
+        displayAutocompleteResults(allResults);
         
     } catch (error) {
         console.error('Error searching locations:', error);
         // Fallback to static search
-        displayHomeFallbackResults(query);
+        displayFallbackResults(query);
     }
 }
 
-function displayHomeAutocompleteResults(results) {
-    const autocompleteContainer = document.getElementById('home-location-autocomplete');
+function displayAutocompleteResults(results) {
+    const autocompleteContainer = document.getElementById('location-autocomplete');
     
     if (results.length === 0) {
-        hideHomeAutocomplete();
+        hideAutocomplete();
         return;
     }
 
@@ -166,7 +164,7 @@ function displayHomeAutocompleteResults(results) {
         item.textContent = result.name;
         
         item.addEventListener('click', function() {
-            selectHomeLocation(result.name);
+            selectLocation(result.name);
         });
         
         autocompleteContainer.appendChild(item);
@@ -175,8 +173,8 @@ function displayHomeAutocompleteResults(results) {
     autocompleteContainer.classList.remove('hidden');
 }
 
-function displayHomeFallbackResults(query) {
-    const autocompleteContainer = document.getElementById('home-location-autocomplete');
+function displayFallbackResults(query) {
+    const autocompleteContainer = document.getElementById('location-autocomplete');
     const vietnameseProvinces = [
         'Hà Nội', 'TP Hồ Chí Minh', 'Đà Nẵng', 'Hải Phòng', 'Cần Thơ',
         'An Giang', 'Bà Rịa - Vũng Tàu', 'Bắc Giang', 'Bắc Kạn', 'Bạc Liêu',
@@ -198,7 +196,7 @@ function displayHomeFallbackResults(query) {
     ).slice(0, 8);
 
     if (matchingProvinces.length === 0) {
-        hideHomeAutocomplete();
+        hideAutocomplete();
         return;
     }
 
@@ -210,7 +208,7 @@ function displayHomeFallbackResults(query) {
         item.textContent = province;
         
         item.addEventListener('click', function() {
-            selectHomeLocation(province);
+            selectLocation(province);
         });
         
         autocompleteContainer.appendChild(item);
@@ -219,20 +217,20 @@ function displayHomeFallbackResults(query) {
     autocompleteContainer.classList.remove('hidden');
 }
 
-function selectHomeLocation(locationName) {
-    const locationInput = document.querySelector('form[th\\:action*="search"] input[name="location"]');
+function selectLocation(locationName) {
+    const locationInput = document.querySelector('input[name="location"]');
     locationInput.value = locationName;
-    hideHomeAutocomplete();
+    hideAutocomplete();
 }
 
-function hideHomeAutocomplete() {
-    const autocompleteContainer = document.getElementById('home-location-autocomplete');
+function hideAutocomplete() {
+    const autocompleteContainer = document.getElementById('location-autocomplete');
     if (autocompleteContainer) {
         autocompleteContainer.classList.add('hidden');
     }
 }
 
-function updateHomeSelection(items) {
+function updateSelection(items) {
     items.forEach((item, index) => {
         if (index === selectedIndex) {
             item.classList.add('bg-blue-100');
@@ -244,4 +242,14 @@ function updateHomeSelection(items) {
     });
 }
 
-
+function initializeFilterHandlers() {
+    // Add real-time filter updates if needed
+    const filterInputs = document.querySelectorAll('select[name="propertyType"], select[name="maxPrice"], select[name="minBedrooms"]');
+    
+    filterInputs.forEach(input => {
+        input.addEventListener('change', function() {
+            // Auto-submit form when filters change
+            this.closest('form').submit();
+        });
+    });
+}

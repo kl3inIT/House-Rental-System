@@ -1,13 +1,16 @@
 package com.rental.houserental.service.impl;
 
 import com.rental.houserental.dto.request.property.CreatePropertyRequestDTO;
-import com.rental.houserental.dto.response.FeaturedPropertyResponseDTO;
+import com.rental.houserental.dto.request.property.SearchPropertyCriteriaDTO;
+import com.rental.houserental.dto.response.property.FeaturedPropertyResponseDTO;
+import com.rental.houserental.dto.response.property.SearchPropertyResponseDTO;
 import com.rental.houserental.entity.PropertyImage;
 import com.rental.houserental.entity.RentalProperty;
 import com.rental.houserental.entity.User;
 import com.rental.houserental.enums.PropertyStatus;
 import com.rental.houserental.exceptions.property.ImageUploadException;
 import com.rental.houserental.repository.PropertyRepository;
+import com.rental.houserental.repository.specification.RentalPropertySpecification;
 
 import com.rental.houserental.service.CategoryService;
 import com.rental.houserental.service.ImageService;
@@ -15,8 +18,11 @@ import com.rental.houserental.service.PropertyService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -93,6 +99,18 @@ public class PropertyServiceImpl implements PropertyService {
         return result;
     }
 
+    @Override
+    public Page<SearchPropertyResponseDTO> searchProperties(SearchPropertyCriteriaDTO criteria, Pageable pageable) {
+        Specification<RentalProperty> spec = RentalPropertySpecification.withCriteria(criteria);
+        Page<RentalProperty> propertyPage = propertyRepository.findAll(spec, pageable);
+
+        List<SearchPropertyResponseDTO> dtoList = propertyPage.getContent().stream()
+                .map(this::convertToSearchDTO)
+                .toList();
+        
+        return new PageImpl<>(dtoList, pageable, propertyPage.getTotalElements());
+    }
+
     private FeaturedPropertyResponseDTO convertToFeaturedDTO(RentalProperty property) {
         List<String> imageUrls = property.getImages().stream()
                 .map(PropertyImage::getImageUrl)
@@ -105,6 +123,29 @@ public class PropertyServiceImpl implements PropertyService {
                 .bedrooms(property.getBedrooms())
                 .bathrooms(property.getBathrooms())
                 .location(property.getCity() + ", " + property.getProvince())
+                .mainImageUrl(property.getMainImageUrl())
+                .imageUrls(imageUrls)
+                .imageCount(imageUrls.size())
+                .build();
+    }
+
+    private SearchPropertyResponseDTO convertToSearchDTO(RentalProperty property) {
+        List<String> imageUrls = property.getImages().stream()
+                .map(PropertyImage::getImageUrl)
+                .toList();
+        
+        return SearchPropertyResponseDTO.builder()
+                .id(property.getId())
+                .title(property.getTitle())
+                .monthlyRent(property.getMonthlyRent())
+                .bedrooms(property.getBedrooms())
+                .bathrooms(property.getBathrooms())
+                .streetAddress(property.getStreetAddress())
+                .city(property.getCity())
+                .province(property.getProvince())
+                .description(property.getDescription())
+                .propertyStatus(property.getPropertyStatus().name())
+                .categoryName(property.getCategory().getName())
                 .mainImageUrl(property.getMainImageUrl())
                 .imageUrls(imageUrls)
                 .imageCount(imageUrls.size())
