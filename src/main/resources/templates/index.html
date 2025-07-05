@@ -24,8 +24,8 @@
             <p class="text-xl md:text-2xl mb-8 text-blue-100">
                 Discover amazing rental properties in your desired location
             </p>
-            <form class="bg-white rounded-lg shadow-xl p-6 max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div>
+            <form class="bg-white rounded-lg shadow-xl p-6 max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-4" method="get" th:action="@{/properties/search}">
+                <div class="relative">
                     <label class="block text-gray-700 text-sm font-medium mb-2">Location</label>
                     <input type="text" name="location" placeholder="Enter city or area"
                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900">

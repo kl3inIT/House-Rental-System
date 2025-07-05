@@ -97,6 +97,7 @@ src/main/resources/static/css/
 
 ### Development Commands
 
+### chạy npm run dev nếu thay đổi html css để tự build lại tailwind
 **For active development (watch mode):**
 ```bash
 # Windows

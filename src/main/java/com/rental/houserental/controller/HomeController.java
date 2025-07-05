@@ -1,19 +1,26 @@
 package com.rental.houserental.controller;
 
-import com.rental.houserental.dto.response.FeaturedPropertyResponseDTO;
+import com.rental.houserental.dto.response.property.FeaturedPropertyResponseDTO;
 import com.rental.houserental.entity.Category;
 import com.rental.houserental.service.CategoryService;
 import com.rental.houserental.service.PropertyService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.data.domain.Pageable;
 
-import java.math.BigDecimal;
+
 import java.util.List;
+
 import static com.rental.houserental.constant.AtrributeNameConstant.*;
 import static com.rental.houserental.constant.ViewNamesConstant.*;
+
+import com.rental.houserental.dto.request.property.SearchPropertyCriteriaDTO;
+import com.rental.houserental.dto.response.property.SearchPropertyResponseDTO;
+
 @Controller
 @RequiredArgsConstructor
 public class HomeController {
@@ -32,7 +39,6 @@ public class HomeController {
         model.addAttribute(FEATURED_PROPERTIES, featuredProperties);
 
 
-
         model.addAttribute("featuredPropertiesCount", featuredProperties.size());
         model.addAttribute("totalPropertiesCount", "10,000+");
         model.addAttribute("totalUsersCount", "50,000+");
@@ -44,15 +50,24 @@ public class HomeController {
 
     @GetMapping("/properties/search")
     public String searchProperties(
-        @RequestParam(required = false) String location,
-        @RequestParam(required = false) Long propertyType,
-        @RequestParam(required = false) BigDecimal maxPrice,
-        @RequestParam(required = false) Integer bedrooms,
-        @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "10") int size,
-        Model model
+            SearchPropertyCriteriaDTO criteria,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            Model model
     ) {
-        // Search logic here
+        // Add categories for the property type dropdown
+        List<Category> categories = categoryService.findAll();
+        model.addAttribute(CATEGORIES, categories);
+
+        Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size);
+        Page<SearchPropertyResponseDTO> propertyPage = propertyService.searchProperties(criteria, pageable);
+
+        model.addAttribute("properties", propertyPage.getContent());
+        model.addAttribute("currentPage", page + 1);
+        model.addAttribute("totalPages", propertyPage.getTotalPages());
+        model.addAttribute("searchCriteria", criteria);
+        model.addAttribute("totalElements", propertyPage.getTotalElements());
+
         return "search-properties";
     }
 }
