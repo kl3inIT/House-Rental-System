@@ -11,7 +11,7 @@ services:
       - SPRING_REDIS_HOST=redis
       - SPRING_MAIL_HOST=smtp.gmail.com
       - SPRING_MAIL_PORT=587
-      - SPRING_MAIL_USERNAME=dathip04@gmail.com
+      - SPRING_MAIL_USERNAME=datphhe180379@fpt.edu.vn
       - SPRING_MAIL_PASSWORD=mqdh xlvr acoy xitn
     depends_on:
       - db
