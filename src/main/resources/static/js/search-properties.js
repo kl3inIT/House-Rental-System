@@ -2,20 +2,75 @@
 document.addEventListener('DOMContentLoaded', function() {
     initializeLocationAutocomplete();
     initializeFilterHandlers();
+    initializeSortingHandler();
 });
 
 function initializeFilterHandlers() {
-    // Add any filter-specific functionality here
-    const filterInputs = document.querySelectorAll('select, input[type="number"]');
+    // Auto-submit form when filters change
+    const filterInputs = document.querySelectorAll('input[type="checkbox"], select[name="minBedrooms"], select[name="minBathrooms"]');
     filterInputs.forEach(input => {
         input.addEventListener('change', function() {
-            // Auto-submit form when filters change
+            // Don't auto-submit for published date filters if they're part of a group
+            if (this.name === 'publishedRanges') {
+                // Handle published date filters with custom logic
+                handlePublishedDateFilterChange(this);
+                return;
+            }
+            
             const form = this.closest('form');
             if (form) {
                 form.submit();
             }
         });
     });
+}
+
+function handlePublishedDateFilterChange(checkbox) {
+    const form = checkbox.closest('form');
+    if (!form) return;
+    
+    // Get all published date checkboxes
+    const publishedCheckboxes = form.querySelectorAll('input[name="publishedRanges"]');
+    const checkedValues = Array.from(publishedCheckboxes)
+        .filter(cb => cb.checked)
+        .map(cb => cb.value);
+    
+    // If no published date filters are selected, submit the form
+    if (checkedValues.length === 0) {
+        form.submit();
+        return;
+    }
+    
+    // If this is a "shorter" time range being selected, uncheck "longer" ranges
+    const timeRanges = ['today', 'week', 'month', '3months', '6months', 'year'];
+    const currentIndex = timeRanges.indexOf(checkbox.value);
+    
+    if (checkbox.checked && currentIndex >= 0) {
+        // Uncheck longer time ranges
+        publishedCheckboxes.forEach(cb => {
+            const cbIndex = timeRanges.indexOf(cb.value);
+            if (cbIndex > currentIndex) {
+                cb.checked = false;
+            }
+        });
+    }
+    
+    // Submit the form after a short delay to allow for UI updates
+    setTimeout(() => {
+        form.submit();
+    }, 100);
+}
+
+function initializeSortingHandler() {
+    const sortSelect = document.querySelector('select[name="sortBy"]');
+    if (sortSelect) {
+        sortSelect.addEventListener('change', function() {
+            // Update URL with new sort parameter
+            const url = new URL(window.location);
+            url.searchParams.set('sortBy', this.value);
+            window.location.href = url.toString();
+        });
+    }
 }
 
 function initializeLocationAutocomplete() {
@@ -104,8 +159,37 @@ function updateSelectedItem(items) {
     });
 }
 
+function selectLocation(locationName) {
+    const locationInput = document.querySelector('input[name="location"]');
+    locationInput.value = locationName;
+    hideAutocomplete();
+    
+    // Parse location to extract province and ward if possible
+    parseLocationForSearch(locationName);
+}
+
+function parseLocationForSearch(locationName) {
+    // If location contains a comma, it might be "Ward, Province" format
+    if (locationName.includes(',')) {
+        const parts = locationName.split(',').map(part => part.trim());
+        if (parts.length >= 2) {
+            const ward = parts[0];
+            const province = parts[1];
+            
+            // You could add hidden inputs to the form to pass these separately
+            // For now, we'll just use the full location name
+            console.log('Parsed location:', { ward, province, full: locationName });
+        }
+    }
+}
+
 async function searchLocations(query) {
     try {
+        // Show loading state
+        const autocompleteContainer = document.getElementById('location-autocomplete');
+        autocompleteContainer.innerHTML = '<div class="px-4 py-3 text-gray-500 text-center">Loading...</div>';
+        autocompleteContainer.classList.remove('hidden');
+        
         // Search in provinces first
         const provinceResponse = await fetch('https://vietnamlabs.com/api/vietnamprovince');
         const provinceData = await provinceResponse.json();
@@ -143,11 +227,23 @@ async function searchLocations(query) {
             index === self.findIndex(r => r.name === result.name)
         ).slice(0, 10);
         
-        displayAutocompleteResults(uniqueResults);
+        if (uniqueResults.length > 0) {
+            displayAutocompleteResults(uniqueResults);
+        } else {
+            autocompleteContainer.innerHTML = '<div class="px-4 py-3 text-gray-500 text-center">No results found</div>';
+            autocompleteContainer.classList.remove('hidden');
+        }
         
     } catch (error) {
         console.error('Error searching locations:', error);
-        hideAutocomplete();
+        const autocompleteContainer = document.getElementById('location-autocomplete');
+        autocompleteContainer.innerHTML = '<div class="px-4 py-3 text-red-500 text-center">Error loading locations</div>';
+        autocompleteContainer.classList.remove('hidden');
+        
+        // Fallback to static search after a delay
+        setTimeout(() => {
+            displayFallbackResults(query);
+        }, 1000);
     }
 }
 
@@ -176,10 +272,45 @@ function displayAutocompleteResults(results) {
     autocompleteContainer.classList.remove('hidden');
 }
 
-function selectLocation(locationName) {
-    const locationInput = document.querySelector('input[name="location"]');
-    locationInput.value = locationName;
-    hideAutocomplete();
+function displayFallbackResults(query) {
+    const autocompleteContainer = document.getElementById('location-autocomplete');
+    const vietnameseProvinces = [
+        'Hà Nội', 'TP Hồ Chí Minh', 'Đà Nẵng', 'Hải Phòng', 'Cần Thơ',
+        'An Giang', 'Bà Rịa - Vũng Tàu', 'Bắc Giang', 'Bắc Kạn', 'Bạc Liêu',
+        'Bắc Ninh', 'Bến Tre', 'Bình Định', 'Bình Dương', 'Bình Phước',
+        'Bình Thuận', 'Cà Mau', 'Cao Bằng', 'Đắk Lắk', 'Đắk Nông',
+        'Điện Biên', 'Đồng Nai', 'Đồng Tháp', 'Gia Lai', 'Hà Giang',
+        'Hà Nam', 'Hà Tĩnh', 'Hải Dương', 'Hậu Giang', 'Hòa Bình',
+        'Hưng Yên', 'Khánh Hòa', 'Kiên Giang', 'Kon Tum', 'Lai Châu',
+        'Lâm Đồng', 'Lạng Sơn', 'Lào Cai', 'Long An', 'Nam Định',
+        'Nghệ An', 'Ninh Bình', 'Ninh Thuận', 'Phú Thọ', 'Quảng Bình',
+        'Quảng Nam', 'Quảng Ngãi', 'Quảng Ninh', 'Quảng Trị', 'Sóc Trăng',
+        'Sơn La', 'Tây Ninh', 'Thái Bình', 'Thái Nguyên', 'Thanh Hóa',
+        'Thừa Thiên Huế', 'Tiền Giang', 'Trà Vinh', 'Tuyên Quang', 'Vĩnh Long',
+        'Vĩnh Phúc', 'Yên Bái', 'Phú Yên'
+    ];
+    
+    const matchingProvinces = vietnameseProvinces.filter(province => 
+        province.toLowerCase().includes(query.toLowerCase())
+    ).slice(0, 8);
+    
+    if (matchingProvinces.length === 0) {
+        hideAutocomplete();
+        return;
+    }
+    
+    autocompleteContainer.innerHTML = '';
+    matchingProvinces.forEach(province => {
+        const item = document.createElement('div');
+        item.className = 'autocomplete-item px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm';
+        item.textContent = province;
+        item.addEventListener('click', function() {
+            selectLocation(province);
+        });
+        autocompleteContainer.appendChild(item);
+    });
+    
+    autocompleteContainer.classList.remove('hidden');
 }
 
 function hideAutocomplete() {
@@ -187,4 +318,9 @@ function hideAutocomplete() {
     if (autocompleteContainer) {
         autocompleteContainer.classList.add('hidden');
     }
+}
+
+// Utility function to clear all filters
+function clearAllFilters() {
+    window.location.href = '/properties/search';
 }

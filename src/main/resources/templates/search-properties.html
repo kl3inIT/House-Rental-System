@@ -3,180 +3,308 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/main}">
 <head>
-    <title>Search Results - RentEase</title>
+    <title>Search Properties - RentEase</title>
 </head>
 <body>
     <div layout:fragment="content">
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <!-- Search Bar -->
-    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-                <form th:action="@{/properties/search}" method="get" class="grid grid-cols-1 md:grid-cols-5 gap-4">
-                    <div class="relative">
-                        <input type="text" name="location" placeholder="Location" th:value="${searchCriteria?.location}"
-                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
-            <div>
-                        <select name="propertyType" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="">Any Type</option>
-                            <option th:each="category : ${categories}" 
-                                    th:value="${category.id}" 
-                                    th:text="${category.name}"
-                                    th:selected="${searchCriteria?.propertyType == category.id}">Category Name</option>
-                </select>
-            </div>
-            <div>
-                        <select name="maxPrice" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="">Any Price</option>
-                            <option value="1000" th:selected="${searchCriteria?.maxPrice == 1000}">Under $1,000</option>
-                            <option value="2000" th:selected="${searchCriteria?.maxPrice == 2000}">$1,000 - $2,000</option>
-                            <option value="3000" th:selected="${searchCriteria?.maxPrice == 3000}">$2,000 - $3,000</option>
-                            <option value="999999" th:selected="${searchCriteria?.maxPrice == 999999}">Above $3,000</option>
-                </select>
-            </div>
-            <div>
-                        <select name="minBedrooms" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="">Any Beds</option>
-                            <option value="0" th:selected="${searchCriteria?.minBedrooms == 0}">Studio</option>
-                            <option value="1" th:selected="${searchCriteria?.minBedrooms == 1}">1+ Bedrooms</option>
-                            <option value="2" th:selected="${searchCriteria?.minBedrooms == 2}">2+ Bedrooms</option>
-                            <option value="3" th:selected="${searchCriteria?.minBedrooms == 3}">3+ Bedrooms</option>
-                </select>
-            </div>
-            <div>
-                <button type="submit" class="w-full bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 font-medium">
-                    <i class="fas fa-search mr-2"></i>Search
-                </button>
-            </div>
-        </form>
-    </div>
-
-    <div class="flex flex-col lg:flex-row gap-8">
-        <!-- Filters Sidebar -->
-        <div class="lg:w-1/4">
-            <div class="bg-white rounded-lg shadow-md p-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Filters</h3>
-
-                <!-- Price Range -->
-                <div class="mb-6">
-                    <h4 class="font-medium text-gray-700 mb-2">Price Range</h4>
-                    <div class="space-y-2">
-                        <label class="flex items-center">
-                                    <input type="checkbox" name="priceFilters" value="0-1000" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                            <span class="ml-2 text-sm text-gray-600">Under $1,000</span>
-                        </label>
-                        <label class="flex items-center">
-                                    <input type="checkbox" name="priceFilters" value="1000-2000" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" checked>
-                            <span class="ml-2 text-sm text-gray-600">$1,000 - $2,000</span>
-                        </label>
-                        <label class="flex items-center">
-                                    <input type="checkbox" name="priceFilters" value="2000-3000" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                            <span class="ml-2 text-sm text-gray-600">$2,000 - $3,000</span>
-                        </label>
-                        <label class="flex items-center">
-                                    <input type="checkbox" name="priceFilters" value="3000+" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                            <span class="ml-2 text-sm text-gray-600">Above $3,000</span>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Property Type -->
-                <div class="mb-6">
-                    <h4 class="font-medium text-gray-700 mb-2">Property Type</h4>
-                    <div class="space-y-2">
-                        <label class="flex items-center">
-                                    <input type="checkbox" name="typeFilters" value="APARTMENT" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" checked>
-                            <span class="ml-2 text-sm text-gray-600">Apartment</span>
-                        </label>
-                        <label class="flex items-center">
-                                    <input type="checkbox" name="typeFilters" value="HOUSE" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                            <span class="ml-2 text-sm text-gray-600">House</span>
-                        </label>
-                        <label class="flex items-center">
-                                    <input type="checkbox" name="typeFilters" value="CONDO" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                            <span class="ml-2 text-sm text-gray-600">Condo</span>
-                        </label>
-                        <label class="flex items-center">
-                                    <input type="checkbox" name="typeFilters" value="STUDIO" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                            <span class="ml-2 text-sm text-gray-600">Studio</span>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Amenities -->
-                <div class="mb-6">
-                    <h4 class="font-medium text-gray-700 mb-2">Amenities</h4>
-                    <div class="space-y-2">
-                        <label class="flex items-center">
-                                    <input type="checkbox" name="amenityFilters" value="PARKING" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                            <span class="ml-2 text-sm text-gray-600">Parking</span>
-                        </label>
-                        <label class="flex items-center">
-                                    <input type="checkbox" name="amenityFilters" value="PET_FRIENDLY" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                            <span class="ml-2 text-sm text-gray-600">Pet Friendly</span>
-                        </label>
-                        <label class="flex items-center">
-                                    <input type="checkbox" name="amenityFilters" value="GYM" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                            <span class="ml-2 text-sm text-gray-600">Gym</span>
-                        </label>
-                        <label class="flex items-center">
-                                    <input type="checkbox" name="amenityFilters" value="POOL" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                            <span class="ml-2 text-sm text-gray-600">Pool</span>
-                        </label>
-                    </div>
-                </div>
-
-                        <button type="button" onclick="clearAllFilters()" class="w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-200 transition-colors">
-                    Clear All Filters
-                </button>
-            </div>
-        </div>
-
-        <!-- Results -->
-        <div class="lg:w-3/4">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold text-gray-900">Search Results</h2>
-                <div class="flex items-center space-x-4">
-                            <span class="text-gray-600" th:text="${totalElements != null ? totalElements + ' properties found' : '0 properties found'}">0 properties found</span>
-                            <select name="sortBy" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <option value="relevance" th:selected="${sortBy == 'relevance'}">Sort by: Relevance</option>
-                                <option value="price_low_high" th:selected="${sortBy == 'price_low_high'}">Price: Low to High</option>
-                                <option value="price_high_low" th:selected="${sortBy == 'price_high_low'}">Price: High to Low</option>
-                                <option value="newest" th:selected="${sortBy == 'newest'}">Newest First</option>
-                    </select>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            
+            <!-- 🔎 Top Search Bar (Minimal) -->
+            <div class="mb-8">
+                <div class="max-w-3xl mx-auto">
+                    <form th:action="@{/properties/search}" method="get" class="flex gap-3 p-4 bg-white rounded-lg shadow-md">
+                        <div class="flex-1 relative">
+                            <input type="text" 
+                                   name="location" 
+                                   placeholder="Enter location (city, district, street)" 
+                                   th:value="${searchCriteria?.location}"
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                        <button type="submit" 
+                                class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium flex items-center gap-2">
+                            <i class="fas fa-search"></i>
+                            Search
+                        </button>
+                    </form>
                 </div>
             </div>
 
-                    <div class="space-y-6" th:if="${properties != null and !properties.empty}">
-                        <!-- Property Results -->
-                        <div th:each="property : ${properties}" class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                            <div class="md:flex">
-                                <div class="md:w-1/3">
-                                    <img th:src="${property.mainImageUrl != null ? property.mainImageUrl : '/images/placeholder.jpg'}" 
-                                         th:alt="${property.title}" 
-                                         class="w-full h-48 md:h-full object-cover">
+            <div class="flex flex-col lg:flex-row gap-8">
+                
+                <!-- 🧰 Filter Sidebar (Left Column) -->
+                <aside class="lg:w-1/4">
+                    <div class="bg-white rounded-lg shadow-md p-6 sticky top-4">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-6">Filters</h3>
+                        
+                        <form method="get" th:action="@{/properties/search}" class="space-y-6">
+                            <!-- Preserve current search parameters -->
+                            <!-- Preserve current search parameters -->
+                            <input type="hidden" name="location" th:value="${searchCriteria?.location}">
+                            <input type="hidden" name="province" th:value="${searchCriteria?.province}">
+                            <input type="hidden" name="ward" th:value="${searchCriteria?.ward}">
+                            <input type="hidden" name="keyword" th:value="${searchCriteria?.keyword}">
+                            <input type="hidden" name="status" th:value="${searchCriteria?.status}">
+                            
+                            <!-- Price Range -->
+                            <div>
+                                <h4 class="font-medium text-gray-700 mb-3">Price Range</h4>
+                                <div class="space-y-2">
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="priceRanges" value="0-1000000" 
+                                               th:checked="${#lists.contains(searchCriteria?.priceRanges, '0-1000000')}"
+                                               class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                        <span class="ml-2 text-sm text-gray-600">Under 1M VND</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="priceRanges" value="1000000-3000000" 
+                                               th:checked="${#lists.contains(searchCriteria?.priceRanges, '1000000-3000000')}"
+                                               class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                        <span class="ml-2 text-sm text-gray-600">1M - 3M VND</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="priceRanges" value="3000000-5000000" 
+                                               th:checked="${#lists.contains(searchCriteria?.priceRanges, '3000000-5000000')}"
+                                               class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                        <span class="ml-2 text-sm text-gray-600">3M - 5M VND</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="priceRanges" value="5000000-999999999" 
+                                               th:checked="${#lists.contains(searchCriteria?.priceRanges, '5000000-999999999')}"
+                                               class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                        <span class="ml-2 text-sm text-gray-600">Above 5M VND</span>
+                                    </label>
                                 </div>
-                                <div class="md:w-2/3 p-6">
-                                    <div class="flex justify-between items-start mb-2">
-                                        <h3 class="text-xl font-semibold text-gray-900" th:text="${property.title}">Property Title</h3>
-                                        <span class="text-2xl font-bold text-blue-600" th:text="'$' + ${#numbers.formatDecimal(property.monthlyRent, 0, 'COMMA', 0, 'POINT')} + '/mo'">$1,800/mo</span>
+                            </div>
+
+                            <!-- Area Range -->
+                            <div>
+                                <h4 class="font-medium text-gray-700 mb-3">Area Range</h4>
+                                <div class="space-y-2">
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="areaRanges" value="0-50" 
+                                               th:checked="${#lists.contains(searchCriteria?.areaRanges, '0-50')}"
+                                               class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                        <span class="ml-2 text-sm text-gray-600">Under 50m²</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="areaRanges" value="50-100" 
+                                               th:checked="${#lists.contains(searchCriteria?.areaRanges, '50-100')}"
+                                               class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                        <span class="ml-2 text-sm text-gray-600">50 - 100m²</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="areaRanges" value="100-200" 
+                                               th:checked="${#lists.contains(searchCriteria?.areaRanges, '100-200')}"
+                                               class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                        <span class="ml-2 text-sm text-gray-600">100 - 200m²</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="areaRanges" value="200-999999" 
+                                               th:checked="${#lists.contains(searchCriteria?.areaRanges, '200-999999')}"
+                                               class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                        <span class="ml-2 text-sm text-gray-600">Above 200m²</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Property Type -->
+                            <div>
+                                <h4 class="font-medium text-gray-700 mb-3">Property Type</h4>
+                                <div class="space-y-2">
+                                    <label class="flex items-center" th:each="category : ${categories}">
+                                        <input type="checkbox" name="propertyTypes" th:value="${category.id}" 
+                                               th:checked="${#lists.contains(searchCriteria?.propertyTypes, category.id)}"
+                                               class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                        <span class="ml-2 text-sm text-gray-600" th:text="${category.name}">Category</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Bedrooms -->
+                            <div>
+                                <h4 class="font-medium text-gray-700 mb-3">Bedrooms</h4>
+                                <select name="minBedrooms" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">Any</option>
+                                    <option value="0" th:selected="${searchCriteria?.minBedrooms == 0}">Studio</option>
+                                    <option value="1" th:selected="${searchCriteria?.minBedrooms == 1}">1+ Bedrooms</option>
+                                    <option value="2" th:selected="${searchCriteria?.minBedrooms == 2}">2+ Bedrooms</option>
+                                    <option value="3" th:selected="${searchCriteria?.minBedrooms == 3}">3+ Bedrooms</option>
+                                    <option value="4" th:selected="${searchCriteria?.minBedrooms == 4}">4+ Bedrooms</option>
+                                </select>
+                            </div>
+
+                            <!-- Bathrooms -->
+                            <div>
+                                <h4 class="font-medium text-gray-700 mb-3">Bathrooms</h4>
+                                <select name="minBathrooms" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">Any</option>
+                                    <option value="1" th:selected="${searchCriteria?.minBathrooms == 1}">1+ Bathrooms</option>
+                                    <option value="2" th:selected="${searchCriteria?.minBathrooms == 2}">2+ Bathrooms</option>
+                                    <option value="3" th:selected="${searchCriteria?.minBathrooms == 3}">3+ Bathrooms</option>
+                                </select>
+                            </div>
+
+                            <!-- Published Date -->
+                            <div>
+                                <h4 class="font-medium text-gray-700 mb-3">Published Date</h4>
+                                <div class="space-y-2">
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="publishedRanges" value="today" 
+                                               th:checked="${#lists.contains(searchCriteria?.publishedRanges, 'today')}"
+                                               class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                        <span class="ml-2 text-sm text-gray-600">Today</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="publishedRanges" value="week" 
+                                               th:checked="${#lists.contains(searchCriteria?.publishedRanges, 'week')}"
+                                               class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                        <span class="ml-2 text-sm text-gray-600">This Week</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="publishedRanges" value="month" 
+                                               th:checked="${#lists.contains(searchCriteria?.publishedRanges, 'month')}"
+                                               class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                        <span class="ml-2 text-sm text-gray-600">This Month</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="publishedRanges" value="3months" 
+                                               th:checked="${#lists.contains(searchCriteria?.publishedRanges, '3months')}"
+                                               class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                        <span class="ml-2 text-sm text-gray-600">Last 3 Months</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="publishedRanges" value="6months" 
+                                               th:checked="${#lists.contains(searchCriteria?.publishedRanges, '6months')}"
+                                               class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                        <span class="ml-2 text-sm text-gray-600">Last 6 Months</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="publishedRanges" value="year" 
+                                               th:checked="${#lists.contains(searchCriteria?.publishedRanges, 'year')}"
+                                               class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                        <span class="ml-2 text-sm text-gray-600">Last Year</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="space-y-3 pt-4 border-t border-gray-200">
+                                <button type="submit" 
+                                        class="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200 font-medium">
+                                    Apply Filters
+                                </button>
+                                <a th:href="@{/properties/search}" 
+                                   class="block text-center text-gray-600 hover:text-gray-800 text-sm">
+                                    Clear All Filters
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </aside>
+
+                <!-- 🏡 Property Results Section (Right Column) -->
+                <main class="lg:w-3/4">
+                    <!-- Results Header -->
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-900">Search Results</h2>
+                            <p class="text-gray-600 mt-1" th:text="${totalElements != null ? totalElements + ' properties found' : '0 properties found'}">
+                                0 properties found
+                            </p>
+                        </div>
+                        
+                        <!-- Sort Dropdown -->
+                        <div class="mt-4 sm:mt-0">
+                            <select name="sortBy" class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+                                <option th:each="sortOption : ${sortOptions}" 
+                                        th:value="${sortOption.value}" 
+                                        th:text="'Sort by: ' + ${sortOption.displayName}"
+                                        th:selected="${sortBy == sortOption.value}">
+                                    Sort by: Relevance
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Property Results Grid -->
+                    <div class="space-y-6" th:if="${properties != null and !properties.empty}">
+                        <div th:each="property : ${properties}" 
+                             class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                            
+                            <div class="md:flex">
+                                <!-- Property Image -->
+                                <div class="md:w-1/3">
+                                    <div class="relative h-48 md:h-full">
+                                        <img th:src="${property.mainImageUrl != null ? property.mainImageUrl : '/images/placeholder.jpg'}" 
+                                             th:alt="${property.title}" 
+                                             class="w-full h-full object-cover">
+                                        
+                                        <!-- Status Badge -->
+                                        <div class="absolute top-3 left-3">
+                                            <span th:class="${property.propertyStatus == 'AVAILABLE' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}"
+                                                  class="px-2 py-1 text-xs rounded-full font-medium"
+                                                  th:text="${property.propertyStatus}">
+                                                Available
+                                            </span>
+                                        </div>
+                                        
+                                        <!-- Property Type Badge -->
+                                        <div class="absolute top-3 right-3">
+                                            <span class="bg-blue-100 text-blue-800 px-2 py-1 text-xs rounded-full font-medium"
+                                                  th:text="${property.categoryName}">
+                                                Apartment
+                                            </span>
+                                        </div>
                                     </div>
-                                    <p class="text-gray-600 mb-3">
-                                        <i class="fas fa-map-marker-alt mr-1"></i>
+                                </div>
+
+                                <!-- Property Details -->
+                                <div class="md:w-2/3 p-6">
+                                    <div class="flex justify-between items-start mb-3">
+                                        <h3 class="text-xl font-semibold text-gray-900" th:text="${property.title}">Property Title</h3>
+                                        <div class="text-right">
+                                            <div class="text-2xl font-bold text-blue-600" 
+                                                 th:text="'₫' + ${#numbers.formatDecimal(property.monthlyRent, 0, 'COMMA', 0, 'POINT')} + '/mo'">
+                                                ₫1,800,000/mo
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Address -->
+                                    <p class="text-gray-600 mb-4 flex items-center">
+                                        <i class="fas fa-map-marker-alt mr-2 text-blue-500"></i>
                                         <span th:text="${property.fullAddress}">123 Main St, Downtown, New York, NY 10001</span>
                                     </p>
-                                    <p class="text-gray-700 mb-4" th:text="${property.description}">Property description goes here.</p>
-                                    <div class="flex justify-between items-center text-sm text-gray-600 mb-4">
-                                        <span><i class="fas fa-bed mr-1"></i><span th:text="${property.bedrooms == 0 ? 'Studio' : property.bedrooms + ' Beds'}">2 Beds</span></span>
-                                        <span><i class="fas fa-bath mr-1"></i><span th:text="${property.bathrooms + ' Baths'}">2 Baths</span></span>
-                                        <span><i class="fas fa-tag mr-1"></i><span th:text="${property.categoryName}">Apartment</span></span>
-                                        <span><i class="fas fa-calendar mr-1"></i><span th:text="${property.availabilityStatus}">Available Now</span></span>
+
+                                    <!-- Property Features -->
+                                    <div class="flex items-center space-x-6 text-sm text-gray-600 mb-4">
+                                        <span class="flex items-center">
+                                            <i class="fas fa-bed mr-1 text-blue-500"></i>
+                                            <span th:text="${property.bedrooms == 0 ? 'Studio' : property.bedrooms + ' Beds'}">2 Beds</span>
+                                        </span>
+                                        <span class="flex items-center">
+                                            <i class="fas fa-bath mr-1 text-blue-500"></i>
+                                            <span th:text="${property.bathrooms + ' Baths'}">2 Baths</span>
+                                        </span>
+                                        <span class="flex items-center">
+                                            <i class="fas fa-ruler-combined mr-1 text-blue-500"></i>
+                                            <span th:text="${property.area != null ? property.area + ' m²' : 'N/A'}">85 m²</span>
+                                        </span>
+                                        <span class="flex items-center" th:if="${property.publishedAt != null}">
+                                            <i class="fas fa-calendar-alt mr-1 text-blue-500"></i>
+                                            <span th:text="${#temporals.format(property.publishedAt, 'dd/MM/yyyy')}">01/01/2024</span>
+                                        </span>
                                     </div>
-                                    <div class="flex justify-between items-center">
-                                        <div class="flex space-x-2">
-                                            <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full" th:text="${property.propertyStatus}">Available</span>
-                                        </div>
+
+                                    <!-- Description Preview -->
+                                    <p class="text-gray-700 mb-4 line-clamp-2" th:text="${#strings.abbreviate(property.description, 150)}">
+                                        Property description goes here...
+                                    </p>
+
+                                    <!-- Action Button -->
+                                    <div class="flex justify-end">
                                         <a th:href="@{/properties/{id}(id=${property.id})}" 
-                                           class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
+                                           class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200 font-medium">
                                             View Details
                                         </a>
                                     </div>
@@ -190,145 +318,55 @@
                         <i class="fas fa-search text-gray-400 text-6xl mb-4"></i>
                         <h3 class="text-xl font-semibold text-gray-900 mb-2">No properties found</h3>
                         <p class="text-gray-600 mb-6">Try adjusting your search criteria or filters to find more properties.</p>
-                        <a th:href="@{/properties}" class="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition-colors">
+                        <a th:href="@{/properties/search}" 
+                           class="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition-colors">
                             Browse All Properties
                         </a>
                     </div>
 
-                    <!-- Sample Results (when no data) -->
+                    <!-- Loading State (when no data) -->
                     <div th:if="${properties == null}" class="space-y-6">
-                <!-- Property Result 1 -->
-                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                    <div class="md:flex">
-                        <div class="md:w-1/3">
-                                    <img src="/images/placeholder.jpg" alt="Modern Apartment" class="w-full h-48 md:h-full object-cover">
-                        </div>
-                        <div class="md:w-2/3 p-6">
-                            <div class="flex justify-between items-start mb-2">
-                                <h3 class="text-xl font-semibold text-gray-900">Modern Downtown Apartment</h3>
-                                <span class="text-2xl font-bold text-blue-600">$1,800/mo</span>
-                            </div>
-                            <p class="text-gray-600 mb-3">
-                                <i class="fas fa-map-marker-alt mr-1"></i>
-                                123 Main St, Downtown, New York, NY 10001
-                            </p>
-                            <p class="text-gray-700 mb-4">Spacious 2-bedroom apartment with city views, modern amenities, and walking distance to subway stations. Perfect for professionals.</p>
-                            <div class="flex justify-between items-center text-sm text-gray-600 mb-4">
-                                <span><i class="fas fa-bed mr-1"></i>2 Beds</span>
-                                <span><i class="fas fa-bath mr-1"></i>2 Baths</span>
-                                <span><i class="fas fa-ruler-combined mr-1"></i>1,200 sq ft</span>
-                                <span><i class="fas fa-calendar mr-1"></i>Available Now</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <div class="flex space-x-2">
-                                    <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Pet Friendly</span>
-                                    <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">Parking</span>
+                        <div class="bg-white rounded-lg shadow-md overflow-hidden animate-pulse">
+                            <div class="md:flex">
+                                <div class="md:w-1/3">
+                                    <div class="h-48 md:h-full bg-gray-200"></div>
                                 </div>
-                                        <a th:href="@{/properties/1}" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
-                                    View Details
-                                </a>
+                                <div class="md:w-2/3 p-6">
+                                    <div class="h-6 bg-gray-200 rounded mb-3"></div>
+                                    <div class="h-4 bg-gray-200 rounded mb-4"></div>
+                                    <div class="h-4 bg-gray-200 rounded mb-4"></div>
+                                    <div class="h-4 bg-gray-200 rounded w-1/2"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Property Result 2 -->
-                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                    <div class="md:flex">
-                        <div class="md:w-1/3">
-                                    <img src="/images/placeholder.jpg" alt="Cozy Studio" class="w-full h-48 md:h-full object-cover">
-                        </div>
-                        <div class="md:w-2/3 p-6">
-                            <div class="flex justify-between items-start mb-2">
-                                <h3 class="text-xl font-semibold text-gray-900">Cozy Studio Apartment</h3>
-                                <span class="text-2xl font-bold text-blue-600">$1,200/mo</span>
-                            </div>
-                            <p class="text-gray-600 mb-3">
-                                <i class="fas fa-map-marker-alt mr-1"></i>
-                                456 Oak Ave, Midtown, New York, NY 10018
-                            </p>
-                            <p class="text-gray-700 mb-4">Charming studio apartment with high ceilings, hardwood floors, and great natural light. Close to restaurants and shopping.</p>
-                            <div class="flex justify-between items-center text-sm text-gray-600 mb-4">
-                                <span><i class="fas fa-bed mr-1"></i>Studio</span>
-                                <span><i class="fas fa-bath mr-1"></i>1 Bath</span>
-                                <span><i class="fas fa-ruler-combined mr-1"></i>600 sq ft</span>
-                                <span><i class="fas fa-calendar mr-1"></i>Available Dec 1</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <div class="flex space-x-2">
-                                    <span class="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">Gym</span>
-                                    <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">Laundry</span>
-                                </div>
-                                        <a th:href="@{/properties/2}" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
-                                    View Details
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Property Result 3 -->
-                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                    <div class="md:flex">
-                        <div class="md:w-1/3">
-                                    <img src="/images/placeholder.jpg" alt="Luxury Condo" class="w-full h-48 md:h-full object-cover">
-                        </div>
-                        <div class="md:w-2/3 p-6">
-                            <div class="flex justify-between items-start mb-2">
-                                <h3 class="text-xl font-semibold text-gray-900">Luxury 1-Bedroom Condo</h3>
-                                <span class="text-2xl font-bold text-blue-600">$2,500/mo</span>
-                            </div>
-                            <p class="text-gray-600 mb-3">
-                                <i class="fas fa-map-marker-alt mr-1"></i>
-                                789 Park Ave, Upper East Side, New York, NY 10021
-                            </p>
-                            <p class="text-gray-700 mb-4">Elegant 1-bedroom condo with premium finishes, doorman building, and rooftop terrace. Prime location near Central Park.</p>
-                            <div class="flex justify-between items-center text-sm text-gray-600 mb-4">
-                                <span><i class="fas fa-bed mr-1"></i>1 Bed</span>
-                                <span><i class="fas fa-bath mr-1"></i>1 Bath</span>
-                                <span><i class="fas fa-ruler-combined mr-1"></i>800 sq ft</span>
-                                <span><i class="fas fa-calendar mr-1"></i>Available Jan 15</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <div class="flex space-x-2">
-                                    <span class="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">Doorman</span>
-                                    <span class="px-2 py-1 bg-indigo-100 text-indigo-800 text-xs rounded-full">Rooftop</span>
-                                </div>
-                                        <a th:href="@{/properties/3}" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
-                                    View Details
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Pagination -->
+                    <!-- 📱 Pagination -->
                     <div class="flex justify-center mt-8" th:if="${totalPages > 1}">
-                <nav class="flex space-x-2">
+                        <nav class="flex space-x-2">
                             <button th:if="${currentPage > 1}" 
-                                    th:onclick="'window.location.href=\'' + @{/properties/search(page=${currentPage - 1}, location=${searchCriteria?.location}, propertyType=${searchCriteria?.propertyType}, maxPrice=${searchCriteria?.maxPrice}, minBedrooms=${searchCriteria?.minBedrooms})} + '\''"
-                                    class="px-3 py-2 text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
-                        <i class="fas fa-chevron-left"></i>
-                    </button>
+                                    th:onclick="'window.location.href=\'' + @{/properties/search(page=${currentPage - 1}, location=${searchCriteria?.location}, province=${searchCriteria?.province}, ward=${searchCriteria?.ward}, keyword=${searchCriteria?.keyword}, status=${searchCriteria?.status}, sortBy=${sortBy}, publishedRanges=${searchCriteria?.publishedRanges})} + '\''"
+                                    class="px-3 py-2 text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
                             
                             <button th:each="pageNum : ${#numbers.sequence(1, totalPages)}"
-                                    th:onclick="'window.location.href=\'' + @{/properties/search(page=${pageNum}, location=${searchCriteria?.location}, propertyType=${searchCriteria?.propertyType}, maxPrice=${searchCriteria?.maxPrice}, minBedrooms=${searchCriteria?.minBedrooms})} + '\''"
+                                    th:onclick="'window.location.href=\'' + @{/properties/search(page=${pageNum}, location=${searchCriteria?.location}, province=${searchCriteria?.province}, ward=${searchCriteria?.ward}, keyword=${searchCriteria?.keyword}, status=${searchCriteria?.status}, sortBy=${sortBy}, publishedRanges=${searchCriteria?.publishedRanges})} + '\''"
                                     th:class="${pageNum == currentPage ? 'px-3 py-2 text-white bg-blue-600 border border-blue-600 rounded-md' : 'px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50'}"
                                     th:text="${pageNum}">1</button>
                             
                             <button th:if="${currentPage < totalPages}" 
-                                    th:onclick="'window.location.href=\'' + @{/properties/search(page=${currentPage + 1}, location=${searchCriteria?.location}, propertyType=${searchCriteria?.propertyType}, maxPrice=${searchCriteria?.maxPrice}, minBedrooms=${searchCriteria?.minBedrooms})} + '\''"
-                                    class="px-3 py-2 text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
-                        <i class="fas fa-chevron-right"></i>
-                    </button>
-                </nav>
+                                    th:onclick="'window.location.href=\'' + @{/properties/search(page=${currentPage + 1}, location=${searchCriteria?.location}, province=${searchCriteria?.province}, ward=${searchCriteria?.ward}, keyword=${searchCriteria?.keyword}, status=${searchCriteria?.status}, sortBy=${sortBy}, publishedRanges=${searchCriteria?.publishedRanges})} + '\''"
+                                    class="px-3 py-2 text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </nav>
+                    </div>
+                </main>
             </div>
-        </div>
-    </div>
         </div>
 
         <script th:src="@{/js/search-properties.js}"></script>
-</div>
+    </div>
 </body>
 </html>

@@ -5,6 +5,7 @@ import com.rental.houserental.exceptions.category.CategoryNotFoundException;
 import com.rental.houserental.exceptions.property.InvalidPropertyStatusException;
 import com.rental.houserental.exceptions.property.ImageUploadException;
 import com.rental.houserental.exceptions.property.FileDeleteException;
+import com.rental.houserental.exceptions.property.PropertyNotFoundException;
 import com.rental.houserental.exceptions.user.*;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -147,6 +148,13 @@ public class GlobalExceptionHandler {
         log.warn("Category not found: {}", ex.getMessage());
         model.addAttribute(MESSAGE, "The specified category does not exist.");
         return GENERIC_ERROR;
+    }
+
+    @ExceptionHandler(PropertyNotFoundException.class)
+    public String handlePropertyNotFoundException(PropertyNotFoundException ex, Model model) {
+        log.warn("Property not found: {}", ex.getMessage());
+        model.addAttribute(MESSAGE, "The requested property could not be found.");
+        return ERROR_404;
     }
 
     @ExceptionHandler(ImageUploadException.class)

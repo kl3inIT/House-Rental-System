@@ -2,6 +2,7 @@ package com.rental.houserental.controller;
 
 import com.rental.houserental.dto.response.property.FeaturedPropertyResponseDTO;
 import com.rental.houserental.entity.Category;
+import com.rental.houserental.enums.SortOption;
 import com.rental.houserental.service.CategoryService;
 import com.rental.houserental.service.PropertyService;
 import lombok.RequiredArgsConstructor;
@@ -9,17 +10,20 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.data.domain.Pageable;
-
+import org.springframework.data.web.PageableDefault;
 
 import java.util.List;
 
 import static com.rental.houserental.constant.AtrributeNameConstant.*;
-import static com.rental.houserental.constant.ViewNamesConstant.*;
 
 import com.rental.houserental.dto.request.property.SearchPropertyCriteriaDTO;
 import com.rental.houserental.dto.response.property.SearchPropertyResponseDTO;
+
+import java.math.BigDecimal;
 
 @Controller
 @RequiredArgsConstructor
@@ -29,45 +33,70 @@ public class HomeController {
     private final CategoryService categoryService;
 
     @GetMapping("/")
-    public String homePage(Model model) {
-        model.addAttribute("title", "Welcome to RentEase");
-
-        List<Category> categories = categoryService.findAll();
-        model.addAttribute(CATEGORIES, categories);
-
-        List<FeaturedPropertyResponseDTO> featuredProperties = propertyService.getFeaturedProperties(6);
+    public String home(Model model) {
+        List<FeaturedPropertyResponseDTO> featuredProperties = propertyService.getFeaturedProperties();
+        List<Category> categories = categoryService.getAllCategories();
+        
         model.addAttribute(FEATURED_PROPERTIES, featuredProperties);
-
-
-        model.addAttribute("featuredPropertiesCount", featuredProperties.size());
-        model.addAttribute("totalPropertiesCount", "10,000+");
-        model.addAttribute("totalUsersCount", "50,000+");
-        model.addAttribute("landlordCount", "500+");
-        model.addAttribute("cityCount", "100+");
-
-        return INDEX;
+        model.addAttribute(CATEGORIES, categories);
+        
+        return "index";
     }
 
     @GetMapping("/properties/search")
     public String searchProperties(
-            SearchPropertyCriteriaDTO criteria,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            Model model
-    ) {
-        // Add categories for the property type dropdown
-        List<Category> categories = categoryService.findAll();
-        model.addAttribute(CATEGORIES, categories);
+            @ModelAttribute SearchPropertyCriteriaDTO searchCriteria,
+            @RequestParam(required = false, defaultValue = "relevance") String sortBy,
+            @RequestParam(required = false) String propertyType,
+            @RequestParam(required = false) String maxPrice,
+            @PageableDefault(size = 12) Pageable pageable,
+            Model model) {
 
-        Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size);
-        Page<SearchPropertyResponseDTO> propertyPage = propertyService.searchProperties(criteria, pageable);
+        // Handle legacy parameters from home page
+        if (propertyType != null && !propertyType.isEmpty()) {
+            try {
+                searchCriteria.setPropertyType(Long.parseLong(propertyType));
+            } catch (NumberFormatException e) {
+                // Ignore invalid property type
+            }
+        }
+        
+        if (maxPrice != null && !maxPrice.isEmpty()) {
+            try {
+                searchCriteria.setMaxPrice(new BigDecimal(maxPrice));
+            } catch (NumberFormatException e) {
+                // Ignore invalid max price
+            }
+        }
 
-        model.addAttribute("properties", propertyPage.getContent());
-        model.addAttribute("currentPage", page + 1);
-        model.addAttribute("totalPages", propertyPage.getTotalPages());
-        model.addAttribute("searchCriteria", criteria);
-        model.addAttribute("totalElements", propertyPage.getTotalElements());
+        // Search properties with sorting handled by service
+        Page<SearchPropertyResponseDTO> propertiesPage = propertyService.searchPropertiesWithSorting(searchCriteria, sortBy, pageable);
+
+        // Get categories for filter dropdown
+        List<Category> categories = categoryService.getAllCategories();
+
+        // Add attributes to model
+        model.addAttribute("properties", propertiesPage.getContent());
+        model.addAttribute("searchCriteria", searchCriteria);
+        model.addAttribute("categories", categories);
+        model.addAttribute("totalElements", propertiesPage.getTotalElements());
+        model.addAttribute("totalPages", propertiesPage.getTotalPages());
+        model.addAttribute("currentPage", propertiesPage.getNumber() + 1);
+        model.addAttribute("sortBy", sortBy);
+        model.addAttribute("sortOptions", SortOption.values());
 
         return "search-properties";
+    }
+
+    @GetMapping("/properties/{id}")
+    public String propertyDetail(@PathVariable Long id, Model model) {
+        try {
+            SearchPropertyResponseDTO property = propertyService.getPropertyById(id);
+            model.addAttribute("property", property);
+            return "property-detail";
+        } catch (Exception e) {
+            // Redirect to search page if property not found
+            return "redirect:/properties/search";
+        }
     }
 }

@@ -45,10 +45,13 @@ function initializeHomeSearch() {
         }
 
         // Hide autocomplete if query is too short
-        if (query.length < 2) {
+        if (query.length < 1) {
             hideHomeAutocomplete();
             return;
         }
+
+        // Show loading indicator
+        showHomeLoading();
 
         // Debounce search
         searchTimeout = setTimeout(() => {
@@ -90,34 +93,36 @@ function initializeHomeSearch() {
     });
 }
 
+function showHomeLoading() {
+    const autocompleteContainer = document.getElementById('home-location-autocomplete');
+    if (autocompleteContainer) {
+        autocompleteContainer.innerHTML = '<div class="px-4 py-3 text-gray-500 text-center">Loading...</div>';
+        autocompleteContainer.classList.remove('hidden');
+    }
+}
+
 async function searchHomeLocations(query) {
     const autocompleteContainer = document.getElementById('home-location-autocomplete');
-    
     try {
         // Search in provinces first
         const response = await fetch('https://vietnamlabs.com/api/vietnamprovince');
         const data = await response.json();
-        
         let results = [];
-        
         if (data.success && data.data) {
             // Search in provinces
             const matchingProvinces = data.data.filter(provinceData => 
                 provinceData.province.toLowerCase().includes(query.toLowerCase())
             );
-            
             results.push(...matchingProvinces.map(provinceData => ({
                 name: provinceData.province,
                 type: 'province'
             })));
-            
             // Search in wards for matching provinces
             for (const provinceData of data.data) {
                 if (provinceData.wards && provinceData.wards.length > 0) {
                     const matchingWards = provinceData.wards.filter(ward => 
                         ward.name.toLowerCase().includes(query.toLowerCase())
                     );
-                    
                     results.push(...matchingWards.map(ward => ({
                         name: `${ward.name}, ${provinceData.province}`,
                         type: 'ward'
@@ -125,14 +130,16 @@ async function searchHomeLocations(query) {
                 }
             }
         }
-        
         // Limit results and remove duplicates
         const uniqueResults = results.filter((result, index, self) => 
             index === self.findIndex(r => r.name === result.name)
         ).slice(0, 10);
-        
-        displayHomeAutocompleteResults(uniqueResults);
-        
+        if (uniqueResults.length > 0) {
+            displayHomeAutocompleteResults(uniqueResults);
+        } else {
+            autocompleteContainer.innerHTML = '<div class="px-4 py-3 text-gray-500 text-center">No results found</div>';
+            autocompleteContainer.classList.remove('hidden');
+        }
     } catch (error) {
         console.error('Error searching locations:', error);
         // Fallback to static search
@@ -142,26 +149,20 @@ async function searchHomeLocations(query) {
 
 function displayHomeAutocompleteResults(results) {
     const autocompleteContainer = document.getElementById('home-location-autocomplete');
-    
     if (results.length === 0) {
         hideHomeAutocomplete();
         return;
     }
-
     autocompleteContainer.innerHTML = '';
-    
     results.forEach((result, index) => {
         const item = document.createElement('div');
         item.className = 'autocomplete-item px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm';
         item.textContent = result.name;
-        
         item.addEventListener('click', function() {
             selectHomeLocation(result.name);
         });
-        
         autocompleteContainer.appendChild(item);
     });
-    
     autocompleteContainer.classList.remove('hidden');
 }
 
@@ -182,30 +183,23 @@ function displayHomeFallbackResults(query) {
         'Thừa Thiên Huế', 'Tiền Giang', 'Trà Vinh', 'Tuyên Quang', 'Vĩnh Long',
         'Vĩnh Phúc', 'Yên Bái', 'Phú Yên'
     ];
-
     const matchingProvinces = vietnameseProvinces.filter(province => 
         province.toLowerCase().includes(query.toLowerCase())
     ).slice(0, 8);
-
     if (matchingProvinces.length === 0) {
         hideHomeAutocomplete();
         return;
     }
-
     autocompleteContainer.innerHTML = '';
-    
     matchingProvinces.forEach(province => {
         const item = document.createElement('div');
         item.className = 'autocomplete-item px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm';
         item.textContent = province;
-        
         item.addEventListener('click', function() {
             selectHomeLocation(province);
         });
-        
         autocompleteContainer.appendChild(item);
     });
-    
     autocompleteContainer.classList.remove('hidden');
 }
 
@@ -213,6 +207,24 @@ function selectHomeLocation(locationName) {
     const locationInput = document.querySelector('form[th\\:action*="search"] input[name="location"]');
     locationInput.value = locationName;
     hideHomeAutocomplete();
+    
+    // Parse location to extract province and ward if possible
+    parseLocationForSearch(locationName);
+}
+
+function parseLocationForSearch(locationName) {
+    // If location contains a comma, it might be "Ward, Province" format
+    if (locationName.includes(',')) {
+        const parts = locationName.split(',').map(part => part.trim());
+        if (parts.length >= 2) {
+            const ward = parts[0];
+            const province = parts[1];
+            
+            // You could add hidden inputs to the form to pass these separately
+            // For now, we'll just use the full location name
+            console.log('Parsed location:', { ward, province, full: locationName });
+        }
+    }
 }
 
 function hideHomeAutocomplete() {
@@ -225,10 +237,10 @@ function hideHomeAutocomplete() {
 function updateHomeSelection(items) {
     items.forEach((item, index) => {
         if (index === selectedIndex) {
-            item.classList.add('bg-blue-100');
+            item.classList.add('bg-blue-100', 'text-blue-900');
             item.classList.remove('hover:bg-gray-100');
         } else {
-            item.classList.remove('bg-blue-100');
+            item.classList.remove('bg-blue-100', 'text-blue-900');
             item.classList.add('hover:bg-gray-100');
         }
     });

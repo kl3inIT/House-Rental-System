@@ -8,5 +8,7 @@ public interface CategoryService {
 
     List<Category> findAll();
     
+    List<Category> getAllCategories(); // Alias for findAll for consistency
+    
     Category findById(Long id);
 } 

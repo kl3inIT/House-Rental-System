@@ -8,7 +8,9 @@ import com.rental.houserental.entity.PropertyImage;
 import com.rental.houserental.entity.RentalProperty;
 import com.rental.houserental.entity.User;
 import com.rental.houserental.enums.PropertyStatus;
+import com.rental.houserental.enums.SortOption;
 import com.rental.houserental.exceptions.property.ImageUploadException;
+import com.rental.houserental.exceptions.property.PropertyNotFoundException;
 import com.rental.houserental.repository.PropertyRepository;
 import com.rental.houserental.repository.specification.RentalPropertySpecification;
 
@@ -50,6 +52,7 @@ public class PropertyServiceImpl implements PropertyService {
                 .monthlyRent(request.getMonthlyRent())
                 .bedrooms(request.getBedrooms())
                 .bathrooms(request.getBathrooms())
+                .area(request.getArea())
                 .streetAddress(request.getStreetAddress())
                 .ward(request.getWard())
                 .province(request.getProvince())
@@ -84,6 +87,11 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
+    public List<FeaturedPropertyResponseDTO> getFeaturedProperties() {
+        return getFeaturedProperties(6); // Default limit
+    }
+
+    @Override
     public List<FeaturedPropertyResponseDTO> getFeaturedProperties(int limit) {
         log.info("Fetching {} featured properties", limit);
 
@@ -101,6 +109,8 @@ public class PropertyServiceImpl implements PropertyService {
 
     @Override
     public Page<SearchPropertyResponseDTO> searchProperties(SearchPropertyCriteriaDTO criteria, Pageable pageable) {
+        log.info("Searching properties with criteria: {}", criteria);
+        
         Specification<RentalProperty> spec = RentalPropertySpecification.withCriteria(criteria);
         Page<RentalProperty> propertyPage = propertyRepository.findAll(spec, pageable);
 
@@ -108,7 +118,33 @@ public class PropertyServiceImpl implements PropertyService {
                 .map(this::convertToSearchDTO)
                 .toList();
         
+        log.info("Found {} properties matching criteria", dtoList.size());
         return new PageImpl<>(dtoList, pageable, propertyPage.getTotalElements());
+    }
+
+    @Override
+    public Page<SearchPropertyResponseDTO> searchPropertiesWithSorting(SearchPropertyCriteriaDTO criteria, String sortBy, Pageable pageable) {
+        log.info("Searching properties with criteria: {} and sorting: {}", criteria, sortBy);
+        
+        // Apply sorting
+        SortOption sortOption = SortOption.fromValue(sortBy);
+        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sortOption.getSort());
+        
+        // Search properties with sorting
+        return searchProperties(criteria, sortedPageable);
+    }
+
+    @Override
+    public SearchPropertyResponseDTO getPropertyById(Long id) {
+        log.info("Fetching property with ID: {}", id);
+        
+        RentalProperty property = propertyRepository.findById(id)
+                .orElseThrow(() -> new PropertyNotFoundException("Property not found with ID: " + id));
+        
+        SearchPropertyResponseDTO result = convertToSearchDTO(property);
+        log.info("Found property: {}", result.getTitle());
+        
+        return result;
     }
 
     private FeaturedPropertyResponseDTO convertToFeaturedDTO(RentalProperty property) {
@@ -122,6 +158,7 @@ public class PropertyServiceImpl implements PropertyService {
                 .price(property.getMonthlyRent())
                 .bedrooms(property.getBedrooms())
                 .bathrooms(property.getBathrooms())
+                .area(property.getArea())
                 .ward(property.getWard())
                 .province(property.getProvince())
                 .location(property.getWard() + ", " + property.getProvince()) // Backward compatibility
@@ -142,6 +179,7 @@ public class PropertyServiceImpl implements PropertyService {
                 .monthlyRent(property.getMonthlyRent())
                 .bedrooms(property.getBedrooms())
                 .bathrooms(property.getBathrooms())
+                .area(property.getArea())
                 .streetAddress(property.getStreetAddress())
                 .ward(property.getWard())
                 .province(property.getProvince())
@@ -151,6 +189,28 @@ public class PropertyServiceImpl implements PropertyService {
                 .mainImageUrl(property.getMainImageUrl())
                 .imageUrls(imageUrls)
                 .imageCount(imageUrls.size())
+                .fullAddress(buildFullAddress(property))
+                .publishedAt(property.getPublishedAt())
                 .build();
+    }
+
+    private String buildFullAddress(RentalProperty property) {
+        StringBuilder address = new StringBuilder();
+        
+        if (property.getStreetAddress() != null && !property.getStreetAddress().trim().isEmpty()) {
+            address.append(property.getStreetAddress().trim());
+        }
+        
+        if (property.getWard() != null && !property.getWard().trim().isEmpty()) {
+            if (address.length() > 0) address.append(", ");
+            address.append(property.getWard().trim());
+        }
+        
+        if (property.getProvince() != null && !property.getProvince().trim().isEmpty()) {
+            if (address.length() > 0) address.append(", ");
+            address.append(property.getProvince().trim());
+        }
+        
+        return address.toString();
     }
 }

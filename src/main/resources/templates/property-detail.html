@@ -4,7 +4,7 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/main}">
 <head>
-    <title>Property Details - RentEase</title>
+    <title th:text="${property.title + ' - RentEase'}">Property Details - RentEase</title>
 </head>
 <body>
 <main layout:fragment="content">
@@ -21,7 +21,7 @@
                 <li>
                     <div class="flex items-center">
                         <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
-                        <a th:href="@{/properties}" class="ml-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ml-2">Properties</a>
+                        <a th:href="@{/properties/search}" class="ml-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ml-2">Properties</a>
                     </div>
                 </li>
                 <li aria-current="page">
@@ -37,26 +37,29 @@
         <div class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
             <div class="md:flex">
                 <div class="md:w-1/3">
-                    <img src="/placeholder.svg?height=400&width=600" alt="Property" class="w-full h-64 md:h-96 object-cover">
+                    <img th:src="${property.mainImageUrl != null ? property.mainImageUrl : '/images/placeholder.jpg'}" 
+                         th:alt="${property.title}" 
+                         class="w-full h-64 md:h-96 object-cover">
                 </div>
                 <div class="md:w-2/3 p-6">
                     <div class="flex justify-between items-start mb-4">
                         <div>
-                            <h1 class="text-3xl font-bold text-gray-900 mb-2">Modern Downtown Apartment</h1>
+                            <h1 class="text-3xl font-bold text-gray-900 mb-2" th:text="${property.title}">Property Title</h1>
                             <p class="text-gray-600 mb-4 flex items-center">
                                 <i class="fas fa-map-marker-alt mr-2"></i>
-                                123 Main St, Downtown, New York, NY 10001
+                                <span th:text="${property.fullAddress}">Property Address</span>
                             </p>
                             <div class="flex items-center space-x-6 text-lg text-gray-600 mb-6">
-                                <span><i class="fas fa-bed mr-2"></i>2 Beds</span>
-                                <span><i class="fas fa-bath mr-2"></i>2 Baths</span>
-                                <span><i class="fas fa-ruler-combined mr-2"></i>1,200 sq ft</span>
+                                <span><i class="fas fa-bed mr-2"></i><span th:text="${property.bedrooms == 0 ? 'Studio' : property.bedrooms + ' Beds'}">Beds</span></span>
+                                <span><i class="fas fa-bath mr-2"></i><span th:text="${property.bathrooms + ' Baths'}">Baths</span></span>
+                                <span><i class="fas fa-ruler-combined mr-2"></i><span th:text="${property.area + ' m²'}">Area</span></span>
                             </div>
                         </div>
                         <div class="text-right">
-                            <div class="text-4xl font-bold text-blue-600 mb-2">$1,800</div>
+                            <div class="text-4xl font-bold text-blue-600 mb-2" th:text="'$' + ${#numbers.formatDecimal(property.monthlyRent, 0, 'COMMA', 0, 'POINT')}">$1,800</div>
                             <div class="text-gray-500">per month</div>
-                            <span class="inline-block mt-3 px-4 py-2 bg-green-100 text-green-800 text-sm rounded-full">Available</span>
+                            <span class="inline-block mt-3 px-4 py-2 bg-green-100 text-green-800 text-sm rounded-full" 
+                                  th:text="${property.propertyStatus == 'AVAILABLE' ? 'Available' : 'Not Available'}">Available</span>
                         </div>
                     </div>
 
@@ -125,17 +128,8 @@
             <!-- Tab Content -->
             <div id="description-content" class="tab-content">
                 <h3 class="text-lg font-semibold text-gray-900 mb-4">Property Description</h3>
-                <p class="text-gray-600 leading-relaxed mb-4">
-                    This stunning modern apartment is located in the heart of downtown, offering the perfect blend of urban convenience and comfortable living. 
-                    With its sleek design and premium finishes, this 2-bedroom, 2-bathroom unit provides 1,200 square feet of beautifully appointed living space.
-                </p>
-                <p class="text-gray-600 leading-relaxed mb-4">
-                    The open-concept layout features floor-to-ceiling windows that flood the space with natural light and offer breathtaking city views. 
-                    The gourmet kitchen boasts stainless steel appliances, granite countertops, and custom cabinetry.
-                </p>
-                <p class="text-gray-600 leading-relaxed">
-                    Residents enjoy access to premium amenities including a rooftop pool, state-of-the-art fitness center, and 24/7 concierge service. 
-                    Located within walking distance of restaurants, shopping, and public transportation.
+                <p class="text-gray-600 leading-relaxed mb-4" th:text="${property.description}">
+                    Property description goes here.
                 </p>
             </div>
 
@@ -200,35 +194,24 @@
             </div>
 
             <div id="reviews-content" class="tab-content hidden">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Tenant Reviews</h3>
-                <div class="space-y-6">
-                    <div class="border-b border-gray-200 pb-6">
-                        <div class="flex items-center mb-3">
-                            <div class="flex text-yellow-400">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                            </div>
-                            <span class="ml-2 text-gray-600 text-sm">5/5 stars</span>
-                        </div>
-                        <p class="text-gray-600 mb-2">"Amazing apartment with great amenities. The location is perfect and the building management is very responsive."</p>
-                        <p class="text-gray-500 text-sm">- John D., Former tenant</p>
-                    </div>
-                    <div class="border-b border-gray-200 pb-6">
-                        <div class="flex items-center mb-3">
-                            <div class="flex text-yellow-400">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="far fa-star"></i>
-                            </div>
-                            <span class="ml-2 text-gray-600 text-sm">4/5 stars</span>
-                        </div>
-                        <p class="text-gray-600 mb-2">"Beautiful apartment with modern finishes. Only minor issue was occasional noise from the street, but overall excellent experience."</p>
-                        <p class="text-gray-500 text-sm">- Sarah M., Former tenant</p>
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Reviews & Ratings</h3>
+                <div class="text-center py-8">
+                    <i class="fas fa-star text-4xl text-yellow-400 mb-4"></i>
+                    <p class="text-gray-600">No reviews yet. Be the first to review this property!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Property Images Gallery -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8" th:if="${!#lists.isEmpty(property.imageUrls)}">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Property Images</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div th:each="imageUrl : ${property.imageUrls}" class="relative group">
+                    <img th:src="${imageUrl}" 
+                         th:alt="${property.title}" 
+                         class="w-full h-48 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity">
+                    <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-expand text-white opacity-0 group-hover:opacity-100 transition-opacity"></i>
                     </div>
                 </div>
             </div>
