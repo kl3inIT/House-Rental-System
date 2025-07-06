@@ -204,6 +204,18 @@
 
                 <!-- 🏡 Property Results Section (Right Column) -->
                 <main class="lg:w-3/4">
+                    <!-- Error Message -->
+                    <div th:if="${error != null}" class="mb-6 p-4 bg-red-50 border border-red-200 rounded-md">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-exclamation-triangle text-red-400"></i>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm text-red-700" th:text="${error}">Error message</p>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <!-- Results Header -->
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
                         <div>
@@ -344,22 +356,61 @@
                     <!-- 📱 Pagination -->
                     <div class="flex justify-center mt-8" th:if="${totalPages > 1}">
                         <nav class="flex space-x-2">
-                            <button th:if="${currentPage > 1}" 
-                                    th:onclick="'window.location.href=\'' + @{/properties/search(page=${currentPage - 1}, location=${searchCriteria?.location}, province=${searchCriteria?.province}, ward=${searchCriteria?.ward}, keyword=${searchCriteria?.keyword}, status=${searchCriteria?.status}, sortBy=${sortBy}, publishedRanges=${searchCriteria?.publishedRanges})} + '\''"
-                                    class="px-3 py-2 text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                            <!-- Previous Page -->
+                            <a th:if="${currentPage > 1}" 
+                               th:href="@{/properties/search(page=${currentPage - 1}, 
+                                                           location=${searchCriteria?.location}, 
+                                                           province=${searchCriteria?.province}, 
+                                                           ward=${searchCriteria?.ward}, 
+                                                           keyword=${searchCriteria?.keyword}, 
+                                                           status=${searchCriteria?.status}, 
+                                                           sortBy=${sortBy}, 
+                                                           priceRanges=${searchCriteria?.priceRanges}, 
+                                                           areaRanges=${searchCriteria?.areaRanges}, 
+                                                           propertyTypes=${searchCriteria?.propertyTypes}, 
+                                                           minBedrooms=${searchCriteria?.minBedrooms}, 
+                                                           minBathrooms=${searchCriteria?.minBathrooms}, 
+                                                           publishedRanges=${searchCriteria?.publishedRanges})}"
+                               class="px-3 py-2 text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
                                 <i class="fas fa-chevron-left"></i>
-                            </button>
+                            </a>
                             
-                            <button th:each="pageNum : ${#numbers.sequence(1, totalPages)}"
-                                    th:onclick="'window.location.href=\'' + @{/properties/search(page=${pageNum}, location=${searchCriteria?.location}, province=${searchCriteria?.province}, ward=${searchCriteria?.ward}, keyword=${searchCriteria?.keyword}, status=${searchCriteria?.status}, sortBy=${sortBy}, publishedRanges=${searchCriteria?.publishedRanges})} + '\''"
-                                    th:class="${pageNum == currentPage ? 'px-3 py-2 text-white bg-blue-600 border border-blue-600 rounded-md' : 'px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50'}"
-                                    th:text="${pageNum}">1</button>
+                            <!-- Page Numbers -->
+                            <a th:each="pageNum : ${#numbers.sequence(1, totalPages)}"
+                               th:href="@{/properties/search(page=${pageNum}, 
+                                                           location=${searchCriteria?.location}, 
+                                                           province=${searchCriteria?.province}, 
+                                                           ward=${searchCriteria?.ward}, 
+                                                           keyword=${searchCriteria?.keyword}, 
+                                                           status=${searchCriteria?.status}, 
+                                                           sortBy=${sortBy}, 
+                                                           priceRanges=${searchCriteria?.priceRanges}, 
+                                                           areaRanges=${searchCriteria?.areaRanges}, 
+                                                           propertyTypes=${searchCriteria?.propertyTypes}, 
+                                                           minBedrooms=${searchCriteria?.minBedrooms}, 
+                                                           minBathrooms=${searchCriteria?.minBathrooms}, 
+                                                           publishedRanges=${searchCriteria?.publishedRanges})}"
+                               th:class="${pageNum == currentPage ? 'px-3 py-2 text-white bg-blue-600 border border-blue-600 rounded-md' : 'px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50'}"
+                               th:text="${pageNum}">1</a>
                             
-                            <button th:if="${currentPage < totalPages}" 
-                                    th:onclick="'window.location.href=\'' + @{/properties/search(page=${currentPage + 1}, location=${searchCriteria?.location}, province=${searchCriteria?.province}, ward=${searchCriteria?.ward}, keyword=${searchCriteria?.keyword}, status=${searchCriteria?.status}, sortBy=${sortBy}, publishedRanges=${searchCriteria?.publishedRanges})} + '\''"
-                                    class="px-3 py-2 text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                            <!-- Next Page -->
+                            <a th:if="${currentPage < totalPages}" 
+                               th:href="@{/properties/search(page=${currentPage + 1}, 
+                                                           location=${searchCriteria?.location}, 
+                                                           province=${searchCriteria?.province}, 
+                                                           ward=${searchCriteria?.ward}, 
+                                                           keyword=${searchCriteria?.keyword}, 
+                                                           status=${searchCriteria?.status}, 
+                                                           sortBy=${sortBy}, 
+                                                           priceRanges=${searchCriteria?.priceRanges}, 
+                                                           areaRanges=${searchCriteria?.areaRanges}, 
+                                                           propertyTypes=${searchCriteria?.propertyTypes}, 
+                                                           minBedrooms=${searchCriteria?.minBedrooms}, 
+                                                           minBathrooms=${searchCriteria?.minBathrooms}, 
+                                                           publishedRanges=${searchCriteria?.publishedRanges})}"
+                               class="px-3 py-2 text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
                                 <i class="fas fa-chevron-right"></i>
-                            </button>
+                            </a>
                         </nav>
                     </div>
                 </main>

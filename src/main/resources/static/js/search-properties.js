@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeLocationAutocomplete();
     initializeFilterHandlers();
     initializeSortingHandler();
+    initializeLoadingStates();
 });
 
 function initializeFilterHandlers() {
@@ -19,6 +20,7 @@ function initializeFilterHandlers() {
             
             const form = this.closest('form');
             if (form) {
+                showLoadingState();
                 form.submit();
             }
         });
@@ -37,6 +39,7 @@ function handlePublishedDateFilterChange(checkbox) {
     
     // If no published date filters are selected, submit the form
     if (checkedValues.length === 0) {
+        showLoadingState();
         form.submit();
         return;
     }
@@ -57,6 +60,7 @@ function handlePublishedDateFilterChange(checkbox) {
     
     // Submit the form after a short delay to allow for UI updates
     setTimeout(() => {
+        showLoadingState();
         form.submit();
     }, 100);
 }
@@ -65,11 +69,40 @@ function initializeSortingHandler() {
     const sortSelect = document.querySelector('select[name="sortBy"]');
     if (sortSelect) {
         sortSelect.addEventListener('change', function() {
+            showLoadingState();
             // Update URL with new sort parameter
             const url = new URL(window.location);
             url.searchParams.set('sortBy', this.value);
             window.location.href = url.toString();
         });
+    }
+}
+
+function initializeLoadingStates() {
+    // Add loading indicator to the page
+    const loadingIndicator = document.createElement('div');
+    loadingIndicator.id = 'loading-indicator';
+    loadingIndicator.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden';
+    loadingIndicator.innerHTML = `
+        <div class="bg-white rounded-lg p-6 flex items-center space-x-3">
+            <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+            <span class="text-gray-700">Loading...</span>
+        </div>
+    `;
+    document.body.appendChild(loadingIndicator);
+}
+
+function showLoadingState() {
+    const loadingIndicator = document.getElementById('loading-indicator');
+    if (loadingIndicator) {
+        loadingIndicator.classList.remove('hidden');
+    }
+}
+
+function hideLoadingState() {
+    const loadingIndicator = document.getElementById('loading-indicator');
+    if (loadingIndicator) {
+        loadingIndicator.classList.add('hidden');
     }
 }
 
@@ -101,6 +134,9 @@ function initializeLocationAutocomplete() {
             return;
         }
 
+        // Show loading indicator in autocomplete
+        showAutocompleteLoading();
+
         // Debounce search
         searchTimeout = setTimeout(() => {
             searchLocations(query);
@@ -128,6 +164,13 @@ function initializeLocationAutocomplete() {
                     e.preventDefault();
                     if (selectedIndex >= 0 && selectedIndex < items.length) {
                         items[selectedIndex].click();
+                    } else {
+                        // Submit the form if no item is selected
+                        const form = locationInput.closest('form');
+                        if (form) {
+                            showLoadingState();
+                            form.submit();
+                        }
                     }
                     break;
                 case 'Escape':
@@ -147,6 +190,14 @@ function initializeLocationAutocomplete() {
     });
 }
 
+function showAutocompleteLoading() {
+    const autocompleteContainer = document.getElementById('location-autocomplete');
+    if (autocompleteContainer) {
+        autocompleteContainer.innerHTML = '<div class="px-4 py-3 text-gray-500 text-center">Loading...</div>';
+        autocompleteContainer.classList.remove('hidden');
+    }
+}
+
 function updateSelectedItem(items) {
     items.forEach((item, index) => {
         if (index === selectedIndex) {
@@ -159,39 +210,15 @@ function updateSelectedItem(items) {
     });
 }
 
-function selectLocation(locationName) {
-    const locationInput = document.querySelector('input[name="location"]');
-    locationInput.value = locationName;
-    hideAutocomplete();
-    
-    // Parse location to extract province and ward if possible
-    parseLocationForSearch(locationName);
-}
-
-function parseLocationForSearch(locationName) {
-    // If location contains a comma, it might be "Ward, Province" format
-    if (locationName.includes(',')) {
-        const parts = locationName.split(',').map(part => part.trim());
-        if (parts.length >= 2) {
-            const ward = parts[0];
-            const province = parts[1];
-            
-            // You could add hidden inputs to the form to pass these separately
-            // For now, we'll just use the full location name
-            console.log('Parsed location:', { ward, province, full: locationName });
-        }
-    }
-}
-
 async function searchLocations(query) {
     try {
-        // Show loading state
-        const autocompleteContainer = document.getElementById('location-autocomplete');
-        autocompleteContainer.innerHTML = '<div class="px-4 py-3 text-gray-500 text-center">Loading...</div>';
-        autocompleteContainer.classList.remove('hidden');
-        
         // Search in provinces first
         const provinceResponse = await fetch('https://vietnamlabs.com/api/vietnamprovince');
+        
+        if (!provinceResponse.ok) {
+            throw new Error(`HTTP error! status: ${provinceResponse.status}`);
+        }
+        
         const provinceData = await provinceResponse.json();
         
         let results = [];
@@ -227,49 +254,13 @@ async function searchLocations(query) {
             index === self.findIndex(r => r.name === result.name)
         ).slice(0, 10);
         
-        if (uniqueResults.length > 0) {
-            displayAutocompleteResults(uniqueResults);
-        } else {
-            autocompleteContainer.innerHTML = '<div class="px-4 py-3 text-gray-500 text-center">No results found</div>';
-            autocompleteContainer.classList.remove('hidden');
-        }
+        displayAutocompleteResults(uniqueResults);
         
     } catch (error) {
         console.error('Error searching locations:', error);
-        const autocompleteContainer = document.getElementById('location-autocomplete');
-        autocompleteContainer.innerHTML = '<div class="px-4 py-3 text-red-500 text-center">Error loading locations</div>';
-        autocompleteContainer.classList.remove('hidden');
-        
-        // Fallback to static search after a delay
-        setTimeout(() => {
-            displayFallbackResults(query);
-        }, 1000);
+        // Fallback to static search
+        displayFallbackResults(query);
     }
-}
-
-function displayAutocompleteResults(results) {
-    const autocompleteContainer = document.getElementById('location-autocomplete');
-    
-    if (results.length === 0) {
-        hideAutocomplete();
-        return;
-    }
-
-    autocompleteContainer.innerHTML = '';
-    
-    results.forEach((result, index) => {
-        const item = document.createElement('div');
-        item.className = 'autocomplete-item px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm';
-        item.textContent = result.name;
-        
-        item.addEventListener('click', function() {
-            selectLocation(result.name);
-        });
-        
-        autocompleteContainer.appendChild(item);
-    });
-    
-    autocompleteContainer.classList.remove('hidden');
 }
 
 function displayFallbackResults(query) {
@@ -313,6 +304,44 @@ function displayFallbackResults(query) {
     autocompleteContainer.classList.remove('hidden');
 }
 
+function displayAutocompleteResults(results) {
+    const autocompleteContainer = document.getElementById('location-autocomplete');
+    
+    if (results.length === 0) {
+        hideAutocomplete();
+        return;
+    }
+
+    autocompleteContainer.innerHTML = '';
+    
+    results.forEach((result, index) => {
+        const item = document.createElement('div');
+        item.className = 'autocomplete-item px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm';
+        item.textContent = result.name;
+        
+        item.addEventListener('click', function() {
+            selectLocation(result.name);
+        });
+        
+        autocompleteContainer.appendChild(item);
+    });
+    
+    autocompleteContainer.classList.remove('hidden');
+}
+
+function selectLocation(locationName) {
+    const locationInput = document.querySelector('input[name="location"]');
+    locationInput.value = locationName;
+    hideAutocomplete();
+    
+    // Auto-submit the form when location is selected
+    const form = locationInput.closest('form');
+    if (form) {
+        showLoadingState();
+        form.submit();
+    }
+}
+
 function hideAutocomplete() {
     const autocompleteContainer = document.getElementById('location-autocomplete');
     if (autocompleteContainer) {
@@ -322,5 +351,18 @@ function hideAutocomplete() {
 
 // Utility function to clear all filters
 function clearAllFilters() {
+    showLoadingState();
     window.location.href = '/properties/search';
 }
+
+// Handle form submission with loading state
+document.addEventListener('submit', function(e) {
+    if (e.target.matches('form[action*="search"]')) {
+        showLoadingState();
+    }
+});
+
+// Hide loading state when page is fully loaded
+window.addEventListener('load', function() {
+    hideLoadingState();
+});

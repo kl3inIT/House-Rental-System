@@ -207,24 +207,6 @@ function selectHomeLocation(locationName) {
     const locationInput = document.querySelector('form[th\\:action*="search"] input[name="location"]');
     locationInput.value = locationName;
     hideHomeAutocomplete();
-    
-    // Parse location to extract province and ward if possible
-    parseLocationForSearch(locationName);
-}
-
-function parseLocationForSearch(locationName) {
-    // If location contains a comma, it might be "Ward, Province" format
-    if (locationName.includes(',')) {
-        const parts = locationName.split(',').map(part => part.trim());
-        if (parts.length >= 2) {
-            const ward = parts[0];
-            const province = parts[1];
-            
-            // You could add hidden inputs to the form to pass these separately
-            // For now, we'll just use the full location name
-            console.log('Parsed location:', { ward, province, full: locationName });
-        }
-    }
 }
 
 function hideHomeAutocomplete() {

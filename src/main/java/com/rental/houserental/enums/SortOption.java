@@ -16,8 +16,6 @@ public enum SortOption {
         Sort.by(Sort.Direction.ASC, "area")),
     AREA_DESC("area_desc", "Area: Large to Small", 
         Sort.by(Sort.Direction.DESC, "area")),
-    NEWEST("newest", "Newest First", 
-        Sort.by(Sort.Direction.DESC, "createdAt")),
     PUBLISHED_NEWEST("published_newest", "Recently Published", 
         Sort.by(Sort.Direction.DESC, "publishedAt")),
     PUBLISHED_OLDEST("published_oldest", "Oldest Published", 
