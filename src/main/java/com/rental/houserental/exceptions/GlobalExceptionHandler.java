@@ -1,6 +1,13 @@
 package com.rental.houserental.exceptions;
 
 import com.rental.houserental.exceptions.auth.*;
+import com.rental.houserental.exceptions.booking.InvalidBookingStatusException;
+import com.rental.houserental.exceptions.category.CategoryNotFoundException;
+import com.rental.houserental.exceptions.property.InvalidPropertyStatusException;
+import com.rental.houserental.exceptions.property.ImageUploadException;
+import com.rental.houserental.exceptions.property.FileDeleteException;
+import com.rental.houserental.exceptions.property.PropertyNotFoundException;
+import com.rental.houserental.exceptions.transaction.InvalidTransactionTypeException;
 import com.rental.houserental.exceptions.user.*;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -10,6 +17,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import static com.rental.houserental.constant.AtrributeNameConstant.*;
 import static com.rental.houserental.constant.ViewNamesConstant.*;
+
 @ControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
@@ -67,7 +75,7 @@ public class GlobalExceptionHandler {
     public String handleUserNotFoundException(UserNotFoundException ex, RedirectAttributes redirectAttributes) {
         log.warn("User not found: {}", ex.getMessage());
         redirectAttributes.addFlashAttribute(ERROR, "User not found. Please register first.");
-        
+
         // Use the redirectPath from the exception if available, otherwise default to register
         String redirectPath = ex.getRedirectPath();
         return redirectPath != null ? redirectPath : REDIRECT_REGISTER;
@@ -87,11 +95,103 @@ public class GlobalExceptionHandler {
         return REDIRECT_LOGIN;
     }
 
+    @ExceptionHandler(OtpNotFoundException.class)
+    public String handleOtpNotFoundException(OtpNotFoundException ex, RedirectAttributes redirectAttributes) {
+        log.warn("OTP not found: {}", ex.getMessage());
+        redirectAttributes.addFlashAttribute(ERROR, "Verification code not found or expired. Please request a new code.");
+        return redirectVerifyOtpWithEmail(ex.getEmail());
+    }
+
+    @ExceptionHandler(InvalidOtpException.class)
+    public String handleInvalidOtpException(InvalidOtpException ex, RedirectAttributes redirectAttributes) {
+        log.warn("Invalid OTP: {}", ex.getMessage());
+        redirectAttributes.addFlashAttribute(ERROR, "Invalid verification code. Please try again.");
+        return redirectVerifyOtpWithEmail(ex.getEmail());
+    }
+
+    @ExceptionHandler(MaxAttemptsReachedException.class)
+    public String handleMaxAttemptsReachedException(MaxAttemptsReachedException ex, RedirectAttributes redirectAttributes) {
+        log.warn("Max attempts reached: {}", ex.getMessage());
+        redirectAttributes.addFlashAttribute(ERROR, "Too many incorrect attempts. Please request a new verification code.");
+
+        return redirectVerifyOtpWithEmail(ex.getEmail());
+    }
+
+    @ExceptionHandler(TooManyPasswordResetAttemptsException.class)
+    public String handleTooManyPasswordResetAttemptsException(TooManyPasswordResetAttemptsException ex, RedirectAttributes redirectAttributes) {
+        log.warn("Too many password reset attempts: {}", ex.getMessage());
+        redirectAttributes.addFlashAttribute(ERROR, "Too many password reset requests. Please try again in 15 minutes.");
+        return REDIRECT_FORGOT_PASSWORD;
+    }
+
+    @ExceptionHandler(InvalidResetTokenException.class)
+    public String handleInvalidResetTokenException(InvalidResetTokenException ex, RedirectAttributes redirectAttributes) {
+        log.warn("Invalid reset token: {}", ex.getMessage());
+        redirectAttributes.addFlashAttribute(ERROR, "Invalid or expired reset link. Please request a new password reset.");
+        return REDIRECT_FORGOT_PASSWORD;
+    }
+
+    @ExceptionHandler(FaildToSendEmailException.class)
+    public String handleFaildToSendEmailException(FaildToSendEmailException ex, RedirectAttributes redirectAttributes) {
+        log.error("Failed to send email: {}", ex.getMessage());
+        redirectAttributes.addFlashAttribute(ERROR, "Failed to send email. Please try again later or contact support.");
+        return REDIRECT_FORGOT_PASSWORD;
+    }
+
+    @ExceptionHandler(InvalidPropertyStatusException.class)
+    public String handleInvalidPropertyStatusException(InvalidPropertyStatusException ex, Model model) {
+        log.warn("Invalid property status: {}", ex.getMessage());
+        model.addAttribute(MESSAGE, "The specified property status is not valid.");
+        return GENERIC_ERROR;
+    }
+
+    @ExceptionHandler(CategoryNotFoundException.class)
+    public String handleCategoryNotFoundException(CategoryNotFoundException ex, Model model) {
+        log.warn("Category not found: {}", ex.getMessage());
+        model.addAttribute(MESSAGE, "The specified category does not exist.");
+        return GENERIC_ERROR;
+    }
+
+    @ExceptionHandler(PropertyNotFoundException.class)
+    public String handlePropertyNotFoundException(PropertyNotFoundException ex, Model model) {
+        log.warn("Property not found: {}", ex.getMessage());
+        model.addAttribute(MESSAGE, "The requested property could not be found.");
+        return ERROR_404;
+    }
+
+    @ExceptionHandler(ImageUploadException.class)
+    public String handleImageUploadException(ImageUploadException ex, RedirectAttributes redirectAttributes) {
+        log.error("Image upload failed: {}", ex.getMessage());
+        redirectAttributes.addFlashAttribute(ERROR, "Failed to upload images. Property was not created. Please try again.");
+        return REDIRECT_LANDLORD_NEW_LISTING;
+    }
+
+    @ExceptionHandler(FileDeleteException.class)
+    public String handleFileDeleteException(FileDeleteException ex, Model model) {
+        log.error("File deletion failed: {}", ex.getMessage());
+        model.addAttribute(MESSAGE, "Failed to delete file. Please try again later.");
+        return GENERIC_ERROR;
+    }
+
+    @ExceptionHandler(InvalidTransactionTypeException.class)
+    public String handleInvalidTransactionTypeException(InvalidTransactionTypeException ex, Model model) {
+        log.warn("Invalid transaction type: {}", ex.getMessage());
+        model.addAttribute(MESSAGE, "The specified transaction type is not valid.");
+        return GENERIC_ERROR;
+    }
+
+    @ExceptionHandler(InvalidBookingStatusException.class)
+    public String handleInvalidBookingStatusException(InvalidBookingStatusException ex, Model model) {
+        log.warn("Invalid booking status: {}", ex.getMessage());
+        model.addAttribute(MESSAGE, "The specified booking status is not valid.");
+        return GENERIC_ERROR;
+    }
+
     //generic phải để cuối để bắt hết được lỗi
     @ExceptionHandler(Exception.class)
     public String handleGenericException(Exception ex, Model model) {
         log.error("Unexpected error: {}", ex.getMessage());
         model.addAttribute(MESSAGE, "An unexpected error occurred. Please try again later.");
-        return "error/500"; //
+        return ERROR_500;
     }
 }

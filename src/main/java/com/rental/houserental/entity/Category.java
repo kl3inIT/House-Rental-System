@@ -2,6 +2,7 @@ package com.rental.houserental.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.*;
 
 @Entity
@@ -10,6 +11,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "Categories")
 public class Category extends BaseEntity {
 
     @Column(name = "Name")

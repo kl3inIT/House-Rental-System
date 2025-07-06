@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verify OTP - RentEase</title>
-    <link th:href="@{/css/output.css}" rel="stylesheet"/>
+    <link th:href="@{/css/main.css}" rel="stylesheet"/>
 </head>
 <body class="bg-gray-50 min-h-screen flex items-center justify-center py-12">
 <div class="max-w-md w-full space-y-8 p-8 bg-white shadow-xl rounded-xl">
@@ -48,12 +48,12 @@
         <span class="text-red-500 text-sm" th:if="${#fields.hasErrors('otp')}" th:errors="*{otp}"></span>
 
         <div class="flex flex-col gap-2 items-center">
-            <button type="submit"
+            <button type="submit" id="verify-button"
                     class="w-full py-2 px-4 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                 Verify Code
             </button>
             <span id="otp-timer" class="text-sm text-gray-500" th:attr="data-expire=${otpExpire}"></span>
-            <span id="otp-attempts" class="text-sm text-red-500" th:attr="data-failcount=${otpFailCount}"></span>
+            <span id="otp-attempts" class="text-sm" th:attr="data-failcount=${otpFailCount}">Attempts left: 3</span>
         </div>
     </form>
 

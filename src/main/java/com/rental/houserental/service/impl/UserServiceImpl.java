@@ -5,7 +5,6 @@ import com.rental.houserental.entity.User;
 import com.rental.houserental.enums.UserStatus;
 import com.rental.houserental.exceptions.auth.EmailAlreadyExistsException;
 import com.rental.houserental.exceptions.auth.PasswordNotMatchException;
-import com.rental.houserental.exceptions.user.UserNotFoundException;
 import com.rental.houserental.repository.UserRepository;
 import com.rental.houserental.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +38,5 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByEmail(email)
                 .orElse(null);
     }
-
 
 }

@@ -4,6 +4,8 @@ import com.rental.houserental.dto.request.auth.LoginRequestDTO;
 import com.rental.houserental.dto.request.auth.LoginPageRequestDTO;
 import com.rental.houserental.dto.request.auth.OtpRequestDTO;
 import com.rental.houserental.dto.request.auth.RegisterRequestDTO;
+import com.rental.houserental.dto.request.auth.ForgotPasswordRequestDTO;
+import com.rental.houserental.dto.request.auth.ResetPasswordRequestDTO;
 import com.rental.houserental.entity.User;
 import com.rental.houserental.enums.UserStatus;
 import com.rental.houserental.service.AuthService;
@@ -32,15 +34,15 @@ public class AuthController {
 
     @GetMapping("/login")
     public String loginPage(Model model, LoginPageRequestDTO pageRequest) {
-        
+
         // Add login request DTO for form binding
         if (!model.containsAttribute(LOGIN_REQUEST)) {
             model.addAttribute(LOGIN_REQUEST, new LoginRequestDTO());
         }
-        
+
         // Add page request for message handling
         model.addAttribute("pageRequest", pageRequest);
-        
+
         return LOGIN;
     }
 
@@ -72,7 +74,7 @@ public class AuthController {
 
     @GetMapping("/verify-otp")
     public String showVerifyOtp(Model model, @RequestParam(required = false) String email) {
-        // Kiểm tra xem có OTP Request nếu người dùng reload trang
+        // Kiểm tra xem có OTP Request nếu người dùng reload trang hoặc redirect từ exception
         OtpRequestDTO otpRequest = (OtpRequestDTO) model.asMap().get(OTP_REQUEST);
         if (otpRequest == null) {
             otpRequest = new OtpRequestDTO();
@@ -82,12 +84,14 @@ public class AuthController {
             otpRequest.setEmail(email);
         }
         model.addAttribute(OTP_REQUEST, otpRequest);
+
         String usedEmail = otpRequest.getEmail();
         if (usedEmail != null && !usedEmail.isEmpty()) {
             String expStr = redisTemplate.opsForValue().get(OTP_EXP_PREFIX + usedEmail);
             String failStr = redisTemplate.opsForValue().get(OTP_FAIL_PREFIX + usedEmail);
+
             model.addAttribute(OTP_EXPIRE, expStr);
-            model.addAttribute(OTP_FAIL_COUNT, failStr);
+            model.addAttribute(OTP_FAIL_COUNT, failStr != null ? failStr : "0");
         }
         return VERIFY_OTP;
     }
@@ -102,58 +106,99 @@ public class AuthController {
             redirectAttributes.addFlashAttribute(OTP_REQUEST, request);
             return redirectVerifyOtpWithEmail(email);
         }
+
         if (authService.verifyOtp(email, request.getOtp())) {
             redirectAttributes.addFlashAttribute(MESSAGE, "Email verified successfully! You can now login.");
             return REDIRECT_LOGIN;
-        } else {
-            redirectAttributes.addFlashAttribute(ERROR, "Invalid or expired OTP. Please try again.");
-            redirectAttributes.addFlashAttribute(OTP_REQUEST, request);
-            return redirectVerifyOtpWithEmail(email);
         }
+
+        // This should not be reached as exceptions will be thrown for invalid cases
+        redirectAttributes.addFlashAttribute(ERROR, "An unexpected error occurred. Please try again.");
+        redirectAttributes.addFlashAttribute(OTP_REQUEST, request);
+        return redirectVerifyOtpWithEmail(email);
     }
 
     @PostMapping("/resend-otp")
     public String resendOtp(@RequestParam String email, RedirectAttributes redirectAttributes) {
-            authService.resendOtp(email);
-            redirectAttributes.addFlashAttribute(MESSAGE, "Verification code has been resent. Please check your inbox.");
+        authService.resendOtp(email);
+        redirectAttributes.addFlashAttribute(MESSAGE, "Verification code has been resent. Please check your inbox.");
         return redirectVerifyOtpWithEmail(email);
     }
 
     @GetMapping("/forgot-password")
     public String forgotPasswordPage(Model model) {
-        model.addAttribute(ERROR, model.containsAttribute(ERROR) ? model.getAttribute(ERROR) : null);
-        model.addAttribute(MESSAGE, model.containsAttribute(MESSAGE) ? model.getAttribute(MESSAGE) : null);
+        // Add forgot password request DTO for form binding
+        if (!model.containsAttribute(FORGOT_PASSWORD_REQUEST)) {
+            model.addAttribute(FORGOT_PASSWORD_REQUEST, new ForgotPasswordRequestDTO());
+        }
+
+        if (!model.containsAttribute(ERROR)) {
+            model.addAttribute(ERROR, null);
+        }
+        if (!model.containsAttribute(MESSAGE)) {
+            model.addAttribute(MESSAGE, null);
+        }
         return FORGOT_PASSWORD;
     }
 
     @PostMapping("/forgot-password")
-    public String forgotPassword(@RequestParam String email, RedirectAttributes redirectAttributes) {
-        try {
-            authService.forgotPassword(email);
-            redirectAttributes.addFlashAttribute(MESSAGE, "Password reset instructions have been sent to your email.");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute(ERROR, e.getMessage());
+    public String forgotPassword(@Valid @ModelAttribute(FORGOT_PASSWORD_REQUEST) ForgotPasswordRequestDTO request,
+                                 BindingResult result,
+                                 RedirectAttributes redirectAttributes) {
+
+        if (result.hasErrors()) {
+            redirectAttributes.addFlashAttribute(BINDING_RESULT_FORGOT_PASSWORD, result);
+            redirectAttributes.addFlashAttribute(FORGOT_PASSWORD_REQUEST, request);
             return REDIRECT_FORGOT_PASSWORD;
         }
+
+        authService.forgotPassword(request.getEmail().trim().toLowerCase());
+        // Always show success message to prevent email enumeration
+        redirectAttributes.addFlashAttribute(MESSAGE,
+                "If an account with that email exists, password reset instructions have been sent to your email address.");
         return REDIRECT_LOGIN;
     }
 
     @GetMapping("/reset-password")
-    public String resetPasswordPage(@RequestParam String token, Model model) {
+    public String resetPasswordPage(@RequestParam(required = false) String token, Model model,
+                                    RedirectAttributes redirectAttributes) {
+        // Validate token parameter
+        if (token == null || token.trim().isEmpty()) {
+            redirectAttributes.addFlashAttribute(ERROR, "Invalid reset link. Please request a new password reset.");
+            return REDIRECT_FORGOT_PASSWORD;
+        }
+
+        // Add reset password request DTO for form binding
+        if (!model.containsAttribute(RESET_PASSWORD_REQUEST)) {
+            ResetPasswordRequestDTO resetRequest = new ResetPasswordRequestDTO();
+            resetRequest.setToken(token);
+            model.addAttribute(RESET_PASSWORD_REQUEST, resetRequest);
+        }
+
         model.addAttribute("token", token);
-        model.addAttribute(ERROR, model.containsAttribute(ERROR) ? model.getAttribute(ERROR) : null);
+        if (!model.containsAttribute(ERROR)) {
+            model.addAttribute(ERROR, null);
+        }
+        if (!model.containsAttribute(MESSAGE)) {
+            model.addAttribute(MESSAGE, null);
+        }
         return RESET_PASSWORD;
     }
 
     @PostMapping("/reset-password")
-    public String resetPassword(@RequestParam String token, @RequestParam String newPassword, RedirectAttributes redirectAttributes) {
-        try {
-            authService.resetPassword(token, newPassword);
-            redirectAttributes.addFlashAttribute(MESSAGE, "Password has been reset successfully. You can now login with your new password.");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute(ERROR, e.getMessage());
-            return redirectResetPasswordWithToken(token);
+    public String resetPassword(@Valid @ModelAttribute(RESET_PASSWORD_REQUEST) ResetPasswordRequestDTO request,
+                                BindingResult result,
+                                RedirectAttributes redirectAttributes) {
+
+        if (result.hasErrors()) {
+            redirectAttributes.addFlashAttribute(BINDING_RESULT_RESET_PASSWORD, result);
+            redirectAttributes.addFlashAttribute(RESET_PASSWORD_REQUEST, request);
+            return redirectResetPasswordWithToken(request.getToken());
         }
+
+        authService.resetPassword(request.getToken(), request.getNewPassword());
+        redirectAttributes.addFlashAttribute(MESSAGE,
+                "Password has been reset successfully! You can now login with your new password.");
         return REDIRECT_LOGIN;
     }
 }
