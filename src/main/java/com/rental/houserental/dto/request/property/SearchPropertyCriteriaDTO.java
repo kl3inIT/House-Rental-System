@@ -10,7 +10,9 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SearchPropertyCriteriaDTO {
-    private String location;
+    private String province;
+    private String ward;
+    private String location; // Keep for backward compatibility
     private Long propertyType;
     private BigDecimal minPrice;
     private BigDecimal maxPrice;

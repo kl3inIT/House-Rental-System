@@ -29,16 +29,26 @@ public class RentalPropertySpecification {
                 }
             }
 
-            // 🔍 Location (city, province, streetAddress)
+            // Handle location search with new address structure
+            if (criteria.getProvince() != null && !criteria.getProvince().isBlank()) {
+                predicates.add(cb.equal(cb.lower(root.get("province")), criteria.getProvince().toLowerCase()));
+            }
+
+            if (criteria.getWard() != null && !criteria.getWard().isBlank()) {
+                predicates.add(cb.equal(cb.lower(root.get("ward")), criteria.getWard().toLowerCase()));
+            }
+
+            // Backward compatibility for location field
             if (criteria.getLocation() != null && !criteria.getLocation().isBlank()) {
                 String likeValue = "%" + criteria.getLocation().toLowerCase() + "%";
                 predicates.add(cb.or(
-                        cb.like(cb.lower(root.get("city")), likeValue),
+                        cb.like(cb.lower(root.get("ward")), likeValue),
                         cb.like(cb.lower(root.get("province")), likeValue),
                         cb.like(cb.lower(root.get("streetAddress")), likeValue)
                 ));
             }
 
+            // 🔍 Các tiêu chí khác...
             if (criteria.getPropertyType() != null) {
                 predicates.add(cb.equal(root.get("category").get("id"), criteria.getPropertyType()));
             }

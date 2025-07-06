@@ -4,20 +4,18 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeFilterHandlers();
 });
 
-function clearAllFilters() {
-    // Clear all checkboxes
-    document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-        checkbox.checked = false;
+function initializeFilterHandlers() {
+    // Add any filter-specific functionality here
+    const filterInputs = document.querySelectorAll('select, input[type="number"]');
+    filterInputs.forEach(input => {
+        input.addEventListener('change', function() {
+            // Auto-submit form when filters change
+            const form = this.closest('form');
+            if (form) {
+                form.submit();
+            }
+        });
     });
-    
-    // Clear form inputs
-    document.querySelector('input[name="location"]').value = '';
-    document.querySelector('select[name="propertyType"]').value = '';
-    document.querySelector('select[name="maxPrice"]').value = '';
-    document.querySelector('select[name="minBedrooms"]').value = '';
-    
-    // Submit the form to refresh results
-    document.querySelector('form').submit();
 }
 
 function initializeLocationAutocomplete() {
@@ -54,29 +52,34 @@ function initializeLocationAutocomplete() {
         }, 300);
     });
 
+    // Handle keyboard navigation
     locationInput.addEventListener('keydown', function(e) {
+        const autocompleteContainer = document.getElementById('location-autocomplete');
         const items = autocompleteContainer.querySelectorAll('.autocomplete-item');
         
-        switch(e.key) {
-            case 'ArrowDown':
-                e.preventDefault();
-                selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
-                updateSelection(items);
-                break;
-            case 'ArrowUp':
-                e.preventDefault();
-                selectedIndex = Math.max(selectedIndex - 1, -1);
-                updateSelection(items);
-                break;
-            case 'Enter':
-                e.preventDefault();
-                if (selectedIndex >= 0 && items[selectedIndex]) {
-                    selectLocation(items[selectedIndex].textContent);
-                }
-                break;
-            case 'Escape':
-                hideAutocomplete();
-                break;
+        if (!autocompleteContainer.classList.contains('hidden') && items.length > 0) {
+            switch (e.key) {
+                case 'ArrowDown':
+                    e.preventDefault();
+                    selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
+                    updateSelectedItem(items);
+                    break;
+                case 'ArrowUp':
+                    e.preventDefault();
+                    selectedIndex = Math.max(selectedIndex - 1, -1);
+                    updateSelectedItem(items);
+                    break;
+                case 'Enter':
+                    e.preventDefault();
+                    if (selectedIndex >= 0 && selectedIndex < items.length) {
+                        items[selectedIndex].click();
+                    }
+                    break;
+                case 'Escape':
+                    hideAutocomplete();
+                    selectedIndex = -1;
+                    break;
+            }
         }
     });
 
@@ -84,67 +87,67 @@ function initializeLocationAutocomplete() {
     document.addEventListener('click', function(e) {
         if (!locationInput.contains(e.target) && !autocompleteContainer.contains(e.target)) {
             hideAutocomplete();
+            selectedIndex = -1;
+        }
+    });
+}
+
+function updateSelectedItem(items) {
+    items.forEach((item, index) => {
+        if (index === selectedIndex) {
+            item.classList.add('bg-blue-100', 'text-blue-900');
+            item.classList.remove('hover:bg-gray-100');
+        } else {
+            item.classList.remove('bg-blue-100', 'text-blue-900');
+            item.classList.add('hover:bg-gray-100');
         }
     });
 }
 
 async function searchLocations(query) {
-    const autocompleteContainer = document.getElementById('location-autocomplete');
-    
     try {
-        // Search provinces first
-        const response = await fetch(`https://provinces.open-api.vn/api/?depth=1`);
-        const provinces = await response.json();
+        // Search in provinces first
+        const provinceResponse = await fetch('https://vietnamlabs.com/api/vietnamprovince');
+        const provinceData = await provinceResponse.json();
         
-        // Filter provinces by query
-        const matchingProvinces = provinces.filter(province => 
-            province.name.toLowerCase().includes(query.toLowerCase())
-        ).slice(0, 5);
-
-        // Search districts for matching provinces
-        const districtPromises = matchingProvinces.map(async (province) => {
-            try {
-                const districtResponse = await fetch(`https://provinces.open-api.vn/api/p/${province.code}?depth=2`);
-                const provinceData = await districtResponse.json();
-                return provinceData.districts || [];
-            } catch (error) {
-                return [];
-            }
-        });
-
-        const districtResults = await Promise.all(districtPromises);
+        let results = [];
         
-        // Combine and filter results
-        const allResults = [];
-        
-        // Add provinces
-        matchingProvinces.forEach(province => {
-            allResults.push({
-                name: province.name,
-                type: 'province'
-            });
-        });
-
-        // Add matching districts
-        districtResults.forEach((districts, index) => {
-            const matchingDistricts = districts.filter(district => 
-                district.name.toLowerCase().includes(query.toLowerCase())
-            ).slice(0, 3);
+        if (provinceData.success && provinceData.data) {
+            // Search in provinces
+            const matchingProvinces = provinceData.data.filter(provinceData => 
+                provinceData.province.toLowerCase().includes(query.toLowerCase())
+            );
             
-            matchingDistricts.forEach(district => {
-                allResults.push({
-                    name: `${district.name}, ${matchingProvinces[index].name}`,
-                    type: 'district'
-                });
-            });
-        });
-
-        displayAutocompleteResults(allResults);
+            results.push(...matchingProvinces.map(provinceData => ({
+                name: provinceData.province,
+                type: 'province'
+            })));
+            
+            // Search in wards for matching provinces
+            for (const provinceData of provinceData.data) {
+                if (provinceData.wards && provinceData.wards.length > 0) {
+                    const matchingWards = provinceData.wards.filter(ward => 
+                        ward.name.toLowerCase().includes(query.toLowerCase())
+                    );
+                    
+                    results.push(...matchingWards.map(ward => ({
+                        name: `${ward.name}, ${provinceData.province}`,
+                        type: 'ward'
+                    })));
+                }
+            }
+        }
+        
+        // Limit results and remove duplicates
+        const uniqueResults = results.filter((result, index, self) => 
+            index === self.findIndex(r => r.name === result.name)
+        ).slice(0, 10);
+        
+        displayAutocompleteResults(uniqueResults);
         
     } catch (error) {
         console.error('Error searching locations:', error);
-        // Fallback to static search
-        displayFallbackResults(query);
+        hideAutocomplete();
     }
 }
 
@@ -173,50 +176,6 @@ function displayAutocompleteResults(results) {
     autocompleteContainer.classList.remove('hidden');
 }
 
-function displayFallbackResults(query) {
-    const autocompleteContainer = document.getElementById('location-autocomplete');
-    const vietnameseProvinces = [
-        'Hà Nội', 'TP Hồ Chí Minh', 'Đà Nẵng', 'Hải Phòng', 'Cần Thơ',
-        'An Giang', 'Bà Rịa - Vũng Tàu', 'Bắc Giang', 'Bắc Kạn', 'Bạc Liêu',
-        'Bắc Ninh', 'Bến Tre', 'Bình Định', 'Bình Dương', 'Bình Phước',
-        'Bình Thuận', 'Cà Mau', 'Cao Bằng', 'Đắk Lắk', 'Đắk Nông',
-        'Điện Biên', 'Đồng Nai', 'Đồng Tháp', 'Gia Lai', 'Hà Giang',
-        'Hà Nam', 'Hà Tĩnh', 'Hải Dương', 'Hậu Giang', 'Hòa Bình',
-        'Hưng Yên', 'Khánh Hòa', 'Kiên Giang', 'Kon Tum', 'Lai Châu',
-        'Lâm Đồng', 'Lạng Sơn', 'Lào Cai', 'Long An', 'Nam Định',
-        'Nghệ An', 'Ninh Bình', 'Ninh Thuận', 'Phú Thọ', 'Quảng Bình',
-        'Quảng Nam', 'Quảng Ngãi', 'Quảng Ninh', 'Quảng Trị', 'Sóc Trăng',
-        'Sơn La', 'Tây Ninh', 'Thái Bình', 'Thái Nguyên', 'Thanh Hóa',
-        'Thừa Thiên Huế', 'Tiền Giang', 'Trà Vinh', 'Tuyên Quang', 'Vĩnh Long',
-        'Vĩnh Phúc', 'Yên Bái', 'Phú Yên'
-    ];
-
-    const matchingProvinces = vietnameseProvinces.filter(province => 
-        province.toLowerCase().includes(query.toLowerCase())
-    ).slice(0, 8);
-
-    if (matchingProvinces.length === 0) {
-        hideAutocomplete();
-        return;
-    }
-
-    autocompleteContainer.innerHTML = '';
-    
-    matchingProvinces.forEach(province => {
-        const item = document.createElement('div');
-        item.className = 'autocomplete-item px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm';
-        item.textContent = province;
-        
-        item.addEventListener('click', function() {
-            selectLocation(province);
-        });
-        
-        autocompleteContainer.appendChild(item);
-    });
-    
-    autocompleteContainer.classList.remove('hidden');
-}
-
 function selectLocation(locationName) {
     const locationInput = document.querySelector('input[name="location"]');
     locationInput.value = locationName;
@@ -228,28 +187,4 @@ function hideAutocomplete() {
     if (autocompleteContainer) {
         autocompleteContainer.classList.add('hidden');
     }
-}
-
-function updateSelection(items) {
-    items.forEach((item, index) => {
-        if (index === selectedIndex) {
-            item.classList.add('bg-blue-100');
-            item.classList.remove('hover:bg-gray-100');
-        } else {
-            item.classList.remove('bg-blue-100');
-            item.classList.add('hover:bg-gray-100');
-        }
-    });
-}
-
-function initializeFilterHandlers() {
-    // Add real-time filter updates if needed
-    const filterInputs = document.querySelectorAll('select[name="propertyType"], select[name="maxPrice"], select[name="minBedrooms"]');
-    
-    filterInputs.forEach(input => {
-        input.addEventListener('change', function() {
-            // Auto-submit form when filters change
-            this.closest('form').submit();
-        });
-    });
 }

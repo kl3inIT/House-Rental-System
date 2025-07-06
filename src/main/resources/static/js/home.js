@@ -94,54 +94,44 @@ async function searchHomeLocations(query) {
     const autocompleteContainer = document.getElementById('home-location-autocomplete');
     
     try {
-        // Search provinces first
-        const response = await fetch(`https://provinces.open-api.vn/api/?depth=1`);
-        const provinces = await response.json();
+        // Search in provinces first
+        const response = await fetch('https://vietnamlabs.com/api/vietnamprovince');
+        const data = await response.json();
         
-        // Filter provinces by query
-        const matchingProvinces = provinces.filter(province => 
-            province.name.toLowerCase().includes(query.toLowerCase())
-        ).slice(0, 5);
-
-        // Search districts for matching provinces
-        const districtPromises = matchingProvinces.map(async (province) => {
-            try {
-                const districtResponse = await fetch(`https://provinces.open-api.vn/api/p/${province.code}?depth=2`);
-                const provinceData = await districtResponse.json();
-                return provinceData.districts || [];
-            } catch (error) {
-                return [];
-            }
-        });
-
-        const districtResults = await Promise.all(districtPromises);
+        let results = [];
         
-        // Combine and filter results
-        const allResults = [];
-        
-        // Add provinces
-        matchingProvinces.forEach(province => {
-            allResults.push({
-                name: province.name,
-                type: 'province'
-            });
-        });
-
-        // Add matching districts
-        districtResults.forEach((districts, index) => {
-            const matchingDistricts = districts.filter(district => 
-                district.name.toLowerCase().includes(query.toLowerCase())
-            ).slice(0, 3);
+        if (data.success && data.data) {
+            // Search in provinces
+            const matchingProvinces = data.data.filter(provinceData => 
+                provinceData.province.toLowerCase().includes(query.toLowerCase())
+            );
             
-            matchingDistricts.forEach(district => {
-                allResults.push({
-                    name: `${district.name}, ${matchingProvinces[index].name}`,
-                    type: 'district'
-                });
-            });
-        });
-
-        displayHomeAutocompleteResults(allResults);
+            results.push(...matchingProvinces.map(provinceData => ({
+                name: provinceData.province,
+                type: 'province'
+            })));
+            
+            // Search in wards for matching provinces
+            for (const provinceData of data.data) {
+                if (provinceData.wards && provinceData.wards.length > 0) {
+                    const matchingWards = provinceData.wards.filter(ward => 
+                        ward.name.toLowerCase().includes(query.toLowerCase())
+                    );
+                    
+                    results.push(...matchingWards.map(ward => ({
+                        name: `${ward.name}, ${provinceData.province}`,
+                        type: 'ward'
+                    })));
+                }
+            }
+        }
+        
+        // Limit results and remove duplicates
+        const uniqueResults = results.filter((result, index, self) => 
+            index === self.findIndex(r => r.name === result.name)
+        ).slice(0, 10);
+        
+        displayHomeAutocompleteResults(uniqueResults);
         
     } catch (error) {
         console.error('Error searching locations:', error);

@@ -35,8 +35,8 @@ public class RentalProperty extends BaseEntity {
     @Column(name = "StreetAddress", nullable = false, columnDefinition = "NVARCHAR(255)")
     private String streetAddress;
 
-    @Column(name = "City", nullable = false, columnDefinition = "NVARCHAR(100)")
-    private String city;
+    @Column(name = "Ward", nullable = false, columnDefinition = "NVARCHAR(100)")
+    private String ward;
 
     @Column(name = "Province", nullable = false, columnDefinition = "NVARCHAR(100)")
     private String province;
@@ -70,6 +70,6 @@ public class RentalProperty extends BaseEntity {
     }
 
     public String getFullAddress() {
-        return String.format("%s, %s, %s", streetAddress, city, province);
+        return String.format("%s, %s, %s", streetAddress, ward, province);
     }
 }

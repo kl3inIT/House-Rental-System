@@ -18,7 +18,7 @@ public class SearchPropertyResponseDTO {
     private Integer bedrooms;
     private Integer bathrooms;
     private String streetAddress;
-    private String city;
+    private String ward;
     private String province;
     private String description;
     private String propertyStatus;
@@ -29,7 +29,7 @@ public class SearchPropertyResponseDTO {
     
     // Computed fields
     public String getFullAddress() {
-        return String.format("%s, %s, %s", streetAddress, city, province);
+        return String.format("%s, %s, %s", streetAddress, ward, province);
     }
     
     public String getAvailabilityStatus() {

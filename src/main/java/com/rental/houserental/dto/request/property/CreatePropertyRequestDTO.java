@@ -38,9 +38,9 @@ public class CreatePropertyRequestDTO {
     @Size(max = 255, message = "Street address must be less than 255 characters")
     private String streetAddress;
 
-    @NotBlank(message = "City is required")
-    @Size(max = 100, message = "City must be less than 100 characters")
-    private String city;
+    @NotBlank(message = "Ward is required")
+    @Size(max = 100, message = "Ward must be less than 100 characters")
+    private String ward;
 
     @NotBlank(message = "Province is required")
     @Size(max = 100, message = "Province must be less than 100 characters")

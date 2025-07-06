@@ -17,7 +17,9 @@ public class FeaturedPropertyResponseDTO {
     private BigDecimal price;
     private Integer bedrooms;
     private Integer bathrooms;
-    private String location;
+    private String ward;
+    private String province;
+    private String location; // Keep for backward compatibility
     private String mainImageUrl;
     private List<String> imageUrls;
     private Integer imageCount;
