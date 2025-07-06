@@ -1,11 +1,13 @@
 package com.rental.houserental.exceptions;
 
 import com.rental.houserental.exceptions.auth.*;
+import com.rental.houserental.exceptions.booking.InvalidBookingStatusException;
 import com.rental.houserental.exceptions.category.CategoryNotFoundException;
 import com.rental.houserental.exceptions.property.InvalidPropertyStatusException;
 import com.rental.houserental.exceptions.property.ImageUploadException;
 import com.rental.houserental.exceptions.property.FileDeleteException;
 import com.rental.houserental.exceptions.property.PropertyNotFoundException;
+import com.rental.houserental.exceptions.transaction.InvalidTransactionTypeException;
 import com.rental.houserental.exceptions.user.*;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -171,6 +173,19 @@ public class GlobalExceptionHandler {
         return GENERIC_ERROR;
     }
 
+    @ExceptionHandler(InvalidTransactionTypeException.class)
+    public String handleInvalidTransactionTypeException(InvalidTransactionTypeException ex, Model model) {
+        log.warn("Invalid transaction type: {}", ex.getMessage());
+        model.addAttribute(MESSAGE, "The specified transaction type is not valid.");
+        return GENERIC_ERROR;
+    }
+
+    @ExceptionHandler(InvalidBookingStatusException.class)
+    public String handleInvalidBookingStatusException(InvalidBookingStatusException ex, Model model) {
+        log.warn("Invalid booking status: {}", ex.getMessage());
+        model.addAttribute(MESSAGE, "The specified booking status is not valid.");
+        return GENERIC_ERROR;
+    }
 
     //generic phải để cuối để bắt hết được lỗi
     @ExceptionHandler(Exception.class)

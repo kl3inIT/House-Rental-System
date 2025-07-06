@@ -1,19 +1,18 @@
 package com.rental.houserental.entity;
 
-import com.rental.houserental.enums.BookingStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "Bookings")
+@Table(name = "Listings")
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Booking extends BaseEntity {
+public class Listing extends BaseEntity {
 
     @Column(name = "StartDate", nullable = false)
     private LocalDateTime startDate;
@@ -21,22 +20,20 @@ public class Booking extends BaseEntity {
     @Column(name = "EndDate", nullable = false)
     private LocalDateTime endDate;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "Status", nullable = false, length = 50)
-    @Builder.Default
-    private BookingStatus status = BookingStatus.PENDING;
-
     @Column(name = "Amount", nullable = false)
     private double amount;
 
-    @Column(name = "Note", columnDefinition = "TEXT")
-    private String note;
+    @Column(name = "Description", columnDefinition = "TEXT")
+    private String description;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "UserId", nullable = false)
-    private User user;
+    @Column(name = "IsHighlight", nullable = false)
+    private boolean isHighlight;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PropertyId", nullable = false)
     private RentalProperty rentalProperty;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "LandlordId", nullable = false)
+    private User landlord;
 }

@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "PropertyImage")
+@Table(name = "PropertyImages")
 @Getter
 @Setter
 @Builder

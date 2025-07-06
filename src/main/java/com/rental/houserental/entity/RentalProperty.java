@@ -6,10 +6,11 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "RentalProperty")
+@Table(name = "RentalProperties")
 @Getter
 @Setter
 @Builder
@@ -79,4 +80,14 @@ public class RentalProperty extends BaseEntity {
     public String getFullAddress() {
         return String.format("%s, %s, %s", streetAddress, ward, province);
     }
+
+    @OneToMany(mappedBy = "rentalProperty", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Booking> bookings = new HashSet<>();
+
+    @OneToMany(mappedBy = "rentalProperty", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Review> reviews = new HashSet<>();
+
+    @OneToMany(mappedBy = "rentalProperty", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Listing> listings = new HashSet<>();
+
 }

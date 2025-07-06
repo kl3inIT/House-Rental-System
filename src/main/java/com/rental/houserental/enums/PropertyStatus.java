@@ -14,6 +14,7 @@ public enum PropertyStatus {
     BOOKED("Booked", "The property has been booked and is waiting for confirmation."),
     RENTED("Rented", "The property has been rented and is no longer available."),
     UNAVAILABLE("Unavailable", "The property is temporarily unavailable for rent."),
+    EXPIRED("Expired", "The listing duration has ended."),
     ADMIN_HIDDEN("Hidden by Admin", "The property is hidden by admin and cannot be modified by landlord."),
     ADMIN_BANNED("Banned by Admin", "The property is banned due to policy violation.");
 
