@@ -1,343 +1,286 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Properties - RentEase</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title th:text="${property.title + ' - RentEase'}">Property Details - RentEase</title>
 </head>
-<body class="bg-gray-50">
-<!-- Navigation -->
-<nav class="bg-white shadow-lg sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-            <div class="flex items-center">
-                <a href="../index.html" class="text-2xl font-bold text-blue-600">RentEase</a>
-                <span class="ml-4 px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">Landlord</span>
-            </div>
-            <div class="hidden md:flex items-center space-x-8">
-                <a href="dashboard.html" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
-                <a href="#" class="text-blue-600 px-3 py-2 rounded-md text-sm font-medium">My Properties</a>
-                <a href="requests.html" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Requests</a>
-                <div class="relative">
-                    <button class="flex items-center text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
-                        <img src="/placeholder.svg?height=32&width=32" alt="Profile" class="w-8 h-8 rounded-full mr-2">
-                        Sarah Johnson
-                        <i class="fas fa-chevron-down ml-1"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-</nav>
-
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <!-- Header -->
-    <div class="flex justify-between items-center mb-8">
-        <div>
-            <h1 class="text-3xl font-bold text-gray-900">My Properties</h1>
-            <p class="text-gray-600 mt-2">Manage your rental properties</p>
-        </div>
-        <a href="new-listing.html" class="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 font-medium">
-            <i class="fas fa-plus mr-2"></i>Add New Property
-        </a>
-    </div>
-
-    <!-- Stats -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <div class="flex items-center">
-                <div class="p-3 rounded-full bg-blue-100 text-blue-600">
-                    <i class="fas fa-home text-xl"></i>
-                </div>
-                <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600">Total Properties</p>
-                    <p class="text-2xl font-bold text-gray-900">12</p>
-                </div>
-            </div>
-        </div>
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <div class="flex items-center">
-                <div class="p-3 rounded-full bg-green-100 text-green-600">
-                    <i class="fas fa-check-circle text-xl"></i>
-                </div>
-                <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600">Occupied</p>
-                    <p class="text-2xl font-bold text-gray-900">9</p>
-                </div>
-            </div>
-        </div>
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <div class="flex items-center">
-                <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
-                    <i class="fas fa-key text-xl"></i>
-                </div>
-                <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600">Available</p>
-                    <p class="text-2xl font-bold text-gray-900">3</p>
-                </div>
-            </div>
-        </div>
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <div class="flex items-center">
-                <div class="p-3 rounded-full bg-purple-100 text-purple-600">
-                    <i class="fas fa-dollar-sign text-xl"></i>
-                </div>
-                <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600">Monthly Revenue</p>
-                    <p class="text-2xl font-bold text-gray-900">$18,400</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Filters -->
-    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Filter by Status</label>
-                <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option>All Properties</option>
-                    <option>Available</option>
-                    <option>Occupied</option>
-                    <option>Under Maintenance</option>
-                </select>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Property Type</label>
-                <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option>All Types</option>
-                    <option>Apartment</option>
-                    <option>House</option>
-                    <option>Condo</option>
-                    <option>Studio</option>
-                </select>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Location</label>
-                <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option>All Locations</option>
-                    <option>Downtown</option>
-                    <option>Midtown</option>
-                    <option>Suburbs</option>
-                    <option>Uptown</option>
-                </select>
-            </div>
-            <div class="flex items-end">
-                <button class="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
-                    <i class="fas fa-search mr-2"></i>Filter
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Properties List -->
-    <div class="space-y-6">
-        <!-- Property 1 -->
-        <div class="bg-white rounded-lg shadow-md overflow-hidden">
-            <div class="md:flex">
-                <div class="md:w-1/4">
-                    <img src="/placeholder.svg?height=200&width=300" alt="Property" class="w-full h-48 md:h-full object-cover">
-                </div>
-                <div class="md:w-3/4 p-6">
-                    <div class="flex justify-between items-start mb-4">
-                        <div>
-                            <h3 class="text-xl font-semibold text-gray-900 mb-2">Modern Downtown Apartment</h3>
-                            <p class="text-gray-600 mb-2">
-                                <i class="fas fa-map-marker-alt mr-1"></i>
-                                123 Main St, Downtown, New York, NY 10001
-                            </p>
-                            <div class="flex items-center space-x-4 text-sm text-gray-600 mb-3">
-                                <span><i class="fas fa-bed mr-1"></i>2 Beds</span>
-                                <span><i class="fas fa-bath mr-1"></i>2 Baths</span>
-                                <span><i class="fas fa-ruler-combined mr-1"></i>1,200 sq ft</span>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <div class="text-2xl font-bold text-green-600 mb-1">$1,800/mo</div>
-                            <span class="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">Occupied</span>
-                        </div>
+<body>
+<main layout:fragment="content">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Breadcrumb -->
+        <nav class="flex mb-8" aria-label="Breadcrumb">
+            <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                <li class="inline-flex items-center">
+                    <a th:href="@{/}" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
+                        <i class="fas fa-home mr-2"></i>
+                        Home
+                    </a>
+                </li>
+                <li>
+                    <div class="flex items-center">
+                        <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                        <a th:href="@{/properties/search}" class="ml-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ml-2">Properties</a>
                     </div>
-
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                        <div class="text-center p-3 bg-gray-50 rounded-lg">
-                            <div class="text-lg font-semibold text-gray-900">45</div>
-                            <div class="text-sm text-gray-600">Views</div>
-                        </div>
-                        <div class="text-center p-3 bg-gray-50 rounded-lg">
-                            <div class="text-lg font-semibold text-gray-900">8</div>
-                            <div class="text-sm text-gray-600">Inquiries</div>
-                        </div>
-                        <div class="text-center p-3 bg-gray-50 rounded-lg">
-                            <div class="text-lg font-semibold text-gray-900">100%</div>
-                            <div class="text-sm text-gray-600">Occupancy</div>
-                        </div>
-                        <div class="text-center p-3 bg-gray-50 rounded-lg">
-                            <div class="text-lg font-semibold text-gray-900">4.8</div>
-                            <div class="text-sm text-gray-600">Rating</div>
-                        </div>
+                </li>
+                <li aria-current="page">
+                    <div class="flex items-center">
+                        <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                        <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2">Property Details</span>
                     </div>
-
-                    <div class="flex flex-wrap gap-2">
-                        <a href="new-listing.html" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 text-sm">
-                            <i class="fas fa-edit mr-1"></i>Edit
-                        </a>
-                        <button class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 text-sm">
-                            <i class="fas fa-eye mr-1"></i>View
-                        </button>
-                        <button class="bg-yellow-600 text-white px-4 py-2 rounded-md hover:bg-yellow-700 text-sm">
-                            <i class="fas fa-pause mr-1"></i>Pause
-                        </button>
-                        <button class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 text-sm">
-                            <i class="fas fa-trash mr-1"></i>Delete
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Property 2 -->
-        <div class="bg-white rounded-lg shadow-md overflow-hidden">
-            <div class="md:flex">
-                <div class="md:w-1/4">
-                    <img src="/placeholder.svg?height=200&width=300" alt="Property" class="w-full h-48 md:h-full object-cover">
-                </div>
-                <div class="md:w-3/4 p-6">
-                    <div class="flex justify-between items-start mb-4">
-                        <div>
-                            <h3 class="text-xl font-semibold text-gray-900 mb-2">Suburban Family House</h3>
-                            <p class="text-gray-600 mb-2">
-                                <i class="fas fa-map-marker-alt mr-1"></i>
-                                456 Oak Ave, Suburbs, New York, NY 10025
-                            </p>
-                            <div class="flex items-center space-x-4 text-sm text-gray-600 mb-3">
-                                <span><i class="fas fa-bed mr-1"></i>3 Beds</span>
-                                <span><i class="fas fa-bath mr-1"></i>2 Baths</span>
-                                <span><i class="fas fa-ruler-combined mr-1"></i>1,800 sq ft</span>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <div class="text-2xl font-bold text-blue-600 mb-1">$2,200/mo</div>
-                            <span class="px-3 py-1 bg-yellow-100 text-yellow-800 text-sm rounded-full">Available</span>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                        <div class="text-center p-3 bg-gray-50 rounded-lg">
-                            <div class="text-lg font-semibold text-gray-900">23</div>
-                            <div class="text-sm text-gray-600">Views</div>
-                        </div>
-                        <div class="text-center p-3 bg-gray-50 rounded-lg">
-                            <div class="text-lg font-semibold text-gray-900">3</div>
-                            <div class="text-sm text-gray-600">Inquiries</div>
-                        </div>
-                        <div class="text-center p-3 bg-gray-50 rounded-lg">
-                            <div class="text-lg font-semibold text-gray-900">0%</div>
-                            <div class="text-sm text-gray-600">Occupancy</div>
-                        </div>
-                        <div class="text-center p-3 bg-gray-50 rounded-lg">
-                            <div class="text-lg font-semibold text-gray-900">-</div>
-                            <div class="text-sm text-gray-600">Rating</div>
-                        </div>
-                    </div>
-
-                    <div class="flex flex-wrap gap-2">
-                        <a href="new-listing.html" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 text-sm">
-                            <i class="fas fa-edit mr-1"></i>Edit
-                        </a>
-                        <button class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 text-sm">
-                            <i class="fas fa-eye mr-1"></i>View
-                        </button>
-                        <button class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 text-sm">
-                            <i class="fas fa-bullhorn mr-1"></i>Promote
-                        </button>
-                        <button class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 text-sm">
-                            <i class="fas fa-trash mr-1"></i>Delete
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Property 3 -->
-        <div class="bg-white rounded-lg shadow-md overflow-hidden">
-            <div class="md:flex">
-                <div class="md:w-1/4">
-                    <img src="/placeholder.svg?height=200&width=300" alt="Property" class="w-full h-48 md:h-full object-cover">
-                </div>
-                <div class="md:w-3/4 p-6">
-                    <div class="flex justify-between items-start mb-4">
-                        <div>
-                            <h3 class="text-xl font-semibold text-gray-900 mb-2">Cozy Studio Apartment</h3>
-                            <p class="text-gray-600 mb-2">
-                                <i class="fas fa-map-marker-alt mr-1"></i>
-                                789 Pine St, Midtown, New York, NY 10018
-                            </p>
-                            <div class="flex items-center space-x-4 text-sm text-gray-600 mb-3">
-                                <span><i class="fas fa-bed mr-1"></i>Studio</span>
-                                <span><i class="fas fa-bath mr-1"></i>1 Bath</span>
-                                <span><i class="fas fa-ruler-combined mr-1"></i>600 sq ft</span>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <div class="text-2xl font-bold text-green-600 mb-1">$1,200/mo</div>
-                            <span class="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">Occupied</span>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                        <div class="text-center p-3 bg-gray-50 rounded-lg">
-                            <div class="text-lg font-semibold text-gray-900">31</div>
-                            <div class="text-sm text-gray-600">Views</div>
-                        </div>
-                        <div class="text-center p-3 bg-gray-50 rounded-lg">
-                            <div class="text-lg font-semibold text-gray-900">5</div>
-                            <div class="text-sm text-gray-600">Inquiries</div>
-                        </div>
-                        <div class="text-center p-3 bg-gray-50 rounded-lg">
-                            <div class="text-lg font-semibold text-gray-900">100%</div>
-                            <div class="text-sm text-gray-600">Occupancy</div>
-                        </div>
-                        <div class="text-center p-3 bg-gray-50 rounded-lg">
-                            <div class="text-lg font-semibold text-gray-900">4.6</div>
-                            <div class="text-sm text-gray-600">Rating</div>
-                        </div>
-                    </div>
-
-                    <div class="flex flex-wrap gap-2">
-                        <a href="new-listing.html" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 text-sm">
-                            <i class="fas fa-edit mr-1"></i>Edit
-                        </a>
-                        <button class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 text-sm">
-                            <i class="fas fa-eye mr-1"></i>View
-                        </button>
-                        <button class="bg-yellow-600 text-white px-4 py-2 rounded-md hover:bg-yellow-700 text-sm">
-                            <i class="fas fa-pause mr-1"></i>Pause
-                        </button>
-                        <button class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 text-sm">
-                            <i class="fas fa-trash mr-1"></i>Delete
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Pagination -->
-    <div class="flex justify-center mt-8">
-        <nav class="flex space-x-2">
-            <button class="px-3 py-2 text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
-                <i class="fas fa-chevron-left"></i>
-            </button>
-            <button class="px-3 py-2 text-white bg-blue-600 border border-blue-600 rounded-md">1</button>
-            <button class="px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">2</button>
-            <button class="px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">3</button>
-            <button class="px-3 py-2 text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
-                <i class="fas fa-chevron-right"></i>
-            </button>
+                </li>
+            </ol>
         </nav>
+
+        <!-- Property Header -->
+        <div class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
+            <div class="md:flex">
+                <div class="md:w-1/3">
+                    <img th:src="${property.mainImageUrl != null ? property.mainImageUrl : '/images/placeholder.jpg'}" 
+                         th:alt="${property.title}" 
+                         class="w-full h-64 md:h-96 object-cover">
+                </div>
+                <div class="md:w-2/3 p-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h1 class="text-3xl font-bold text-gray-900 mb-2" th:text="${property.title}">Property Title</h1>
+                            <p class="text-gray-600 mb-4 flex items-center">
+                                <i class="fas fa-map-marker-alt mr-2"></i>
+                                <span th:text="${property.fullAddress}">Property Address</span>
+                            </p>
+                            <div class="flex items-center space-x-6 text-lg text-gray-600 mb-6">
+                                <span><i class="fas fa-bed mr-2"></i><span th:text="${property.bedrooms == 0 ? 'Studio' : property.bedrooms + ' Beds'}">Beds</span></span>
+                                <span><i class="fas fa-bath mr-2"></i><span th:text="${property.bathrooms + ' Baths'}">Baths</span></span>
+                                <span><i class="fas fa-ruler-combined mr-2"></i><span th:text="${property.area + ' m²'}">Area</span></span>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-4xl font-bold text-blue-600 mb-2" th:text="'$' + ${#numbers.formatDecimal(property.monthlyRent, 0, 'COMMA', 0, 'POINT')}">$1,800</div>
+                            <div class="text-gray-500">per month</div>
+                            <span class="inline-block mt-3 px-4 py-2 bg-green-100 text-green-800 text-sm rounded-full" 
+                                  th:text="${property.propertyStatus == 'AVAILABLE' ? 'Available' : 'Not Available'}">Available</span>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex flex-wrap gap-3 mb-6">
+                        <button sec:authorize="isAuthenticated()" 
+                                class="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 font-medium transition-colors duration-200">
+                            <i class="fas fa-calendar-check mr-2"></i>Schedule Tour
+                        </button>
+                        <button sec:authorize="isAuthenticated()"
+                                class="bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 font-medium transition-colors duration-200">
+                            <i class="fas fa-envelope mr-2"></i>Contact Landlord
+                        </button>
+                        <button sec:authorize="isAuthenticated()"
+                                class="border border-gray-300 text-gray-700 px-6 py-3 rounded-md hover:bg-gray-50 font-medium transition-colors duration-200">
+                            <i class="far fa-heart mr-2"></i>Save Property
+                        </button>
+                        <a sec:authorize="!isAuthenticated()" th:href="@{/login}"
+                           class="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 font-medium transition-colors duration-200">
+                            <i class="fas fa-sign-in-alt mr-2"></i>Login to Contact
+                        </a>
+                    </div>
+
+                    <!-- Property Features -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="text-center p-3 bg-gray-50 rounded-lg">
+                            <i class="fas fa-wifi text-xl text-blue-600 mb-2"></i>
+                            <div class="text-sm text-gray-600">WiFi</div>
+                        </div>
+                        <div class="text-center p-3 bg-gray-50 rounded-lg">
+                            <i class="fas fa-car text-xl text-blue-600 mb-2"></i>
+                            <div class="text-sm text-gray-600">Parking</div>
+                        </div>
+                        <div class="text-center p-3 bg-gray-50 rounded-lg">
+                            <i class="fas fa-swimming-pool text-xl text-blue-600 mb-2"></i>
+                            <div class="text-sm text-gray-600">Pool</div>
+                        </div>
+                        <div class="text-center p-3 bg-gray-50 rounded-lg">
+                            <i class="fas fa-dumbbell text-xl text-blue-600 mb-2"></i>
+                            <div class="text-sm text-gray-600">Gym</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Property Details Tabs -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <div class="border-b border-gray-200 mb-6">
+                <nav class="-mb-px flex space-x-8">
+                    <button class="property-tab active border-b-2 border-blue-500 py-2 px-1 text-sm font-medium text-blue-600" data-tab="description">
+                        Description
+                    </button>
+                    <button class="property-tab border-b-2 border-transparent py-2 px-1 text-sm font-medium text-gray-500 hover:text-gray-700" data-tab="amenities">
+                        Amenities
+                    </button>
+                    <button class="property-tab border-b-2 border-transparent py-2 px-1 text-sm font-medium text-gray-500 hover:text-gray-700" data-tab="location">
+                        Location
+                    </button>
+                    <button class="property-tab border-b-2 border-transparent py-2 px-1 text-sm font-medium text-gray-500 hover:text-gray-700" data-tab="reviews">
+                        Reviews
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Tab Content -->
+            <div id="description-content" class="tab-content">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Property Description</h3>
+                <p class="text-gray-600 leading-relaxed mb-4" th:text="${property.description}">
+                    Property description goes here.
+                </p>
+            </div>
+
+            <div id="amenities-content" class="tab-content hidden">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Building Amenities</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h4 class="font-medium text-gray-900 mb-3">Interior Features</h4>
+                        <ul class="space-y-2 text-gray-600">
+                            <li><i class="fas fa-check text-green-500 mr-2"></i>Hardwood floors</li>
+                            <li><i class="fas fa-check text-green-500 mr-2"></i>Stainless steel appliances</li>
+                            <li><i class="fas fa-check text-green-500 mr-2"></i>In-unit washer/dryer</li>
+                            <li><i class="fas fa-check text-green-500 mr-2"></i>Walk-in closets</li>
+                            <li><i class="fas fa-check text-green-500 mr-2"></i>Central air conditioning</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-medium text-gray-900 mb-3">Building Features</h4>
+                        <ul class="space-y-2 text-gray-600">
+                            <li><i class="fas fa-check text-green-500 mr-2"></i>24/7 concierge</li>
+                            <li><i class="fas fa-check text-green-500 mr-2"></i>Rooftop pool & deck</li>
+                            <li><i class="fas fa-check text-green-500 mr-2"></i>Fitness center</li>
+                            <li><i class="fas fa-check text-green-500 mr-2"></i>Garage parking</li>
+                            <li><i class="fas fa-check text-green-500 mr-2"></i>Pet-friendly</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div id="location-content" class="tab-content hidden">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Location & Neighborhood</h3>
+                <div class="bg-gray-100 h-64 rounded-lg mb-4 flex items-center justify-center">
+                    <i class="fas fa-map text-4xl text-gray-400"></i>
+                    <span class="ml-3 text-gray-500">Map will be loaded here</span>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <h4 class="font-medium text-gray-900 mb-3">Transportation</h4>
+                        <ul class="space-y-2 text-gray-600 text-sm">
+                            <li><i class="fas fa-subway mr-2"></i>Central Station (2 min walk)</li>
+                            <li><i class="fas fa-bus mr-2"></i>Bus stop (1 min walk)</li>
+                            <li><i class="fas fa-bicycle mr-2"></i>Bike share station (3 min walk)</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-medium text-gray-900 mb-3">Shopping & Dining</h4>
+                        <ul class="space-y-2 text-gray-600 text-sm">
+                            <li><i class="fas fa-shopping-cart mr-2"></i>Grocery store (5 min walk)</li>
+                            <li><i class="fas fa-utensils mr-2"></i>Restaurants (2 min walk)</li>
+                            <li><i class="fas fa-coffee mr-2"></i>Coffee shops (1 min walk)</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-medium text-gray-900 mb-3">Recreation</h4>
+                        <ul class="space-y-2 text-gray-600 text-sm">
+                            <li><i class="fas fa-tree mr-2"></i>Central Park (10 min walk)</li>
+                            <li><i class="fas fa-running mr-2"></i>Jogging trail (5 min walk)</li>
+                            <li><i class="fas fa-film mr-2"></i>Movie theater (8 min walk)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div id="reviews-content" class="tab-content hidden">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Reviews & Ratings</h3>
+                <div class="text-center py-8">
+                    <i class="fas fa-star text-4xl text-yellow-400 mb-4"></i>
+                    <p class="text-gray-600">No reviews yet. Be the first to review this property!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Property Images Gallery -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8" th:if="${!#lists.isEmpty(property.imageUrls)}">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Property Images</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div th:each="imageUrl : ${property.imageUrls}" class="relative group">
+                    <img th:src="${imageUrl}" 
+                         th:alt="${property.title}" 
+                         class="w-full h-48 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity">
+                    <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-expand text-white opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Similar Properties -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Similar Properties</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Similar property cards would go here -->
+                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                    <div class="h-48 bg-gray-200"></div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-gray-900 mb-2">Similar Property 1</h3>
+                        <p class="text-gray-600 text-sm mb-2">Downtown Location</p>
+                        <div class="text-lg font-bold text-blue-600">$1,750/mo</div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                    <div class="h-48 bg-gray-200"></div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-gray-900 mb-2">Similar Property 2</h3>
+                        <p class="text-gray-600 text-sm mb-2">Midtown Location</p>
+                        <div class="text-lg font-bold text-blue-600">$1,900/mo</div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                    <div class="h-48 bg-gray-200"></div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-gray-900 mb-2">Similar Property 3</h3>
+                        <p class="text-gray-600 text-sm mb-2">Uptown Location</p>
+                        <div class="text-lg font-bold text-blue-600">$1,650/mo</div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
+
+    <!-- Tab switching JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabs = document.querySelectorAll('.property-tab');
+            const contents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const targetTab = this.getAttribute('data-tab');
+                    
+                    // Remove active classes
+                    tabs.forEach(t => {
+                        t.classList.remove('active', 'border-blue-500', 'text-blue-600');
+                        t.classList.add('border-transparent', 'text-gray-500');
+                    });
+                    
+                    // Add active class to clicked tab
+                    this.classList.add('active', 'border-blue-500', 'text-blue-600');
+                    this.classList.remove('border-transparent', 'text-gray-500');
+                    
+                    // Hide all content
+                    contents.forEach(content => {
+                        content.classList.add('hidden');
+                    });
+                    
+                    // Show target content
+                    document.getElementById(targetTab + '-content').classList.remove('hidden');
+                });
+            });
+        });
+    </script>
+</main>
 </body>
 </html>
