@@ -8,7 +8,9 @@ import com.rental.houserental.entity.PropertyImage;
 import com.rental.houserental.entity.RentalProperty;
 import com.rental.houserental.entity.User;
 import com.rental.houserental.enums.PropertyStatus;
+import com.rental.houserental.enums.SortOption;
 import com.rental.houserental.exceptions.property.ImageUploadException;
+import com.rental.houserental.exceptions.property.PropertyNotFoundException;
 import com.rental.houserental.repository.PropertyRepository;
 import com.rental.houserental.repository.specification.RentalPropertySpecification;
 
@@ -26,6 +28,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -44,111 +47,223 @@ public class PropertyServiceImpl implements PropertyService {
                                          MultipartFile[] imageFiles) {
         log.info("Creating property for landlord: {}", landlord.getEmail());
 
-        RentalProperty property = RentalProperty.builder()
-                .title(request.getTitle())
-                .category(categoryService.findById(request.getCategoryId()))
-                .monthlyRent(request.getMonthlyRent())
-                .bedrooms(request.getBedrooms())
-                .bathrooms(request.getBathrooms())
-                .streetAddress(request.getStreetAddress())
-                .city(request.getCity())
-                .province(request.getProvince())
-                .description(request.getDescription())
-                .propertyStatus(PropertyStatus.DRAFT)
-                .landlord(landlord)
-                .images(new HashSet<>())
-                .build();
+        try {
+            RentalProperty property = RentalProperty.builder()
+                    .title(request.getTitle())
+                    .category(categoryService.findById(request.getCategoryId()))
+                    .monthlyRent(request.getMonthlyRent())
+                    .bedrooms(request.getBedrooms())
+                    .bathrooms(request.getBathrooms())
+                    .area(request.getArea())
+                    .streetAddress(request.getStreetAddress())
+                    .ward(request.getWard())
+                    .province(request.getProvince())
+                    .description(request.getDescription())
+                    .propertyStatus(PropertyStatus.DRAFT)
+                    .landlord(landlord)
+                    .images(new HashSet<>())
+                    .build();
 
-        RentalProperty savedProperty = propertyRepository.save(property);
+            RentalProperty savedProperty = propertyRepository.save(property);
 
-        if (imageFiles != null && imageFiles.length > 0) {
-            try {
-                List<MultipartFile> fileList = Arrays.asList(imageFiles);
-                List<PropertyImage> propertyImages = imageService.uploadPropertyImages(fileList, savedProperty);
-                for (PropertyImage image : propertyImages) {
-                    image.setRentalProperty(savedProperty);
+            if (imageFiles != null && imageFiles.length > 0) {
+                try {
+                    List<MultipartFile> fileList = Arrays.asList(imageFiles);
+                    List<PropertyImage> propertyImages = imageService.uploadPropertyImages(fileList, savedProperty);
+                    for (PropertyImage image : propertyImages) {
+                        image.setRentalProperty(savedProperty);
+                    }
+                    savedProperty.getImages().addAll(propertyImages);
+                    savedProperty = propertyRepository.save(savedProperty);
+                    log.info("Uploaded {} images for property: {}", propertyImages.size(), savedProperty.getId());
+                } catch (Exception e) {
+                    log.error("Failed to upload images for property: {}", savedProperty.getId(), e);
+                    // Delete the property since image upload failed
+                    propertyRepository.delete(savedProperty);
+                    throw new ImageUploadException("Failed to upload images for property. Property creation cancelled.", e);
                 }
-                savedProperty.getImages().addAll(propertyImages);
-                savedProperty = propertyRepository.save(savedProperty);
-                log.info("Uploaded {} images for property: {}", propertyImages.size(), savedProperty.getId());
-            } catch (Exception e) {
-                log.error("Failed to upload images for property: {}", savedProperty.getId(), e);
-                // Delete the property since image upload failed
-                propertyRepository.delete(savedProperty);
-                throw new ImageUploadException("Failed to upload images for property. Property creation cancelled.", e);
             }
-        }
 
-        log.info("Successfully created property with ID: {}", savedProperty.getId());
-        return savedProperty;
+            log.info("Successfully created property with ID: {}", savedProperty.getId());
+            return savedProperty;
+            
+        } catch (Exception e) {
+            log.error("Failed to create property for landlord: {}", landlord.getEmail(), e);
+            throw e;
+        }
+    }
+
+    @Override
+    public List<FeaturedPropertyResponseDTO> getFeaturedProperties() {
+        return getFeaturedProperties(6); // Default limit
     }
 
     @Override
     public List<FeaturedPropertyResponseDTO> getFeaturedProperties(int limit) {
         log.info("Fetching {} featured properties", limit);
 
-        Pageable pageable = PageRequest.of(0, limit);
-        List<RentalProperty> properties = propertyRepository.findFeaturedProperties(
-                PropertyStatus.AVAILABLE, pageable);
+        try {
+            Pageable pageable = PageRequest.of(0, limit);
+            List<RentalProperty> properties = propertyRepository.findFeaturedProperties(
+                    PropertyStatus.AVAILABLE, pageable);
 
-        List<FeaturedPropertyResponseDTO> result = properties.stream()
-                .map(this::convertToFeaturedDTO)
-                .toList();
+            List<FeaturedPropertyResponseDTO> result = properties.stream()
+                    .map(this::convertToFeaturedDTO)
+                    .toList();
 
-        log.info("Found {} featured properties", result.size());
-        return result;
+            log.info("Found {} featured properties", result.size());
+            return result;
+            
+        } catch (Exception e) {
+            log.error("Error fetching featured properties", e);
+            return List.of();
+        }
     }
 
     @Override
     public Page<SearchPropertyResponseDTO> searchProperties(SearchPropertyCriteriaDTO criteria, Pageable pageable) {
-        Specification<RentalProperty> spec = RentalPropertySpecification.withCriteria(criteria);
-        Page<RentalProperty> propertyPage = propertyRepository.findAll(spec, pageable);
-
-        List<SearchPropertyResponseDTO> dtoList = propertyPage.getContent().stream()
-                .map(this::convertToSearchDTO)
-                .toList();
+        log.info("Searching properties with criteria: {}", criteria);
         
-        return new PageImpl<>(dtoList, pageable, propertyPage.getTotalElements());
+        try {
+            Specification<RentalProperty> spec = RentalPropertySpecification.withCriteria(criteria);
+            Page<RentalProperty> propertyPage = propertyRepository.findAll(spec, pageable);
+
+            List<SearchPropertyResponseDTO> dtoList = propertyPage.getContent().stream()
+                    .map(this::convertToSearchDTO)
+                    .toList();
+            
+            log.info("Found {} properties matching criteria", dtoList.size());
+            return new PageImpl<>(dtoList, pageable, propertyPage.getTotalElements());
+            
+        } catch (Exception e) {
+            log.error("Error searching properties with criteria: {}", criteria, e);
+            return new PageImpl<>(List.of(), pageable, 0);
+        }
+    }
+
+    @Override
+    public Page<SearchPropertyResponseDTO> searchPropertiesWithSorting(SearchPropertyCriteriaDTO criteria, String sortBy, Pageable pageable) {
+        log.info("Searching properties with criteria: {} and sorting: {}", criteria, sortBy);
+        
+        try {
+            // Apply sorting
+            SortOption sortOption = SortOption.fromValue(sortBy);
+            Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sortOption.getSort());
+            
+            // Search properties with sorting
+            return searchProperties(criteria, sortedPageable);
+            
+        } catch (Exception e) {
+            log.error("Error searching properties with sorting: {}", sortBy, e);
+            // Fallback to default sorting
+            return searchProperties(criteria, pageable);
+        }
+    }
+
+    @Override
+    public SearchPropertyResponseDTO getPropertyById(Long id) {
+        log.info("Fetching property with ID: {}", id);
+        
+        try {
+            RentalProperty property = propertyRepository.findById(id)
+                    .orElseThrow(() -> new PropertyNotFoundException("Property not found with ID: " + id));
+            
+            SearchPropertyResponseDTO result = convertToSearchDTO(property);
+            log.info("Found property: {}", result.getTitle());
+            
+            return result;
+            
+        } catch (PropertyNotFoundException e) {
+            log.warn("Property not found with ID: {}", id);
+            throw e;
+        } catch (Exception e) {
+            log.error("Error fetching property with ID: {}", id, e);
+            throw new PropertyNotFoundException("Error retrieving property with ID: " + id, e);
+        }
     }
 
     private FeaturedPropertyResponseDTO convertToFeaturedDTO(RentalProperty property) {
-        List<String> imageUrls = property.getImages().stream()
-                .map(PropertyImage::getImageUrl)
-                .toList();
-        
-        return FeaturedPropertyResponseDTO.builder()
-                .id(property.getId())
-                .title(property.getTitle())
-                .price(property.getMonthlyRent())
-                .bedrooms(property.getBedrooms())
-                .bathrooms(property.getBathrooms())
-                .location(property.getCity() + ", " + property.getProvince())
-                .mainImageUrl(property.getMainImageUrl())
-                .imageUrls(imageUrls)
-                .imageCount(imageUrls.size())
-                .build();
+        try {
+            List<String> imageUrls = property.getImages().stream()
+                    .map(PropertyImage::getImageUrl)
+                    .toList();
+            
+            return FeaturedPropertyResponseDTO.builder()
+                    .id(property.getId())
+                    .title(property.getTitle())
+                    .price(property.getMonthlyRent())
+                    .bedrooms(property.getBedrooms())
+                    .bathrooms(property.getBathrooms())
+                    .area(property.getArea())
+                    .ward(property.getWard())
+                    .province(property.getProvince())
+                    .location(property.getWard() + ", " + property.getProvince()) // Backward compatibility
+                    .mainImageUrl(property.getMainImageUrl())
+                    .imageUrls(imageUrls)
+                    .imageCount(imageUrls.size())
+                    .build();
+                    
+        } catch (Exception e) {
+            log.error("Error converting property to featured DTO: {}", property.getId(), e);
+            throw e;
+        }
     }
 
     private SearchPropertyResponseDTO convertToSearchDTO(RentalProperty property) {
-        List<String> imageUrls = property.getImages().stream()
-                .map(PropertyImage::getImageUrl)
-                .toList();
-        
-        return SearchPropertyResponseDTO.builder()
-                .id(property.getId())
-                .title(property.getTitle())
-                .monthlyRent(property.getMonthlyRent())
-                .bedrooms(property.getBedrooms())
-                .bathrooms(property.getBathrooms())
-                .streetAddress(property.getStreetAddress())
-                .city(property.getCity())
-                .province(property.getProvince())
-                .description(property.getDescription())
-                .propertyStatus(property.getPropertyStatus().name())
-                .categoryName(property.getCategory().getName())
-                .mainImageUrl(property.getMainImageUrl())
-                .imageUrls(imageUrls)
-                .imageCount(imageUrls.size())
-                .build();
+        try {
+            List<String> imageUrls = property.getImages().stream()
+                    .map(PropertyImage::getImageUrl)
+                    .toList();
+            
+            return SearchPropertyResponseDTO.builder()
+                    .id(property.getId())
+                    .title(property.getTitle())
+                    .monthlyRent(property.getMonthlyRent())
+                    .bedrooms(property.getBedrooms())
+                    .bathrooms(property.getBathrooms())
+                    .area(property.getArea())
+                    .streetAddress(property.getStreetAddress())
+                    .ward(property.getWard())
+                    .province(property.getProvince())
+                    .description(property.getDescription())
+                    .propertyStatus(property.getPropertyStatus().name())
+                    .categoryName(property.getCategory().getName())
+                    .mainImageUrl(property.getMainImageUrl())
+                    .imageUrls(imageUrls)
+                    .imageCount(imageUrls.size())
+                    .fullAddress(buildFullAddress(property))
+                    .publishedAt(property.getPublishedAt())
+                    .build();
+                    
+        } catch (Exception e) {
+            log.error("Error converting property to search DTO: {}", property.getId(), e);
+            throw e;
+        }
+    }
+
+    private String buildFullAddress(RentalProperty property) {
+        try {
+            StringBuilder address = new StringBuilder();
+            
+            if (property.getStreetAddress() != null && !property.getStreetAddress().trim().isEmpty()) {
+                address.append(property.getStreetAddress().trim());
+            }
+            
+            if (property.getWard() != null && !property.getWard().trim().isEmpty()) {
+                if (address.length() > 0) address.append(", ");
+                address.append(property.getWard().trim());
+            }
+            
+            if (property.getProvince() != null && !property.getProvince().trim().isEmpty()) {
+                if (address.length() > 0) address.append(", ");
+                address.append(property.getProvince().trim());
+            }
+            
+            return address.toString();
+            
+        } catch (Exception e) {
+            log.error("Error building full address for property: {}", property.getId(), e);
+            return "Address not available";
+        }
     }
 }

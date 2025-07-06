@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity
@@ -32,11 +33,14 @@ public class RentalProperty extends BaseEntity {
     @Column(name = "Bathrooms", nullable = false)
     private Integer bathrooms;
 
+    @Column(name = "Area", nullable = false, precision = 8, scale = 2)
+    private BigDecimal area;
+
     @Column(name = "StreetAddress", nullable = false, columnDefinition = "NVARCHAR(255)")
     private String streetAddress;
 
-    @Column(name = "City", nullable = false, columnDefinition = "NVARCHAR(100)")
-    private String city;
+    @Column(name = "Ward", nullable = false, columnDefinition = "NVARCHAR(100)")
+    private String ward;
 
     @Column(name = "Province", nullable = false, columnDefinition = "NVARCHAR(100)")
     private String province;
@@ -52,6 +56,9 @@ public class RentalProperty extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "LandlordId", nullable = false)
     private User landlord;
+
+    @Column(name = "PublishedAt")
+    private LocalDateTime publishedAt;
 
     @OneToMany(mappedBy = "rentalProperty", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @OrderBy("displayOrder ASC, createdAt ASC")
@@ -70,6 +77,6 @@ public class RentalProperty extends BaseEntity {
     }
 
     public String getFullAddress() {
-        return String.format("%s, %s, %s", streetAddress, city, province);
+        return String.format("%s, %s, %s", streetAddress, ward, province);
     }
 }

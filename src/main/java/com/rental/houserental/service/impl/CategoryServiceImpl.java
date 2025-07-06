@@ -21,6 +21,11 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    public List<Category> getAllCategories() {
+        return findAll(); // Alias for consistency
+    }
+
+    @Override
     public Category findById(Long id) {
         return categoryRepository.findById(id)
                 .orElseThrow(() -> new CategoryNotFoundException("Category not found with id: " + id));

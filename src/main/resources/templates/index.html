@@ -24,38 +24,49 @@
             <p class="text-xl md:text-2xl mb-8 text-blue-100">
                 Discover amazing rental properties in your desired location
             </p>
-            <form class="bg-white rounded-lg shadow-xl p-6 max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-4" method="get" th:action="@{/properties/search}">
-                <div class="relative">
-                    <label class="block text-gray-700 text-sm font-medium mb-2">Location</label>
-                    <input type="text" name="location" placeholder="Enter city or area"
-                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900">
-                </div>
-                <div>
-                    <label class="block text-gray-700 text-sm font-medium mb-2">Property Type</label>
-                    <select name="propertyType" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900">
-                        <option value="">Any Type</option>
-                        <option th:each="category : ${categories}" 
-                                th:value="${category.id}" 
-                                th:text="${category.name}">Category Name</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-gray-700 text-sm font-medium mb-2">Max Price</label>
-                    <select name="maxPrice" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900">
-                        <option value="">Any Price</option>
-                        <option value="1000">Under $1,000</option>
-                        <option value="2000">$1,000 - $2,000</option>
-                        <option value="3000">$2,000 - $3,000</option>
-                        <option value="999999">Above $3,000</option>
-                    </select>
-                </div>
-                <div class="flex items-end">
-                    <button type="submit"
-                            class="w-full bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 font-medium transition-colors duration-200">
-                        <i class="fas fa-search mr-2"></i>Search
-                    </button>
-                </div>
-            </form>
+            
+            <!-- 🔎 Modern Single-Row Search Bar (USD) -->
+            <div class="max-w-4xl mx-auto">
+                <form class="flex flex-col md:flex-row items-end gap-4 bg-white rounded-xl shadow-xl p-6" method="get" th:action="@{/properties/search}">
+                    <!-- Location -->
+                    <div class="flex-1">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                        <input type="text" name="location" placeholder="Enter city, district, or street"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900" />
+                    </div>
+                    <!-- Property Type -->
+                    <div class="w-48">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Property Type</label>
+                        <select name="propertyType"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900">
+                            <option value="">Any Type</option>
+                            <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}">Category</option>
+                        </select>
+                    </div>
+                    <!-- Max Price (USD) -->
+                    <div class="w-48">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Max Price</label>
+                        <select name="maxPrice"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900">
+                            <option value="">Any Price</option>
+                            <option value="500">Under $500</option>
+                            <option value="1000">Under $1,000</option>
+                            <option value="2000">Under $2,000</option>
+                            <option value="3000">Under $3,000</option>
+                            <option value="5000">Under $5,000</option>
+                            <option value="5001">Over $5,000</option>
+                        </select>
+                    </div>
+                    <!-- Search Button -->
+                    <div class="flex-shrink-0 md:mt-6">
+                        <button type="submit"
+                            class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium flex items-center gap-2">
+                            <i class="fas fa-search"></i>
+                            Search Properties
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </section>
 
@@ -121,16 +132,20 @@
                                 <i class="fas fa-bath mr-1 text-xs"></i>
                                 <span th:text="${property.bathrooms + ' bathrooms'}">Baths</span>
                             </span>
+                            <span class="flex items-center">
+                                <i class="fas fa-ruler-combined mr-1 text-xs"></i>
+                                <span th:text="${property.area + ' m²'}">Area</span>
+                            </span>
                         </div>
                         
                         <!-- Pricing -->
                         <div class="pt-2 border-t border-gray-100">
                             <div class="flex justify-between items-end">
                                 <div>
-                                    <span class="text-lg font-bold text-gray-900" th:text="'$' + ${#numbers.formatDecimal(property.price, 0, 'COMMA', 0, 'POINT')}">$750,000</span>
+                                    <span class="text-lg font-bold text-gray-900" th:text="'₫' + ${#numbers.formatDecimal(property.price, 0, 'COMMA', 0, 'POINT')}">₫750,000</span>
                                     <span class="text-sm text-gray-500">/ tháng</span>
                                 </div>
-                                <a th:href="@{'/property/' + ${property.id}}" 
+                                <a th:href="@{/properties/{id}(id=${property.id})}" 
                                    class="text-blue-600 hover:text-blue-700 text-sm font-medium">
                                    Xem chi tiết →
                                 </a>
@@ -192,7 +207,7 @@
                    class="bg-white text-blue-600 px-8 py-3 rounded-md font-semibold hover:bg-gray-100 transition-colors duration-200 shadow-sm">
                     <i class="fas fa-user-plus mr-2"></i>Get Started - It's Free
                 </a>
-                <a th:href="@{/properties}"
+                <a th:href="@{/properties/search}"
                    class="border border-white text-white px-8 py-3 rounded-md font-semibold hover:bg-blue-700 transition-colors duration-200">
                     <i class="fas fa-search mr-2"></i>Browse Properties
                 </a>

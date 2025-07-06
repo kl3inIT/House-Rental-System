@@ -3,10 +3,12 @@ package com.rental.houserental.repository.specification;
 import com.rental.houserental.dto.request.property.SearchPropertyCriteriaDTO;
 import com.rental.houserental.entity.RentalProperty;
 import com.rental.houserental.enums.PropertyStatus;
-import com.rental.houserental.exceptions.property.InvalidPropertyStatusException;
-import jakarta.persistence.criteria.*;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,65 +19,223 @@ public class RentalPropertySpecification {
     }
 
     public static Specification<RentalProperty> withCriteria(SearchPropertyCriteriaDTO criteria) {
-        return (root, query, cb) -> {
-            List<Predicate> predicates = new ArrayList<>();
+        return (root, query, criteriaBuilder) -> {
+            List<jakarta.persistence.criteria.Predicate> predicates = new ArrayList<>();
 
-            if (criteria.getStatus() != null && !criteria.getStatus().isBlank()) {
-                try {
-                    PropertyStatus status = PropertyStatus.fromString(criteria.getStatus());
-                    predicates.add(cb.equal(root.get("propertyStatus"), status));
-                } catch (InvalidPropertyStatusException e) {
-                    throw new InvalidPropertyStatusException("Invalid property status: " + criteria.getStatus());
+            // Location search (province, ward, streetAddress)
+            if (criteria.getLocation() != null && !criteria.getLocation().trim().isEmpty()) {
+                String locationPattern = "%" + criteria.getLocation().trim().toLowerCase() + "%";
+                predicates.add(criteriaBuilder.or(
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("province")), locationPattern),
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("ward")), locationPattern),
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("streetAddress")), locationPattern)
+                ));
+            }
+
+            // Province filter
+            if (criteria.getProvince() != null && !criteria.getProvince().trim().isEmpty()) {
+                predicates.add(criteriaBuilder.equal(root.get("province"), criteria.getProvince().trim()));
+            }
+
+            // Ward filter
+            if (criteria.getWard() != null && !criteria.getWard().trim().isEmpty()) {
+                predicates.add(criteriaBuilder.equal(root.get("ward"), criteria.getWard().trim()));
+            }
+
+            // Property Type (Category) filter
+            if (criteria.getPropertyTypes() != null && !criteria.getPropertyTypes().isEmpty()) {
+                predicates.add(root.get("category").get("id").in(criteria.getPropertyTypes()));
+            } else if (criteria.getPropertyType() != null) {
+                // Legacy support
+                predicates.add(criteriaBuilder.equal(root.get("category").get("id"), criteria.getPropertyType()));
+            }
+
+            // Price Range filters
+            if (criteria.getPriceRanges() != null && !criteria.getPriceRanges().isEmpty()) {
+                List<jakarta.persistence.criteria.Predicate> pricePredicates = new ArrayList<>();
+                
+                for (String range : criteria.getPriceRanges()) {
+                    String[] parts = range.split("-");
+                    if (parts.length == 2) {
+                        BigDecimal minPrice = new BigDecimal(parts[0]);
+                        BigDecimal maxPrice = new BigDecimal(parts[1]);
+                        
+                        if (maxPrice.compareTo(BigDecimal.valueOf(999999999)) == 0) {
+                            // "Above X" case
+                            pricePredicates.add(criteriaBuilder.greaterThanOrEqualTo(
+                                root.get("monthlyRent"), minPrice));
+                        } else {
+                            // Range case
+                            pricePredicates.add(criteriaBuilder.and(
+                                criteriaBuilder.greaterThanOrEqualTo(root.get("monthlyRent"), minPrice),
+                                criteriaBuilder.lessThanOrEqualTo(root.get("monthlyRent"), maxPrice)
+                            ));
+                        }
+                    }
+                }
+                
+                if (!pricePredicates.isEmpty()) {
+                    predicates.add(criteriaBuilder.or(pricePredicates.toArray(new jakarta.persistence.criteria.Predicate[0])));
+                }
+            } else {
+                // Legacy price filters
+                if (criteria.getMinPrice() != null) {
+                    predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("monthlyRent"), criteria.getMinPrice()));
+                }
+                if (criteria.getMaxPrice() != null) {
+                    predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("monthlyRent"), criteria.getMaxPrice()));
                 }
             }
 
-            // 🔍 Location (city, province, streetAddress)
-            if (criteria.getLocation() != null && !criteria.getLocation().isBlank()) {
-                String likeValue = "%" + criteria.getLocation().toLowerCase() + "%";
-                predicates.add(cb.or(
-                        cb.like(cb.lower(root.get("city")), likeValue),
-                        cb.like(cb.lower(root.get("province")), likeValue),
-                        cb.like(cb.lower(root.get("streetAddress")), likeValue)
-                ));
+            // Area Range filters
+            if (criteria.getAreaRanges() != null && !criteria.getAreaRanges().isEmpty()) {
+                List<jakarta.persistence.criteria.Predicate> areaPredicates = new ArrayList<>();
+                
+                for (String range : criteria.getAreaRanges()) {
+                    String[] parts = range.split("-");
+                    if (parts.length == 2) {
+                        BigDecimal minArea = new BigDecimal(parts[0]);
+                        BigDecimal maxArea = new BigDecimal(parts[1]);
+                        
+                        if (maxArea.compareTo(BigDecimal.valueOf(999999)) == 0) {
+                            // "Above X" case
+                            areaPredicates.add(criteriaBuilder.greaterThanOrEqualTo(
+                                root.get("area"), minArea));
+                        } else {
+                            // Range case
+                            areaPredicates.add(criteriaBuilder.and(
+                                criteriaBuilder.greaterThanOrEqualTo(root.get("area"), minArea),
+                                criteriaBuilder.lessThanOrEqualTo(root.get("area"), maxArea)
+                            ));
+                        }
+                    }
+                }
+                
+                if (!areaPredicates.isEmpty()) {
+                    predicates.add(criteriaBuilder.or(areaPredicates.toArray(new jakarta.persistence.criteria.Predicate[0])));
+                }
+            } else {
+                // Legacy area filters
+                if (criteria.getMinArea() != null) {
+                    predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("area"), criteria.getMinArea()));
+                }
+                if (criteria.getMaxArea() != null) {
+                    predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("area"), criteria.getMaxArea()));
+                }
             }
 
-            if (criteria.getPropertyType() != null) {
-                predicates.add(cb.equal(root.get("category").get("id"), criteria.getPropertyType()));
-            }
-
-            if (criteria.getMinPrice() != null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("monthlyRent"), criteria.getMinPrice()));
-            }
-
-            if (criteria.getMaxPrice() != null) {
-                predicates.add(cb.lessThanOrEqualTo(root.get("monthlyRent"), criteria.getMaxPrice()));
-            }
-
+            // Bedrooms filter
             if (criteria.getMinBedrooms() != null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("bedrooms"), criteria.getMinBedrooms()));
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("bedrooms"), criteria.getMinBedrooms()));
             }
-
             if (criteria.getMaxBedrooms() != null) {
-                predicates.add(cb.lessThanOrEqualTo(root.get("bedrooms"), criteria.getMaxBedrooms()));
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("bedrooms"), criteria.getMaxBedrooms()));
             }
 
+            // Bathrooms filter
             if (criteria.getMinBathrooms() != null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("bathrooms"), criteria.getMinBathrooms()));
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("bathrooms"), criteria.getMinBathrooms()));
             }
-
             if (criteria.getMaxBathrooms() != null) {
-                predicates.add(cb.lessThanOrEqualTo(root.get("bathrooms"), criteria.getMaxBathrooms()));
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("bathrooms"), criteria.getMaxBathrooms()));
             }
 
-            if (criteria.getKeyword() != null && !criteria.getKeyword().isBlank()) {
-                String likeKeyword = "%" + criteria.getKeyword().toLowerCase() + "%";
-                predicates.add(cb.or(
-                        cb.like(cb.lower(root.get("title")), likeKeyword),
-                        cb.like(cb.lower(root.get("description")), likeKeyword)
+            // Published Date filters
+            if (criteria.getPublishedRanges() != null && !criteria.getPublishedRanges().isEmpty()) {
+                List<jakarta.persistence.criteria.Predicate> publishedPredicates = new ArrayList<>();
+                
+                for (String range : criteria.getPublishedRanges()) {
+                    LocalDateTime fromDate = getPublishedFromDate(range);
+                    LocalDateTime toDate = getPublishedToDate(range);
+                    
+                    if (fromDate != null && toDate != null) {
+                        publishedPredicates.add(criteriaBuilder.and(
+                            criteriaBuilder.greaterThanOrEqualTo(root.get("publishedAt"), fromDate),
+                            criteriaBuilder.lessThanOrEqualTo(root.get("publishedAt"), toDate)
+                        ));
+                    } else if (fromDate != null) {
+                        publishedPredicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("publishedAt"), fromDate));
+                    } else if (toDate != null) {
+                        publishedPredicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("publishedAt"), toDate));
+                    }
+                }
+                
+                if (!publishedPredicates.isEmpty()) {
+                    predicates.add(criteriaBuilder.or(publishedPredicates.toArray(new jakarta.persistence.criteria.Predicate[0])));
+                }
+            } else {
+                // Direct date range filters
+                if (criteria.getPublishedFrom() != null) {
+                    LocalDateTime fromDateTime = criteria.getPublishedFrom().atStartOfDay();
+                    predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("publishedAt"), fromDateTime));
+                }
+                if (criteria.getPublishedTo() != null) {
+                    LocalDateTime toDateTime = criteria.getPublishedTo().atTime(LocalTime.MAX);
+                    predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("publishedAt"), toDateTime));
+                }
+            }
+
+            // Keyword search (title, description)
+            if (criteria.getKeyword() != null && !criteria.getKeyword().trim().isEmpty()) {
+                String keywordPattern = "%" + criteria.getKeyword().trim().toLowerCase() + "%";
+                predicates.add(criteriaBuilder.or(
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("title")), keywordPattern),
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("description")), keywordPattern)
                 ));
             }
 
-            return cb.and(predicates.toArray(new Predicate[0]));
+            // Status filter
+            if (criteria.getStatus() != null && !criteria.getStatus().trim().isEmpty()) {
+                try {
+                    PropertyStatus status = PropertyStatus.valueOf(criteria.getStatus().toUpperCase());
+                    predicates.add(criteriaBuilder.equal(root.get("propertyStatus"), status));
+                } catch (IllegalArgumentException e) {
+                    // Invalid status, ignore this filter
+                }
+            }
+
+            // Default: only show available properties
+            predicates.add(criteriaBuilder.equal(root.get("propertyStatus"), PropertyStatus.AVAILABLE));
+
+            return criteriaBuilder.and(predicates.toArray(new jakarta.persistence.criteria.Predicate[0]));
         };
+    }
+
+    private static LocalDateTime getPublishedFromDate(String range) {
+        LocalDate today = LocalDate.now();
+        
+        switch (range.toLowerCase()) {
+            case "today":
+                return today.atStartOfDay();
+            case "week":
+                return today.minusWeeks(1).atStartOfDay();
+            case "month":
+                return today.minusMonths(1).atStartOfDay();
+            case "3months":
+                return today.minusMonths(3).atStartOfDay();
+            case "6months":
+                return today.minusMonths(6).atStartOfDay();
+            case "year":
+                return today.minusYears(1).atStartOfDay();
+            default:
+                return null;
+        }
+    }
+
+    private static LocalDateTime getPublishedToDate(String range) {
+        LocalDate today = LocalDate.now();
+        
+        switch (range.toLowerCase()) {
+            case "today":
+                return today.atTime(LocalTime.MAX);
+            case "week":
+            case "month":
+            case "3months":
+            case "6months":
+            case "year":
+                return today.atTime(LocalTime.MAX);
+            default:
+                return null;
+        }
     }
 }

@@ -34,13 +34,19 @@ public class CreatePropertyRequestDTO {
     @Max(value = 10, message = "Bathrooms must be 10 or less")
     private Integer bathrooms;
 
+    @NotNull(message = "Property area is required")
+    @DecimalMin(value = "1.0", inclusive = true, message = "Area must be at least 1 square meter")
+    @DecimalMax(value = "10000.0", inclusive = true, message = "Area must be less than 10,000 square meters")
+    @Digits(integer = 6, fraction = 2, message = "Invalid area value")
+    private BigDecimal area;
+
     @NotBlank(message = "Street address is required")
     @Size(max = 255, message = "Street address must be less than 255 characters")
     private String streetAddress;
 
-    @NotBlank(message = "City is required")
-    @Size(max = 100, message = "City must be less than 100 characters")
-    private String city;
+    @NotBlank(message = "Ward is required")
+    @Size(max = 100, message = "Ward must be less than 100 characters")
+    private String ward;
 
     @NotBlank(message = "Province is required")
     @Size(max = 100, message = "Province must be less than 100 characters")
