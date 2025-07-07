@@ -43,15 +43,12 @@ public class RentalPropertySpecification {
             }
 
             // Property Type (Category) filter
-            if (criteria.getPropertyTypes() != null && !criteria.getPropertyTypes().isEmpty()) {
+            if (!criteria.getPropertyTypes().isEmpty()) {
                 predicates.add(root.get("category").get("id").in(criteria.getPropertyTypes()));
-            } else if (criteria.getPropertyType() != null) {
-                // Legacy support
-                predicates.add(criteriaBuilder.equal(root.get("category").get("id"), criteria.getPropertyType()));
             }
 
             // Price Range filters
-            if (criteria.getPriceRanges() != null && !criteria.getPriceRanges().isEmpty()) {
+            if (!criteria.getPriceRanges().isEmpty()) {
                 List<jakarta.persistence.criteria.Predicate> pricePredicates = new ArrayList<>();
                 
                 for (String range : criteria.getPriceRanges()) {
@@ -77,18 +74,10 @@ public class RentalPropertySpecification {
                 if (!pricePredicates.isEmpty()) {
                     predicates.add(criteriaBuilder.or(pricePredicates.toArray(new jakarta.persistence.criteria.Predicate[0])));
                 }
-            } else {
-                // Legacy price filters
-                if (criteria.getMinPrice() != null) {
-                    predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("monthlyRent"), criteria.getMinPrice()));
-                }
-                if (criteria.getMaxPrice() != null) {
-                    predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("monthlyRent"), criteria.getMaxPrice()));
-                }
             }
 
             // Area Range filters
-            if (criteria.getAreaRanges() != null && !criteria.getAreaRanges().isEmpty()) {
+            if (!criteria.getAreaRanges().isEmpty()) {
                 List<jakarta.persistence.criteria.Predicate> areaPredicates = new ArrayList<>();
                 
                 for (String range : criteria.getAreaRanges()) {
@@ -114,14 +103,6 @@ public class RentalPropertySpecification {
                 if (!areaPredicates.isEmpty()) {
                     predicates.add(criteriaBuilder.or(areaPredicates.toArray(new jakarta.persistence.criteria.Predicate[0])));
                 }
-            } else {
-                // Legacy area filters
-                if (criteria.getMinArea() != null) {
-                    predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("area"), criteria.getMinArea()));
-                }
-                if (criteria.getMaxArea() != null) {
-                    predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("area"), criteria.getMaxArea()));
-                }
             }
 
             // Bedrooms filter
@@ -141,7 +122,7 @@ public class RentalPropertySpecification {
             }
 
             // Published Date filters
-            if (criteria.getPublishedRanges() != null && !criteria.getPublishedRanges().isEmpty()) {
+            if (!criteria.getPublishedRanges().isEmpty()) {
                 List<jakarta.persistence.criteria.Predicate> publishedPredicates = new ArrayList<>();
                 
                 for (String range : criteria.getPublishedRanges()) {
@@ -163,16 +144,6 @@ public class RentalPropertySpecification {
                 if (!publishedPredicates.isEmpty()) {
                     predicates.add(criteriaBuilder.or(publishedPredicates.toArray(new jakarta.persistence.criteria.Predicate[0])));
                 }
-            } else {
-                // Direct date range filters
-                if (criteria.getPublishedFrom() != null) {
-                    LocalDateTime fromDateTime = criteria.getPublishedFrom().atStartOfDay();
-                    predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("publishedAt"), fromDateTime));
-                }
-                if (criteria.getPublishedTo() != null) {
-                    LocalDateTime toDateTime = criteria.getPublishedTo().atTime(LocalTime.MAX);
-                    predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("publishedAt"), toDateTime));
-                }
             }
 
             // Keyword search (title, description)
@@ -192,10 +163,10 @@ public class RentalPropertySpecification {
                 } catch (IllegalArgumentException e) {
                     // Invalid status, ignore this filter
                 }
+            } else {
+                // Default: only show available properties if no status filter is specified
+                predicates.add(criteriaBuilder.equal(root.get("propertyStatus"), PropertyStatus.AVAILABLE));
             }
-
-            // Default: only show available properties
-            predicates.add(criteriaBuilder.equal(root.get("propertyStatus"), PropertyStatus.AVAILABLE));
 
             return criteriaBuilder.and(predicates.toArray(new jakarta.persistence.criteria.Predicate[0]));
         };

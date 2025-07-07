@@ -14,15 +14,11 @@ import java.util.List;
 
 public interface PropertyService {
 
-    RentalProperty createProperty(CreatePropertyRequestDTO request, User landlord, MultipartFile[] imageFiles);
-    
-    List<FeaturedPropertyResponseDTO> getFeaturedProperties(); // Default limit
+    RentalProperty createProperty(CreatePropertyRequestDTO request, User landlord, MultipartFile[] imageFiles);// Default limit
     
     List<FeaturedPropertyResponseDTO> getFeaturedProperties(int limit);
-
-    Page<SearchPropertyResponseDTO> searchProperties(SearchPropertyCriteriaDTO criteria, Pageable pageable);
-    
-    Page<SearchPropertyResponseDTO> searchPropertiesWithSorting(SearchPropertyCriteriaDTO criteria, String sortBy, Pageable pageable);
     
     SearchPropertyResponseDTO getPropertyById(Long id);
+
+    Page<SearchPropertyResponseDTO> searchProperties(SearchPropertyCriteriaDTO criteria, Pageable pageable);
 }

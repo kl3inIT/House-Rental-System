@@ -299,19 +299,18 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function createImagePreviewItem(file, index, fileId) {
         const reader = new FileReader();
-        
         reader.onload = function(e) {
             // Create container - removed overflow-hidden to prevent clipping of remove button
             const container = document.createElement('div');
-            container.className = 'relative group bg-gray-100 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200';
+            container.className = 'relative group bg-gray-100 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 flex flex-col items-center';
             container.setAttribute('data-file-id', fileId);
-            
-            // Create image element with rounded corners
+
+            // Create image element with rounded corners, square, responsive
             const img = document.createElement('img');
             img.src = e.target.result;
             img.alt = `Property image ${index + 1}`;
-            img.className = 'w-full h-24 object-cover rounded-lg';
-            
+            img.className = 'w-32 h-32 md:w-40 md:h-40 object-cover rounded-lg mx-auto';
+
             // Create beautiful modern remove button
             const removeBtn = document.createElement('button');
             removeBtn.type = 'button';
@@ -319,39 +318,37 @@ document.addEventListener('DOMContentLoaded', function() {
             removeBtn.setAttribute('data-file-id', fileId);
             removeBtn.setAttribute('aria-label', `Remove image ${index + 1}`);
             removeBtn.setAttribute('title', `Remove image ${index + 1}`);
-            
+
             // Use FontAwesome icon with better styling
             const icon = document.createElement('i');
             icon.className = 'fas fa-times text-sm font-bold drop-shadow-sm';
             icon.setAttribute('aria-hidden', 'true');
             removeBtn.appendChild(icon);
-            
+
             // Create image number badge
             const numberBadge = document.createElement('div');
             numberBadge.className = 'absolute bottom-1 left-1 bg-white bg-opacity-90 text-gray-700 text-xs px-1.5 py-0.5 rounded font-medium shadow-sm';
             numberBadge.innerHTML = `#${index + 1}`;
             numberBadge.setAttribute('aria-label', `Image ${index + 1}`);
-            
+
             // Create file size badge
             const sizeBadge = document.createElement('div');
             sizeBadge.className = 'absolute bottom-1 right-1 bg-black bg-opacity-70 text-white text-xs px-1.5 py-0.5 rounded shadow-sm';
             sizeBadge.innerHTML = `${(file.size / 1024 / 1024).toFixed(1)} MB`;
             sizeBadge.setAttribute('aria-label', `File size ${(file.size / 1024 / 1024).toFixed(1)} megabytes`);
-            
+
             // Add all elements to container
             container.appendChild(img);
             container.appendChild(removeBtn);
             container.appendChild(numberBadge);
             container.appendChild(sizeBadge);
-            
+
             imagePreview.appendChild(container);
         };
-        
         reader.onerror = function() {
             console.error('Error reading file:', file.name);
             showNotification(`Failed to load image: ${file.name}`, 'error');
         };
-        
         reader.readAsDataURL(file);
     }
     
@@ -604,16 +601,34 @@ async function loadProvinces() {
 
 async function loadWards(provinceName) {
     const wardSelect = document.getElementById('ward-select');
-    
+    let allWards = [];
+    let offset = 0;
+    const limit = 50;
+    let hasMore = true;
+
     try {
-        // Load specific province with wards from the new API
-        const response = await fetch(`https://vietnamlabs.com/api/vietnamprovince?province=${encodeURIComponent(provinceName)}`);
-        const data = await response.json();
-        
+        while (hasMore) {
+            const response = await fetch(
+                `https://vietnamlabs.com/api/vietnamprovince?province=${encodeURIComponent(provinceName)}&offset=${offset}&limit=${limit}`
+            );
+            const data = await response.json();
+
+            if (data.success && data.data && data.data.wards) {
+                allWards = allWards.concat(data.data.wards);
+                if (data.pagination && data.pagination.hasMore) {
+                    offset += limit;
+                    hasMore = true;
+                } else {
+                    hasMore = false;
+                }
+            } else {
+                hasMore = false;
+            }
+        }
+
         wardSelect.innerHTML = '<option value="">Chọn phường/xã</option>';
-        
-        if (data.success && data.data && data.data.wards && data.data.wards.length > 0) {
-            data.data.wards.forEach(ward => {
+        if (allWards.length > 0) {
+            allWards.forEach(ward => {
                 const option = document.createElement('option');
                 option.value = ward.name;
                 option.textContent = ward.name;

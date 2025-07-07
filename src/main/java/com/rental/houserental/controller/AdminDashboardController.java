@@ -1,4 +1,4 @@
-package com.rental.houserental.controller.admin;
+package com.rental.houserental.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;

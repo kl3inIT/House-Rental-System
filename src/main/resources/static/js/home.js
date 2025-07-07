@@ -9,10 +9,8 @@ function initializeFavorites() {
     document.querySelectorAll('.favorite-btn').forEach(button => {
         button.addEventListener('click', function(e) {
             e.stopPropagation();
-            
             const icon = this.querySelector('i');
             const isFavorite = icon.classList.contains('fas');
-            
             if (isFavorite) {
                 icon.className = 'far fa-heart text-gray-600 hover:text-red-500 text-sm';
             } else {
@@ -24,13 +22,20 @@ function initializeFavorites() {
 
 // Home search functionality
 function initializeHomeSearch() {
-    const locationInput = document.querySelector('form[th\\:action*="search"] input[name="location"]');
-    if (!locationInput) return;
-
+    const locationInput = document.querySelector('form[action*="search"] input[name="location"]');
+    if (!locationInput) {
+        return;
+    }
     // Create autocomplete container
     const autocompleteContainer = document.createElement('div');
     autocompleteContainer.className = 'absolute z-50 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto hidden';
     autocompleteContainer.id = 'home-location-autocomplete';
+    autocompleteContainer.style.position = 'absolute';
+    autocompleteContainer.style.top = '100%';
+    autocompleteContainer.style.left = '0';
+    autocompleteContainer.style.right = '0';
+    autocompleteContainer.style.zIndex = '9999';
+    locationInput.parentElement.style.position = 'relative';
     locationInput.parentElement.appendChild(autocompleteContainer);
 
     let searchTimeout;
@@ -38,30 +43,25 @@ function initializeHomeSearch() {
 
     locationInput.addEventListener('input', function() {
         const query = this.value.trim();
-        
-        // Clear previous timeout
         if (searchTimeout) {
             clearTimeout(searchTimeout);
         }
-
-        // Hide autocomplete if query is too short
         if (query.length < 1) {
             hideHomeAutocomplete();
             return;
         }
-
-        // Show loading indicator
         showHomeLoading();
-
-        // Debounce search
         searchTimeout = setTimeout(() => {
             searchHomeLocations(query);
         }, 300);
     });
 
+    locationInput.addEventListener('focus', function() {
+        // No debug
+    });
+
     locationInput.addEventListener('keydown', function(e) {
         const items = autocompleteContainer.querySelectorAll('.autocomplete-item');
-        
         switch(e.key) {
             case 'ArrowDown':
                 e.preventDefault();
@@ -85,7 +85,6 @@ function initializeHomeSearch() {
         }
     });
 
-    // Hide autocomplete when clicking outside
     document.addEventListener('click', function(e) {
         if (!locationInput.contains(e.target) && !autocompleteContainer.contains(e.target)) {
             hideHomeAutocomplete();
@@ -104,8 +103,21 @@ function showHomeLoading() {
 async function searchHomeLocations(query) {
     const autocompleteContainer = document.getElementById('home-location-autocomplete');
     try {
-        // Search in provinces first
-        const response = await fetch('https://vietnamlabs.com/api/vietnamprovince');
+        // Search in provinces first with timeout
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+        const response = await fetch('https://vietnamlabs.com/api/vietnamprovince', {
+            signal: controller.signal,
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+        clearTimeout(timeoutId);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
         const data = await response.json();
         let results = [];
         if (data.success && data.data) {
@@ -141,8 +153,6 @@ async function searchHomeLocations(query) {
             autocompleteContainer.classList.remove('hidden');
         }
     } catch (error) {
-        console.error('Error searching locations:', error);
-        // Fallback to static search
         displayHomeFallbackResults(query);
     }
 }
@@ -156,7 +166,7 @@ function displayHomeAutocompleteResults(results) {
     autocompleteContainer.innerHTML = '';
     results.forEach((result, index) => {
         const item = document.createElement('div');
-        item.className = 'autocomplete-item px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm';
+        item.className = 'autocomplete-item px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm text-black text-left';
         item.textContent = result.name;
         item.addEventListener('click', function() {
             selectHomeLocation(result.name);
@@ -193,7 +203,7 @@ function displayHomeFallbackResults(query) {
     autocompleteContainer.innerHTML = '';
     matchingProvinces.forEach(province => {
         const item = document.createElement('div');
-        item.className = 'autocomplete-item px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm';
+        item.className = 'autocomplete-item px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm text-black text-left';
         item.textContent = province;
         item.addEventListener('click', function() {
             selectHomeLocation(province);
@@ -204,7 +214,7 @@ function displayHomeFallbackResults(query) {
 }
 
 function selectHomeLocation(locationName) {
-    const locationInput = document.querySelector('form[th\\:action*="search"] input[name="location"]');
+    const locationInput = document.querySelector('form[action*="search"] input[name="location"]');
     locationInput.value = locationName;
     hideHomeAutocomplete();
 }

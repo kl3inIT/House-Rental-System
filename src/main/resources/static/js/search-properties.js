@@ -263,6 +263,25 @@ async function searchLocations(query) {
     }
 }
 
+function displayAutocompleteResults(results) {
+    const autocompleteContainer = document.getElementById('location-autocomplete');
+    if (results.length === 0) {
+        hideAutocomplete();
+        return;
+    }
+    autocompleteContainer.innerHTML = '';
+    results.forEach((result, index) => {
+        const item = document.createElement('div');
+        item.className = 'autocomplete-item px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm text-black text-left';
+        item.textContent = result.name;
+        item.addEventListener('click', function() {
+            selectLocation(result.name);
+        });
+        autocompleteContainer.appendChild(item);
+    });
+    autocompleteContainer.classList.remove('hidden');
+}
+
 function displayFallbackResults(query) {
     const autocompleteContainer = document.getElementById('location-autocomplete');
     const vietnameseProvinces = [
@@ -280,52 +299,23 @@ function displayFallbackResults(query) {
         'Thừa Thiên Huế', 'Tiền Giang', 'Trà Vinh', 'Tuyên Quang', 'Vĩnh Long',
         'Vĩnh Phúc', 'Yên Bái', 'Phú Yên'
     ];
-    
     const matchingProvinces = vietnameseProvinces.filter(province => 
         province.toLowerCase().includes(query.toLowerCase())
     ).slice(0, 8);
-    
     if (matchingProvinces.length === 0) {
         hideAutocomplete();
         return;
     }
-    
     autocompleteContainer.innerHTML = '';
     matchingProvinces.forEach(province => {
         const item = document.createElement('div');
-        item.className = 'autocomplete-item px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm';
+        item.className = 'autocomplete-item px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm text-black text-left';
         item.textContent = province;
         item.addEventListener('click', function() {
             selectLocation(province);
         });
         autocompleteContainer.appendChild(item);
     });
-    
-    autocompleteContainer.classList.remove('hidden');
-}
-
-function displayAutocompleteResults(results) {
-    const autocompleteContainer = document.getElementById('location-autocomplete');
-    
-    if (results.length === 0) {
-        hideAutocomplete();
-        return;
-    }
-
-    autocompleteContainer.innerHTML = '';
-    
-    results.forEach((result, index) => {
-        const item = document.createElement('div');
-        item.className = 'autocomplete-item px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm';
-        item.textContent = result.name;
-        
-        item.addEventListener('click', function() {
-            selectLocation(result.name);
-        });
-        
-        autocompleteContainer.appendChild(item);
-    });
-    
     autocompleteContainer.classList.remove('hidden');
 }
 
