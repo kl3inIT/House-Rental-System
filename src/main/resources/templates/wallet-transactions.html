@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Wallet Transaction History</title>
+    <link th:href="@{/css/main.css}" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer"/>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div th:replace="fragments/header :: header"></div>
+    <div class="max-w-4xl mx-auto mt-10 p-6 bg-white rounded-lg shadow">
+        <div class="flex items-center justify-between mb-6">
+            <h1 class="text-2xl font-bold text-blue-600 flex items-center">
+                <i class="fas fa-wallet mr-2"></i> Wallet Transaction History
+            </h1>
+            <a th:href="@{/wallet/deposit}" class="bg-blue-600 text-white px-4 py-2 rounded-md font-medium hover:bg-blue-700 transition-colors duration-200">
+                <i class="fas fa-plus-circle mr-2"></i>Deposit
+            </a>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full divide-y divide-gray-200">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sender</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Receiver</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Balance</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    <tr th:each="tx : ${transactions}">
+                        <td class="px-6 py-4 whitespace-nowrap" th:text="${tx.type}">Deposit</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-green-600 font-semibold" th:text="${#numbers.formatDecimal(tx.amount, 0, 'COMMA', 0, 'POINT')} + '₫'">1,000,000₫</td>
+                        <td class="px-6 py-4 whitespace-nowrap" th:text="${tx.description}">Top up wallet</td>
+                        <td class="px-6 py-4 whitespace-nowrap" th:text="${tx.sender}">Sender Name</td>
+                        <td class="px-6 py-4 whitespace-nowrap" th:text="${tx.receiver}">Receiver Name</td>
+                        <td class="px-6 py-4 whitespace-nowrap" th:text="${#dates.format(tx.createdAt, 'yyyy-MM-dd HH:mm')}">2024-01-01 12:00</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span th:if="${tx.status == 'SUCCESS'}" class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">Success</span>
+                            <span th:if="${tx.status == 'PENDING'}" class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-medium">Pending</span>
+                            <span th:if="${tx.status == 'FAILED'}" class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-medium">Failed</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap font-semibold" th:text="${#numbers.formatDecimal(tx.balance, 0, 'COMMA', 0, 'POINT')} + '₫'">2,000,000₫</td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(transactions)}">
+                        <td colspan="8" class="px-6 py-4 text-center text-gray-400">No transactions found</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html> 

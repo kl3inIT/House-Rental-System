@@ -57,6 +57,13 @@ public class GlobalExceptionHandler {
         return REDIRECT_LOGIN;
     }
 
+    @ExceptionHandler(SecurityException.class)
+    public String handleEmailAlreadyVerifiedException(SecurityException ex, RedirectAttributes redirectAttributes) {
+        log.warn("Security err: {}", ex.getMessage());
+        redirectAttributes.addFlashAttribute(ERROR, "Security err payment gateway SE Pay");
+        return REDIRECT_INDEX;
+    }
+
     @ExceptionHandler(UserSuspendedException.class)
     public String handleUserSuspendedException(UserSuspendedException ex, RedirectAttributes redirectAttributes) {
         log.warn("User suspended: {}", ex.getMessage());
