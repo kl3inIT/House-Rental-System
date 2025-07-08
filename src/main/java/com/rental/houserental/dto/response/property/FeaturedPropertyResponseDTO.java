@@ -18,9 +18,7 @@ public class FeaturedPropertyResponseDTO {
     private Integer bedrooms;
     private Integer bathrooms;
     private BigDecimal area;
-    private String ward;
-    private String province;
-    private String location; // Keep for backward compatibility
+    private String location;
     private String mainImageUrl;
     private List<String> imageUrls;
     private Integer imageCount;

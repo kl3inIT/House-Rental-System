@@ -5,7 +5,8 @@
       layout:decorate="~{layout/main}">
 <head>
     <title>Home - RentEase</title>
-    <link rel="stylesheet" th:href="@{/css/carousel.css}">
+    <!-- Home page JavaScript -->
+    <script th:src="@{/js/home.js}" defer></script>
 </head>
 <body>
 <main layout:fragment="content">
@@ -24,8 +25,7 @@
             <p class="text-xl md:text-2xl mb-8 text-blue-100">
                 Discover amazing rental properties in your desired location
             </p>
-            
-            <!-- 🔎 Modern Single-Row Search Bar (USD) -->
+
             <div class="max-w-4xl mx-auto">
                 <form class="flex flex-col md:flex-row items-end gap-4 bg-white rounded-xl shadow-xl p-6" method="get" th:action="@{/properties/search}">
                     <!-- Location -->
@@ -244,8 +244,5 @@
         </div>
     </section>
 </main>
-
-<!-- Home page JavaScript -->
-<script th:src="@{/js/home.js}"></script>
 </body>
 </html>

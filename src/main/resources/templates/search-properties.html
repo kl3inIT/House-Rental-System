@@ -38,7 +38,6 @@
                         
                         <form method="get" th:action="@{/properties/search}" class="space-y-6">
                             <!-- Preserve current search parameters -->
-                            <!-- Preserve current search parameters -->
                             <input type="hidden" name="location" th:value="${searchCriteria?.location}">
                             <input type="hidden" name="province" th:value="${searchCriteria?.province}">
                             <input type="hidden" name="ward" th:value="${searchCriteria?.ward}">
@@ -51,25 +50,25 @@
                                 <div class="space-y-2">
                                     <label class="flex items-center">
                                         <input type="checkbox" name="priceRanges" value="0-1000000" 
-                                               th:checked="${#lists.contains(searchCriteria?.priceRanges, '0-1000000')}"
+                                               th:checked="${#lists.contains(searchCriteria.priceRanges, '0-1000000')}"
                                                class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                                         <span class="ml-2 text-sm text-gray-600">Under 1M VND</span>
                                     </label>
                                     <label class="flex items-center">
                                         <input type="checkbox" name="priceRanges" value="1000000-3000000" 
-                                               th:checked="${#lists.contains(searchCriteria?.priceRanges, '1000000-3000000')}"
+                                               th:checked="${#lists.contains(searchCriteria.priceRanges, '1000000-3000000')}"
                                                class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                                         <span class="ml-2 text-sm text-gray-600">1M - 3M VND</span>
                                     </label>
                                     <label class="flex items-center">
                                         <input type="checkbox" name="priceRanges" value="3000000-5000000" 
-                                               th:checked="${#lists.contains(searchCriteria?.priceRanges, '3000000-5000000')}"
+                                               th:checked="${#lists.contains(searchCriteria.priceRanges, '3000000-5000000')}"
                                                class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                                         <span class="ml-2 text-sm text-gray-600">3M - 5M VND</span>
                                     </label>
                                     <label class="flex items-center">
                                         <input type="checkbox" name="priceRanges" value="5000000-999999999" 
-                                               th:checked="${#lists.contains(searchCriteria?.priceRanges, '5000000-999999999')}"
+                                               th:checked="${#lists.contains(searchCriteria.priceRanges, '5000000-999999999')}"
                                                class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                                         <span class="ml-2 text-sm text-gray-600">Above 5M VND</span>
                                     </label>
@@ -82,25 +81,25 @@
                                 <div class="space-y-2">
                                     <label class="flex items-center">
                                         <input type="checkbox" name="areaRanges" value="0-50" 
-                                               th:checked="${#lists.contains(searchCriteria?.areaRanges, '0-50')}"
+                                               th:checked="${#lists.contains(searchCriteria.areaRanges, '0-50')}"
                                                class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                                         <span class="ml-2 text-sm text-gray-600">Under 50m²</span>
                                     </label>
                                     <label class="flex items-center">
                                         <input type="checkbox" name="areaRanges" value="50-100" 
-                                               th:checked="${#lists.contains(searchCriteria?.areaRanges, '50-100')}"
+                                               th:checked="${#lists.contains(searchCriteria.areaRanges, '50-100')}"
                                                class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                                         <span class="ml-2 text-sm text-gray-600">50 - 100m²</span>
                                     </label>
                                     <label class="flex items-center">
                                         <input type="checkbox" name="areaRanges" value="100-200" 
-                                               th:checked="${#lists.contains(searchCriteria?.areaRanges, '100-200')}"
+                                               th:checked="${#lists.contains(searchCriteria.areaRanges, '100-200')}"
                                                class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                                         <span class="ml-2 text-sm text-gray-600">100 - 200m²</span>
                                     </label>
                                     <label class="flex items-center">
                                         <input type="checkbox" name="areaRanges" value="200-999999" 
-                                               th:checked="${#lists.contains(searchCriteria?.areaRanges, '200-999999')}"
+                                               th:checked="${#lists.contains(searchCriteria.areaRanges, '200-999999')}"
                                                class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                                         <span class="ml-2 text-sm text-gray-600">Above 200m²</span>
                                     </label>
@@ -113,7 +112,7 @@
                                 <div class="space-y-2">
                                     <label class="flex items-center" th:each="category : ${categories}">
                                         <input type="checkbox" name="propertyTypes" th:value="${category.id}" 
-                                               th:checked="${#lists.contains(searchCriteria?.propertyTypes, category.id)}"
+                                               th:checked="${#lists.contains(searchCriteria.propertyTypes, category.id)}"
                                                class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                                         <span class="ml-2 text-sm text-gray-600" th:text="${category.name}">Category</span>
                                     </label>
@@ -150,37 +149,37 @@
                                 <div class="space-y-2">
                                     <label class="flex items-center">
                                         <input type="checkbox" name="publishedRanges" value="today" 
-                                               th:checked="${#lists.contains(searchCriteria?.publishedRanges, 'today')}"
+                                               th:checked="${#lists.contains(searchCriteria.publishedRanges, 'today')}"
                                                class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                                         <span class="ml-2 text-sm text-gray-600">Today</span>
                                     </label>
                                     <label class="flex items-center">
                                         <input type="checkbox" name="publishedRanges" value="week" 
-                                               th:checked="${#lists.contains(searchCriteria?.publishedRanges, 'week')}"
+                                               th:checked="${#lists.contains(searchCriteria.publishedRanges, 'week')}"
                                                class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                                         <span class="ml-2 text-sm text-gray-600">This Week</span>
                                     </label>
                                     <label class="flex items-center">
                                         <input type="checkbox" name="publishedRanges" value="month" 
-                                               th:checked="${#lists.contains(searchCriteria?.publishedRanges, 'month')}"
+                                               th:checked="${#lists.contains(searchCriteria.publishedRanges, 'month')}"
                                                class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                                         <span class="ml-2 text-sm text-gray-600">This Month</span>
                                     </label>
                                     <label class="flex items-center">
                                         <input type="checkbox" name="publishedRanges" value="3months" 
-                                               th:checked="${#lists.contains(searchCriteria?.publishedRanges, '3months')}"
+                                               th:checked="${#lists.contains(searchCriteria.publishedRanges, '3months')}"
                                                class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                                         <span class="ml-2 text-sm text-gray-600">Last 3 Months</span>
                                     </label>
                                     <label class="flex items-center">
                                         <input type="checkbox" name="publishedRanges" value="6months" 
-                                               th:checked="${#lists.contains(searchCriteria?.publishedRanges, '6months')}"
+                                               th:checked="${#lists.contains(searchCriteria.publishedRanges, '6months')}"
                                                class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                                         <span class="ml-2 text-sm text-gray-600">Last 6 Months</span>
                                     </label>
                                     <label class="flex items-center">
                                         <input type="checkbox" name="publishedRanges" value="year" 
-                                               th:checked="${#lists.contains(searchCriteria?.publishedRanges, 'year')}"
+                                               th:checked="${#lists.contains(searchCriteria.publishedRanges, 'year')}"
                                                class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                                         <span class="ml-2 text-sm text-gray-600">Last Year</span>
                                     </label>
