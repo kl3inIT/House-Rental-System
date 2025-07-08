@@ -1,5 +1,6 @@
 package com.rental.houserental.entity;
 
+import com.rental.houserental.enums.FurnishingType;
 import com.rental.houserental.enums.PropertyStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -22,7 +23,7 @@ public class RentalProperty extends BaseEntity {
     private String title;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "CategoryId", nullable = false)
+    @JoinColumn(name = "CategoryId", nullable = false, columnDefinition = "NVARCHAR(100)")
     private Category category;
 
     @Column(name = "MonthlyRent", nullable = false, precision = 10, scale = 2)
@@ -48,6 +49,25 @@ public class RentalProperty extends BaseEntity {
 
     @Column(name = "Description", nullable = false, columnDefinition = "TEXT")
     private String description;
+
+    @Column(name = "Furnishing", nullable = false, length = 20)
+    @Enumerated(EnumType.STRING)
+    private FurnishingType furnishing; // "FULL", "BASIC", "NONE"
+
+    @Column(name = "DepositType", nullable = false, length = 10)
+    private String depositType; // "AMOUNT" hoặc "MONTH"
+
+    @Column(name = "DepositAmount", precision = 10, scale = 2)
+    private BigDecimal depositAmount; // nếu chọn kiểu amount
+
+    @Column(name = "DepositMonths")
+    private Integer depositMonths; // nếu chọn kiểu month
+
+    @Column(name = "Latitude")
+    private Double latitude;
+
+    @Column(name = "Longitude")
+    private Double longitude;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "PropertyStatus")

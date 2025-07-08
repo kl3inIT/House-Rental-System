@@ -7,6 +7,7 @@ import com.rental.houserental.dto.response.property.SearchPropertyResponseDTO;
 import com.rental.houserental.entity.PropertyImage;
 import com.rental.houserental.entity.RentalProperty;
 import com.rental.houserental.entity.User;
+import com.rental.houserental.enums.FurnishingType;
 import com.rental.houserental.enums.PropertyStatus;
 import com.rental.houserental.exceptions.property.ImageUploadException;
 import com.rental.houserental.exceptions.property.PropertyNotFoundException;
@@ -43,8 +44,6 @@ public class PropertyServiceImpl implements PropertyService {
     @Override
     public RentalProperty createProperty(CreatePropertyRequestDTO request, User landlord,
                                          MultipartFile[] imageFiles) {
-        log.info("Creating property for landlord: {}", landlord.getEmail());
-
         try {
             RentalProperty property = RentalProperty.builder()
                     .title(request.getTitle())
@@ -59,6 +58,12 @@ public class PropertyServiceImpl implements PropertyService {
                     .description(request.getDescription())
                     .propertyStatus(PropertyStatus.DRAFT)
                     .landlord(landlord)
+                    .depositType(request.getDepositType())
+                    .depositAmount(request.getDepositAmount())
+                    .furnishing(request.getFurnishing() != null ? FurnishingType.fromString(request.getFurnishing()) : FurnishingType.NONE)
+                    .depositMonths(request.getDepositMonths())
+                    .latitude(request.getLatitude())
+                    .longitude(request.getLongitude())
                     .images(new HashSet<>())
                     .build();
 
@@ -73,16 +78,13 @@ public class PropertyServiceImpl implements PropertyService {
                     }
                     savedProperty.getImages().addAll(propertyImages);
                     savedProperty = propertyRepository.save(savedProperty);
-                    log.info("Uploaded {} images for property: {}", propertyImages.size(), savedProperty.getId());
                 } catch (Exception e) {
-                    log.error("Failed to upload images for property: {}", savedProperty.getId(), e);
                     // Delete the property since image upload failed
                     propertyRepository.delete(savedProperty);
                     throw new ImageUploadException("Failed to upload images for property. Property creation cancelled.", e);
                 }
             }
 
-            log.info("Successfully created property with ID: {}", savedProperty.getId());
             return savedProperty;
             
         } catch (Exception e) {

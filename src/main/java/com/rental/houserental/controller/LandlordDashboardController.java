@@ -2,6 +2,7 @@ package com.rental.houserental.controller;
 
 import com.rental.houserental.dto.request.property.CreatePropertyRequestDTO;
 import com.rental.houserental.entity.User;
+import com.rental.houserental.enums.FurnishingType;
 import com.rental.houserental.service.CategoryService;
 import com.rental.houserental.service.PropertyService;
 import com.rental.houserental.service.UserService;
@@ -32,10 +33,6 @@ import static com.rental.houserental.constant.ViewNamesConstant.*;
 @RequiredArgsConstructor
 @Slf4j
 public class LandlordDashboardController {
-
-    private final PropertyService propertyService;
-    private final UserService userService;
-    private final CategoryService categoryService;
 
     @GetMapping("/dashboard")
     public String dashboard(Model model, Authentication authentication) {
@@ -105,34 +102,5 @@ public class LandlordDashboardController {
         model.addAttribute("propertyPerformance", propertyPerformance);
 
         return LANDLORD_DASHBOARD;
-    }
-
-    @GetMapping("/properties/new")
-    public String newPropertyForm(Model model) {
-        model.addAttribute(PROPERTY_REQUEST, new CreatePropertyRequestDTO());
-        model.addAttribute(CATEGORIES, categoryService.findAll());
-        return LANDLORD_NEW_LISTING;
-    }
-
-    @PostMapping("/properties")
-    public String createProperty(@Valid @ModelAttribute(PROPERTY_REQUEST) CreatePropertyRequestDTO request,
-                                 BindingResult bindingResult,
-                                 @RequestParam(value = "imageFiles", required = false) MultipartFile[] imageFiles,
-                                 Authentication authentication,
-                                 Model model,
-                                 RedirectAttributes redirectAttributes) {
-
-        if (bindingResult.hasErrors()) {
-            model.addAttribute(PROPERTY_REQUEST, request);
-            model.addAttribute(CATEGORIES, categoryService.findAll());
-            return LANDLORD_NEW_LISTING;
-        }
-
-        User landlord = userService.findByEmail(authentication.getName());
-
-        propertyService.createProperty(request, landlord, imageFiles);
-
-        redirectAttributes.addFlashAttribute(SUCCESS_MESSAGE, "Property listing created successfully and saved as draft.");
-        return LANDLORD_NEW_LISTING;
     }
 }

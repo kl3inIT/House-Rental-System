@@ -55,4 +55,25 @@ public class CreatePropertyRequestDTO {
     @NotBlank(message = "Property description is required")
     @Size(max = 2000, message = "Description must be less than 2000 characters")
     private String description;
+
+    // --------- Các trường bổ sung ----------
+    @NotBlank(message = "Furnishing is required")
+    private String furnishing; // FULL, BASIC, NONE
+
+    @NotBlank(message = "Deposit type is required")
+    private String depositType; // "MONTH" hoặc "AMOUNT"
+
+    @Min(value = 1, message = "Deposit months must be at least 1")
+    @Max(value = 12, message = "Deposit months must be at most 12")
+    private Integer depositMonths; // Nếu kiểu MONTH
+
+    @DecimalMin(value = "0.0", inclusive = false, message = "Deposit amount must be greater than 0")
+    @Digits(integer = 10, fraction = 2, message = "Invalid deposit amount")
+    private BigDecimal depositAmount; // Nếu kiểu AMOUNT
+
+    @NotNull(message = "Latitude is required")
+    private Double latitude;
+
+    @NotNull(message = "Longitude is required")
+    private Double longitude;
 }

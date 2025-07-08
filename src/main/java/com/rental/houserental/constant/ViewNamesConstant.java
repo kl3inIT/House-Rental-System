@@ -18,6 +18,8 @@ public final class ViewNamesConstant {
     public static final String ADMIN_DASHBOARD = "admin/dashboard";
     public static final String LANDLORD_DASHBOARD = "landlord/dashboard";
     public static final String LANDLORD_NEW_LISTING = "landlord/new-listing";
+    public static final String LANDLORD_EDIT_LISTING = "landlord/edit-listing";
+    public static final String LANDLORD_PROPERTIES = "landlord/properties";
     
     // User Views
     public static final String USER_PROFILE = "user/profile";
