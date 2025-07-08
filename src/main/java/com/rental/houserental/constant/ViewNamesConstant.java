@@ -36,7 +36,7 @@ public final class ViewNamesConstant {
     public static final String REDIRECT_LANDLORD_DASHBOARD = "redirect:/landlord/dashboard";
     public static final String REDIRECT_LANDLORD_NEW_LISTING = "redirect:/landlord/properties/new";
     public static final String REDIRECT_USER_PROFILE = "redirect:/user/profile";
-
+    public static final String REDIRECT_WALLET_TRANSACTION = "redirect:/wallet/transactions";
 
 
 

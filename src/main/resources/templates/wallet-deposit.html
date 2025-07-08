@@ -5,6 +5,8 @@
     <title>Deposit to Wallet</title>
     <link th:href="@{/css/main.css}" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer"/>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.6.1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 </head>
 <body class="bg-gray-50 min-h-screen">
     <div th:replace="fragments/header :: header"></div>
@@ -14,9 +16,27 @@
         </h1>
         <img th:src="@{'https://qr.sepay.vn/img?acc=22226376000&bank=TPBank&des=' + ${content}}" alt="Deposit QR Code" class="mx-auto mb-4 w-64 h-64 object-contain border rounded"/>
         <p class="mb-6 text-gray-700 font-medium">Please scan the QR code to deposit money into your wallet.</p>
-        <a th:href="@{/wallet/transactions}" class="inline-block bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold px-6 py-2 rounded transition-colors duration-200">
+        <div id="status-message" class="mb-4 text-lg font-semibold"></div>
+        <a id="back-btn" th:href="@{/wallet/transactions}" class="inline-block bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold px-6 py-2 rounded transition-colors duration-200">
             <i class="fas fa-arrow-left mr-2"></i>Back
         </a>
+
     </div>
+    <script th:inline="javascript">
+        const userId = /*[[${currentUser.id}]]*/ '1';
+        const socket = new SockJS('/ws');
+        const stompClient = Stomp.over(socket);
+
+        stompClient.connect({}, function (frame) {
+            stompClient.subscribe('/topic/deposit/' + userId, function (message) {
+                const status = message.body;
+                if (status === 'success') {
+                    window.location.href = '/wallet/transactions';
+                }
+            });
+        });
+    </script>
+
+
 </body>
 </html> 

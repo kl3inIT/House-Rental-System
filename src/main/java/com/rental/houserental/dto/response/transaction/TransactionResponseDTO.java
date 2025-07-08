@@ -1,11 +1,11 @@
 package com.rental.houserental.dto.response.transaction;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class TransactionResponseDTO {
     private String type;
@@ -14,5 +14,5 @@ public class TransactionResponseDTO {
     private String sender;
     private String receiver;
     private String date;
-    private String balanceAfter;
+    private double balanceAfter;
 }

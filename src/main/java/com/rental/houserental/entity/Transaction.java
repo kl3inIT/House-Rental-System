@@ -20,12 +20,6 @@ public class Transaction extends BaseEntity {
     @Column(name = "Type", nullable = false)
     private TransactionType type;
 
-    @Column(name = "Sender", columnDefinition = "NVARCHAR(255)")
-    private String sender;
-
-    @Column(name = "Receiver", columnDefinition = "NVARCHAR(255)")
-    private String receiver;
-
     @Column(name = "Description", columnDefinition = "NVARCHAR(255)")
     private String description;
 

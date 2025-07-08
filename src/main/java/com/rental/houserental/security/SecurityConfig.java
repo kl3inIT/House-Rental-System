@@ -78,6 +78,7 @@ public class SecurityConfig {
         http
                 // Enable CSRF protection for better security
                 .csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/wallet/deposit/webhook")
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 )
                 .authorizeHttpRequests(auth -> auth
@@ -86,7 +87,7 @@ public class SecurityConfig {
                         .requestMatchers("/user/**").hasRole("USER")
                         .requestMatchers("/", "/login", "/perform-login", "/register", "/verify-email/**",
                                 "/forgot-password", "/reset-password/**", "/verify-otp/**", "/resend-otp",
-                                "/css/**", "/js/**", "/images/**", "/output.css").permitAll()
+                                "/css/**", "/js/**", "/images/**", "/output.css", "/wallet/deposit/webhook").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

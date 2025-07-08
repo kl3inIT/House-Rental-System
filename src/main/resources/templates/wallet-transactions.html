@@ -4,54 +4,160 @@
     <meta charset="UTF-8">
     <title>Wallet Transaction History</title>
     <link th:href="@{/css/main.css}" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+          crossorigin="anonymous" referrerpolicy="no-referrer"/>
 </head>
 <body class="bg-gray-50 min-h-screen">
-    <div th:replace="fragments/header :: header"></div>
-    <div class="max-w-4xl mx-auto mt-10 p-6 bg-white rounded-lg shadow">
-        <div class="flex items-center justify-between mb-6">
-            <h1 class="text-2xl font-bold text-blue-600 flex items-center">
-                <i class="fas fa-wallet mr-2"></i> Wallet Transaction History
-            </h1>
-            <a th:href="@{/wallet/deposit}" class="bg-blue-600 text-white px-4 py-2 rounded-md font-medium hover:bg-blue-700 transition-colors duration-200">
-                <i class="fas fa-plus-circle mr-2"></i>Deposit
-            </a>
-        </div>
-        <div class="overflow-x-auto">
-            <table class="w-full divide-y divide-gray-200">
-                <thead class="bg-gray-100">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sender</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Receiver</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Balance</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                    <tr th:each="tx : ${transactions}">
-                        <td class="px-6 py-4 whitespace-nowrap" th:text="${tx.type}">Deposit</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-green-600 font-semibold" th:text="${#numbers.formatDecimal(tx.amount, 0, 'COMMA', 0, 'POINT')} + '₫'">1,000,000₫</td>
-                        <td class="px-6 py-4 whitespace-nowrap" th:text="${tx.description}">Top up wallet</td>
-                        <td class="px-6 py-4 whitespace-nowrap" th:text="${tx.sender}">Sender Name</td>
-                        <td class="px-6 py-4 whitespace-nowrap" th:text="${tx.receiver}">Receiver Name</td>
-                        <td class="px-6 py-4 whitespace-nowrap" th:text="${#dates.format(tx.createdAt, 'yyyy-MM-dd HH:mm')}">2024-01-01 12:00</td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span th:if="${tx.status == 'SUCCESS'}" class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">Success</span>
-                            <span th:if="${tx.status == 'PENDING'}" class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-medium">Pending</span>
-                            <span th:if="${tx.status == 'FAILED'}" class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-medium">Failed</span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap font-semibold" th:text="${#numbers.formatDecimal(tx.balance, 0, 'COMMA', 0, 'POINT')} + '₫'">2,000,000₫</td>
-                    </tr>
-                    <tr th:if="${#lists.isEmpty(transactions)}">
-                        <td colspan="8" class="px-6 py-4 text-center text-gray-400">No transactions found</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+<div th:replace="fragments/header :: header"></div>
+<div class="max-w-7xl mx-auto mt-10 p-8 bg-white rounded-lg shadow">
+    <div class="flex items-center justify-between mb-8">
+        <h1 class="text-3xl font-bold text-blue-600 flex items-center">
+            <i class="fas fa-wallet mr-2"></i> Wallet Transaction History
+        </h1>
+        <a th:href="@{/wallet/deposit}"
+           class="bg-blue-600 text-white px-4 py-2 rounded-md font-medium hover:bg-blue-700 transition-colors duration-200 flex items-center">
+            <i class="fas fa-plus-circle mr-2"></i>Deposit
+        </a>
     </div>
+    <!-- Filter row -->
+    <form th:object="${transactionRequest}" method="get" action="/wallet/transactions" class="flex flex-row items-end gap-2 mb-6 w-full">
+        <div class="flex flex-col w-full" style="max-width:18%">
+            <label for="type" class="block text-xs font-medium text-gray-700 mb-1">Type</label>
+            <select id="type" th:field="*{type}"
+                    class="border border-gray-300 rounded-md px-2 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">All</option>
+                <option th:each="t : ${types}"
+                        th:value="${t}"
+                        th:text="${t}">
+                </option>
+            </select>
+            <span th:if="${#fields.hasErrors('type')}" th:errors="*{type}" class="text-red-500 text-xs min-h-[18px] mt-1"></span>
+        </div>
+        <div class="flex flex-col w-full" style="max-width:15%">
+            <label for="amountFrom" class="block text-xs font-medium text-gray-700 mb-1">Amount from</label>
+            <input type="number" id="amountFrom" th:field="*{amountFrom}"
+                   class="border border-gray-300 rounded-md px-2 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500" min="1">
+            <span th:if="${#fields.hasErrors('amountFrom')}" th:errors="*{amountFrom}" class="text-red-500 text-xs min-h-[18px] mt-1"></span>
+        </div>
+        <div class="flex flex-col w-full" style="max-width:15%">
+            <label for="amountTo" class="block text-xs font-medium text-gray-700 mb-1">Amount to</label>
+            <input type="number" id="amountTo" th:field="*{amountTo}"
+                   class="border border-gray-300 rounded-md px-2 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500" min="1">
+            <span th:if="${#fields.hasErrors('amountTo')}" th:errors="*{amountTo}" class="text-red-500 text-xs min-h-[18px] mt-1"></span>
+        </div>
+        <div class="flex flex-col w-full" style="max-width:20%">
+            <label for="dateFrom" class="block text-xs font-medium text-gray-700 mb-1">Date from</label>
+            <input type="date" id="dateFrom" th:field="*{dateFrom}"
+                   class="border border-gray-300 rounded-md px-2 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <span th:if="${#fields.hasErrors('dateFrom')}" th:errors="*{dateFrom}" class="text-red-500 text-xs min-h-[18px] mt-1"></span>
+        </div>
+        <div class="flex flex-col w-full" style="max-width:20%">
+            <label for="dateTo" class="block text-xs font-medium text-gray-700 mb-1">Date to</label>
+            <input type="date" id="dateTo" th:field="*{dateTo}"
+                   class="border border-gray-300 rounded-md px-2 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <span th:if="${#fields.hasErrors('dateTo')}" th:errors="*{dateTo}" class="text-red-500 text-xs min-h-[18px] mt-1"></span>
+        </div>
+        <div class="flex flex-col w-full justify-end" style="max-width:12%">
+            <button type="submit"
+                    class="bg-blue-600 text-white w-full py-2 rounded-md font-medium hover:bg-blue-700 transition-colors duration-200 shadow mt-auto">
+                Filter
+            </button>
+        </div>
+    </form>
+    <div class="overflow-x-auto">
+        <table class="w-full text-base divide-y-2 divide-gray-300 rounded-lg">
+            <thead class="bg-gray-100 text-base">
+            <tr>
+                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Type</th>
+                <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Amount
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    Description
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Date</th>
+                <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Balance
+                </th>
+            </tr>
+            </thead>
+            <tbody class="bg-white divide-y-2 divide-gray-300">
+            <!--/* @thymesVar id="tx" type="com.rental.houserental.dto.response.transaction.TransactionResponseDTO" */-->
+            <tr th:each="tx : ${transactions.content}" class="border-b border-gray-200 hover:bg-gray-50 transition">
+                <td class="px-6 py-4 whitespace-nowrap font-semibold uppercase text-left"
+                    th:text="${tx.type}"
+                    th:classappend="
+                                ${tx.type == 'DEPOSIT'} ? 'text-green-600' :
+                                (${tx.type == 'WITHDRAW'} ? 'text-yellow-500' :
+                                (${tx.type == 'PAYMENT'} ? 'text-blue-600' :
+                                (${tx.type == 'REFUND'} ? 'text-red-500' : 'text-gray-700')))
+                            ">
+                    DEPOSIT
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-right font-semibold"
+                    th:text="${tx.amount % 1 == 0} ? ${#numbers.formatInteger(tx.amount, 0, 'COMMA')} + '₫' : ${#numbers.formatDecimal(tx.amount, 0, 'COMMA', 2, 'POINT')} + '₫'">
+                    1,000,000₫
+                </td>
+                <td class="px-6 py-4 whitespace-pre-line text-gray-700 text-left" style="max-width: 350px;">
+                    <span th:text="${tx.description}">Top up wallet</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-gray-500 text-left"
+                    th:text="${#dates.format(tx.date, 'HH:mm dd/MM/yyyy')}">
+                    09:12 07/08/2025
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-right font-semibold text-blue-700"
+                    th:text="${tx.balanceAfter % 1 == 0} ? ${#numbers.formatInteger(tx.balanceAfter, 0, 'COMMA')} + '₫' : ${#numbers.formatDecimal(tx.balanceAfter, 0, 'COMMA', 2, 'POINT')} + '₫'">
+                    2,000,000₫
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(transactions)}">
+                <td colspan="5" class="px-6 py-4 text-center text-gray-400">No transactions found</td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="mt-4 flex justify-end space-x-2" th:if="${transactions.totalPages > 0}">
+            <div class="mt-4 flex justify-end space-x-2">
+                <a th:if="${transactions.hasPrevious()}"
+                   th:href="@{/wallet/transactions(page=${transactions.number - 1}, size=${transactions.size}, size=${transactions.size},
+                        type=${transactionRequest.type},
+                        amountFrom=${transactionRequest.amountFrom},
+                        amountTo=${transactionRequest.amountTo},
+                        dateFrom=${transactionRequest.dateFrom},
+                        dateTo=${transactionRequest.dateTo})}"
+                   class="px-3 py-1 rounded border text-gray-600 hover:bg-gray-100">
+                    &laquo; Prev
+                </a>
+
+                <a th:each="i : ${#numbers.sequence(0, transactions.totalPages - 1)}"
+                   th:href="@{/wallet/transactions(
+                        page=${i},
+                        size=${transactions.size},
+                        type=${transactionRequest.type},
+                        amountFrom=${transactionRequest.amountFrom},
+                        amountTo=${transactionRequest.amountTo},
+                        dateFrom=${transactionRequest.dateFrom},
+                        dateTo=${transactionRequest.dateTo}
+                    )}"
+                   th:text="${i + 1}"
+                   th:classappend="${i == transactions.number} ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-gray-100'"
+                   class="px-3 py-1 rounded border">
+                </a>
+
+                <a th:if="${transactions.hasNext()}"
+                   th:href="@{/wallet/transactions(page=${transactions.number + 1}, size=${transactions.size}, size=${transactions.size},
+                        type=${transactionRequest.type},
+                        amountFrom=${transactionRequest.amountFrom},
+                        amountTo=${transactionRequest.amountTo},
+                        dateFrom=${transactionRequest.dateFrom},
+                        dateTo=${transactionRequest.dateTo})}"
+                   class="px-3 py-1 rounded border text-gray-600 hover:bg-gray-100">
+                    Next &raquo;
+                </a>
+            </div>
+        </div>
+
+
+    </div>
+
+</div>
+
 </body>
 </html> 
