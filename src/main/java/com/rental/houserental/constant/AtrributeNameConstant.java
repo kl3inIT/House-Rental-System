@@ -35,4 +35,5 @@ public final class AtrributeNameConstant {
 
     public static final String CATEGORIES = "categories";
     public static final String FEATURED_PROPERTIES = "featuredProperties";
+    public static final String FURNISHING_TYPES  = "furnishingTypes";
 }
