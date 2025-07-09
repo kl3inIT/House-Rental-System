@@ -1,4 +1,4 @@
-package com.rental.houserental.controller.user;
+package com.rental.houserental.controller;
 
 import com.rental.houserental.dto.response.property.FeaturedPropertyResponseDTO;
 import com.rental.houserental.entity.Category;

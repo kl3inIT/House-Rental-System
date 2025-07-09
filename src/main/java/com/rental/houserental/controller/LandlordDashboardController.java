@@ -1,4 +1,4 @@
-package com.rental.houserental.controller.landlord;
+package com.rental.houserental.controller;
 
 import com.rental.houserental.dto.request.property.CreatePropertyRequestDTO;
 import com.rental.houserental.entity.User;

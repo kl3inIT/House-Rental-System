@@ -1,4 +1,4 @@
-package com.rental.houserental.controller.user;
+package com.rental.houserental.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
