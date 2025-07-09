@@ -3,7 +3,7 @@ services:
     build: .
     container_name: house-rental-app
     ports:
-      - "8080:8080"
+      - "9090:8080"
     environment:
       - SPRING_DATASOURCE_URL=jdbc:sqlserver://db:1433;databaseName=HouseRentalDB;encrypt=true;trustServerCertificate=true
       - SPRING_DATASOURCE_USERNAME=sa
@@ -28,7 +28,7 @@ services:
       - SA_PASSWORD=Dat12345!
       - MSSQL_PID=Express
     ports:
-      - "1434:1433"  # Host:Container
+      - "1435:1433"  # Host:Container
     volumes:
       - sqlserver_data:/var/opt/mssql
     networks:

@@ -3,7 +3,7 @@ server:
 
 spring:
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:sqlserver://localhost:1434;databaseName=HouseRentalDB;encrypt=true;trustServerCertificate=true}
+    url: ${SPRING_DATASOURCE_URL:jdbc:sqlserver://localhost:1435;databaseName=HouseRentalDB;encrypt=true;trustServerCertificate=true}
     username: ${SPRING_DATASOURCE_USERNAME:sa}
     password: ${SPRING_DATASOURCE_PASSWORD:Dat12345!}
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
@@ -11,7 +11,7 @@ spring:
   jpa:
     show-sql: false
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     properties:
       hibernate.dialect: org.hibernate.dialect.SQLServerDialect
       hibernate.format_sql: true
