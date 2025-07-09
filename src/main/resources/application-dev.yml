@@ -9,7 +9,7 @@ spring:
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
 
   jpa:
-    show-sql: true
+    show-sql: false
     hibernate:
       ddl-auto: update
     properties:
@@ -35,3 +35,13 @@ spring:
       port: 6379
 sepay:
   secret-key: QD3Uo8YkDJxT0zy/ctP7OX8ZDcbskxeuk66JT8WurtoIV7T/YbdAtvPGh1bflbDd
+
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: OFF
+        type:
+          descriptor:
+            sql:
+              BasicBinder: OFF
