@@ -23,6 +23,9 @@ public enum TransactionType {
     }
 
     public static TransactionType fromString(String type) {
+        if(type == null || type.trim().isEmpty()) {
+            return null;
+        }
         try {
             return TransactionType.valueOf(type.trim().toUpperCase());
         } catch (IllegalArgumentException e) {
@@ -45,6 +48,12 @@ public enum TransactionType {
                         "displayName", type.getDisplayName(),
                         "description", type.getDescription()
                 ))
+                .toList();
+    }
+
+    public static List<String> getAllTypes() {
+        return Arrays.stream(TransactionType.values())
+                .map(TransactionType::getDisplayName)
                 .toList();
     }
 }

@@ -23,7 +23,11 @@ public class Transaction extends BaseEntity {
     @Column(name = "Description", columnDefinition = "NVARCHAR(255)")
     private String description;
 
+    @Column(name = "BalanceAfter", nullable = false)
+    private double balanceAfter;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "UserId", nullable = false)
+
     private User user;
 }
