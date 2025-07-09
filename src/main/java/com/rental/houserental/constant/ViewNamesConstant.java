@@ -18,6 +18,8 @@ public final class ViewNamesConstant {
     public static final String WALLET_TRANSACTION = "wallet-transactions";
     public static final String WALLET_DEPOSIT = "wallet-deposit";
 
+    // Admin Transaction Views
+    public static final String ADMIN_TRANSACTION = "admin/transactions";
     // Dashboard Views
     public static final String ADMIN_DASHBOARD = "admin/dashboard";
     public static final String LANDLORD_DASHBOARD = "landlord/dashboard";

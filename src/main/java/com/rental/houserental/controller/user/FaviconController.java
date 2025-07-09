@@ -1,4 +1,4 @@
-package com.rental.houserental.controller;
+package com.rental.houserental.controller.user;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.ResponseEntity;

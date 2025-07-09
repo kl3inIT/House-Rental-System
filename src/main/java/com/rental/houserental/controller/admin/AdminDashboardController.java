@@ -1,4 +1,4 @@
-package com.rental.houserental.controller;
+package com.rental.houserental.controller.admin;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -280,53 +280,7 @@ public class AdminDashboardController {
         return "admin/categories";
     }
 
-    @GetMapping("/transactions")
-    public String transactions(Model model, HttpServletRequest request) {
-        model.addAttribute("currentUri", request.getRequestURI());
-        model.addAttribute("title", "Manage Transactions - Admin Dashboard");
-        
-        // Mock transaction data
-        List<Map<String, Object>> transactions = new ArrayList<>();
-        
-        Map<String, Object> transaction1 = new HashMap<>();
-        transaction1.put("id", "PAY-2024-001");
-        transaction1.put("landlordName", "John Smith");
-        transaction1.put("landlordEmail", "john@example.com");
-        transaction1.put("propertyName", "Modern 2BR Apartment");
-        transaction1.put("amount", new BigDecimal("63.00"));
-        transaction1.put("method", "Credit Card");
-        transaction1.put("date", "Jan 15, 2024");
-        transaction1.put("status", "Successful");
-        transactions.add(transaction1);
 
-        Map<String, Object> transaction2 = new HashMap<>();
-        transaction2.put("id", "PAY-2024-002");
-        transaction2.put("landlordName", "Mary Johnson");
-        transaction2.put("landlordEmail", "mary@example.com");
-        transaction2.put("propertyName", "Cozy Studio Downtown");
-        transaction2.put("amount", new BigDecimal("78.00"));
-        transaction2.put("method", "PayPal");
-        transaction2.put("date", "Jan 14, 2024");
-        transaction2.put("status", "Pending");
-        transactions.add(transaction2);
-
-        // Calculate counts
-        long successfulCount = transactions.stream()
-                .filter(t -> "Successful".equals(t.get("status")))
-                .count();
-        long pendingCount = transactions.stream()
-                .filter(t -> "Pending".equals(t.get("status")))
-                .count();
-        BigDecimal totalAmount = transactions.stream()
-                .map(t -> (BigDecimal) t.get("amount"))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        model.addAttribute("transactions", transactions);
-        model.addAttribute("successfulCount", successfulCount);
-        model.addAttribute("pendingCount", pendingCount);
-        model.addAttribute("totalAmount", totalAmount);
-        return "admin/transactions";
-    }
 
     @GetMapping("/reviews")
     public String reviews(Model model, HttpServletRequest request) {

@@ -1,4 +1,4 @@
-package com.rental.houserental.controller;
+package com.rental.houserental.controller.user;
 
 import com.rental.houserental.dto.request.auth.LoginRequestDTO;
 import com.rental.houserental.dto.request.auth.LoginPageRequestDTO;

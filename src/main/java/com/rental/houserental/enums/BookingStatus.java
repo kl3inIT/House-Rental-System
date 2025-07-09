@@ -9,11 +9,10 @@ import java.util.Map;
 
 @Getter
 public enum BookingStatus {
-    PENDING("Pending", "The booking is awaiting confirmation from the landlord."),
-    CONFIRMED("Confirmed", "The landlord has accepted the booking."),
-    CANCELLED("Cancelled", "The booking was cancelled by the user."),
+    CONFIRMED("Confirmed", "Booking and deposit successful."),
+    ACTIVE("Active", "The tenant has checked in and is currently staying."),
     COMPLETED("Completed", "The stay has been completed successfully."),
-    REJECTED("Rejected", "The landlord has rejected the booking request.");
+    CANCELLED("Cancelled", "The booking was cancelled");
 
     private final String displayName;
     private final String description;
@@ -31,20 +30,20 @@ public enum BookingStatus {
         }
     }
 
-    public boolean isPending() {
-        return this == PENDING;
-    }
-
     public boolean isConfirmed() {
         return this == CONFIRMED;
     }
 
-    public boolean isRejected() {
-        return this == REJECTED;
+    public boolean isActive() {
+        return this == ACTIVE;
     }
 
     public boolean isCompleted() {
         return this == COMPLETED;
+    }
+
+    public boolean isCancelled() {
+        return this == CANCELLED;
     }
 
     public static List<Map<String, String>> getStatusList() {
@@ -57,4 +56,3 @@ public enum BookingStatus {
                 .toList();
     }
 }
-

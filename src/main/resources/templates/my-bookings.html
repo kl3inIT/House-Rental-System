@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
+<head>
+    <title>My Bookings - RentEase</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="max-w-5xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
+        <h1 class="text-2xl font-bold text-blue-600 mb-6 flex items-center">
+            <i class="fas fa-calendar-check mr-2"></i>My Bookings
+        </h1>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Property</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                        <th class="px-6 py-3"></th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    <!-- Fake Data Example -->
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap">1</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=facearea&w=48&h=48" alt="Property" class="w-12 h-12 rounded mr-3 object-cover">
+                                <div>
+                                    <div class="font-semibold text-gray-900">Sunshine Apartment</div>
+                                    <div class="text-xs text-gray-500">Hanoi, Vietnam</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">2024-06-01</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Confirmed</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap font-medium text-blue-600">5,000,000₫</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <a th:href="@{/my-bookings/1}" class="text-blue-600 hover:text-blue-900">View</a>
+                        </td>
+                    </tr>
+
+                    <!-- Add more fake bookings as needed -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html> 

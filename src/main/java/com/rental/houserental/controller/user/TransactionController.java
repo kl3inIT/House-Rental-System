@@ -1,4 +1,4 @@
-package com.rental.houserental.controller;
+package com.rental.houserental.controller.user;
 
 import com.rental.houserental.dto.request.transaction.TransactionRequestDTO;
 import com.rental.houserental.dto.response.transaction.TransactionResponseDTO;
@@ -10,7 +10,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -38,8 +37,7 @@ public class TransactionController {
     @GetMapping("/wallet/transactions")
     public String viewTransactions(@Valid @ModelAttribute("transactionRequest") TransactionRequestDTO transactionRequestDTO,
                                    BindingResult bindingResult,
-                                   Model model,
-                                   HttpSession session) {
+                                   Model model) {
         Page<TransactionResponseDTO> transactions;
 
         if (bindingResult.hasErrors()) {

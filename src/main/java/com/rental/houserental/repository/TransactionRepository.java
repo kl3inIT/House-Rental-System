@@ -1,6 +1,6 @@
 package com.rental.houserental.repository;
 
-import com.rental.houserental.dto.request.transaction.TransactionRequestDTO;
+import com.rental.houserental.dto.response.transaction.TransactionStatsDTO;
 import com.rental.houserental.entity.Transaction;
 import com.rental.houserental.enums.TransactionType;
 import org.springframework.data.domain.Page;
@@ -30,5 +30,31 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             @Param("amountTo") Double amountTo,
             @Param("userId") Long userId,
             Pageable pageable);
+
+    @Query("SELECT t FROM Transaction t " +
+            "JOIN t.user u " +
+            "WHERE (:type IS NULL OR t.type = :type) AND " +
+            "(:dateFrom IS NULL OR t.createdAt >= :dateFrom) AND " +
+            "(:dateTo IS NULL OR t.createdAt <= :dateTo) AND " +
+            "(:amountFrom IS NULL OR t.amount >= :amountFrom) AND " +
+            "(:amountTo IS NULL OR t.amount <= :amountTo) AND " +
+            "(:email IS NULL OR LOWER(u.email) LIKE LOWER(CONCAT('%', :email, '%'))) " +
+            "ORDER BY t.createdAt DESC")
+    Page<Transaction> findAllBySearchRequestForAdmin(
+            @Param("type") TransactionType type,
+            @Param("dateFrom") LocalDateTime dateFrom,
+            @Param("dateTo") LocalDateTime dateTo,
+            @Param("amountFrom") Double amountFrom,
+            @Param("amountTo") Double amountTo,
+            @Param("email") String email,
+            Pageable pageable);
+
+    @Query("SELECT new com.rental.houserental.dto.response.transaction.TransactionStatsDTO( " +
+            "COALESCE(SUM(t.amount), 0), " +
+            "COUNT(t), " +
+            "COUNT(DISTINCT t.user.id)) " +
+            "FROM Transaction t " +
+            "WHERE t.type = 'DEPOSIT'")
+    TransactionStatsDTO getDepositStats();
 
 }

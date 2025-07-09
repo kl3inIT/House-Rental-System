@@ -1240,6 +1240,10 @@ select {
   max-width: 56rem;
 }
 
+.max-w-5xl {
+  max-width: 64rem;
+}
+
 .max-w-7xl {
   max-width: 80rem;
 }
@@ -1258,6 +1262,10 @@ select {
 
 .max-w-xs {
   max-width: 20rem;
+}
+
+.max-w-2xl {
+  max-width: 42rem;
 }
 
 .flex-1 {
@@ -1517,10 +1525,6 @@ select {
 
 .whitespace-nowrap {
   white-space: nowrap;
-}
-
-.whitespace-pre-line {
-  white-space: pre-line;
 }
 
 .rounded {
@@ -2089,6 +2093,10 @@ select {
   text-align: right;
 }
 
+.font-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
 .text-2xl {
   font-size: 1.5rem;
   line-height: 2rem;
@@ -2156,6 +2164,10 @@ select {
 
 .lowercase {
   text-transform: lowercase;
+}
+
+.leading-5 {
+  line-height: 1.25rem;
 }
 
 .leading-relaxed {
