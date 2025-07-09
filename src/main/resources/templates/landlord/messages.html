@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/landlord}">
+<head>
+    <title>Messages - RentEase</title>
+</head>
+<body class="bg-gray-50">
+<main layout:fragment="content">
+    <div class="p-6">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Messages</h1>
+            <p class="text-gray-600 mt-2">Communicate with tenants and manage inquiries</p>
+        </div>
+
+        <!-- Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                        <i class="fas fa-inbox text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Total Messages</p>
+                        <p class="text-2xl font-bold text-gray-900">24</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
+                        <i class="fas fa-envelope text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Unread</p>
+                        <p class="text-2xl font-bold text-gray-900">3</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-green-100 text-green-600">
+                        <i class="fas fa-reply text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Replied</p>
+                        <p class="text-2xl font-bold text-gray-900">18</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-purple-100 text-purple-600">
+                        <i class="fas fa-clock text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Avg Response</p>
+                        <p class="text-2xl font-bold text-gray-900">2.4h</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Message List -->
+        <div class="bg-white rounded-lg shadow-md">
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-lg font-semibold text-gray-900">Inbox</h2>
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 text-sm">
+                        <i class="fas fa-plus mr-1"></i>New Message
+                    </button>
+                </div>
+            </div>
+
+            <div class="divide-y divide-gray-200" th:if="${messages != null and !#lists.isEmpty(messages)}">
+                <div th:each="message : ${messages}" 
+                     th:class="'p-6 hover:bg-gray-50 cursor-pointer transition-colors duration-200 ' + (${!message.isRead} ? 'bg-blue-50' : '')">
+                    <div class="flex items-start space-x-4">
+                        <div class="flex-shrink-0">
+                            <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                                <span class="text-blue-600 font-semibold" th:text="${#strings.substring(message.from, 0, 1).toUpperCase()}">M</span>
+                            </div>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-900" th:text="${message.from}">Sender Name</p>
+                                    <p class="text-sm text-gray-900 font-medium" th:text="${message.subject}">Subject</p>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <span th:if="${!message.isRead}" class="w-2 h-2 bg-blue-600 rounded-full"></span>
+                                    <span class="text-xs text-gray-500" th:text="${message.date}">2025-01-15</span>
+                                </div>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-1" th:text="${message.preview}">Message preview...</p>
+                        </div>
+                        <div class="flex-shrink-0">
+                            <button class="text-gray-400 hover:text-gray-600">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Empty state -->
+            <div th:if="${messages == null or #lists.isEmpty(messages)}" class="text-center py-12">
+                <i class="fas fa-inbox text-6xl text-gray-300 mb-4"></i>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">No messages</h3>
+                <p class="text-gray-500">You don't have any messages at the moment.</p>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="flex justify-center mt-8" th:if="${messages != null and !#lists.isEmpty(messages)}">
+            <nav class="flex space-x-2">
+                <button class="px-3 py-2 text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="px-3 py-2 text-white bg-blue-600 border border-blue-600 rounded-md">1</button>
+                <button class="px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">2</button>
+                <button class="px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">3</button>
+                <button class="px-3 py-2 text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </nav>
+        </div>
+    </div>
+</main>
+</body>
+</html> 
