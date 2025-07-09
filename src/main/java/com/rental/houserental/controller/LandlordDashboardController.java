@@ -17,6 +17,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -35,7 +36,8 @@ import static com.rental.houserental.constant.ViewNamesConstant.*;
 public class LandlordDashboardController {
 
     @GetMapping("/dashboard")
-    public String dashboard(Model model, Authentication authentication) {
+    public String dashboard(Model model, Authentication authentication, HttpServletRequest request) {
+        model.addAttribute("currentUri", request.getRequestURI());
         // Dashboard Statistics - using hardcoded values for now
         Map<String, Object> dashboardStats = new HashMap<>();
         dashboardStats.put("totalProperties", 12);

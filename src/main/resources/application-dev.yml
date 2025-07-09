@@ -33,3 +33,5 @@ spring:
     redis:
       host: ${SPRING_REDIS_HOST:localhost}
       port: 6379
+sepay:
+  secret-key: QD3Uo8YkDJxT0zy/ctP7OX8ZDcbskxeuk66JT8WurtoIV7T/YbdAtvPGh1bflbDd

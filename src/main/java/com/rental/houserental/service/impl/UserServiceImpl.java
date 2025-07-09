@@ -5,11 +5,16 @@ import com.rental.houserental.entity.User;
 import com.rental.houserental.enums.UserStatus;
 import com.rental.houserental.exceptions.auth.EmailAlreadyExistsException;
 import com.rental.houserental.exceptions.auth.PasswordNotMatchException;
+import com.rental.houserental.exceptions.user.UserNotFoundException;
 import com.rental.houserental.repository.UserRepository;
 import com.rental.houserental.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import static com.rental.houserental.constant.ErrorMessageConstant.MSG_400;
 
 @Service
 @RequiredArgsConstructor
@@ -34,9 +39,24 @@ public class UserServiceImpl implements UserService {
                 .build());
     }
 
-    public User findByEmail(String email) {
-        return userRepository.findByEmail(email)
-                .orElse(null);
+    @Override
+    public User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        return findByEmail(email);
     }
+
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email).orElse(null);
+
+    }
+
+    @Override
+    public void depositBalance(Long id, Double amount) {
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found", MSG_400));
+        user.setBalance(user.getBalance() + amount);
+        userRepository.save(user);
+    }
+
 
 }

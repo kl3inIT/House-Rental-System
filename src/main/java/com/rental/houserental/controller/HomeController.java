@@ -4,6 +4,7 @@ import com.rental.houserental.dto.response.property.FeaturedPropertyResponseDTO;
 import com.rental.houserental.entity.Category;
 import com.rental.houserental.service.CategoryService;
 import com.rental.houserental.service.PropertyService;
+import com.rental.houserental.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -36,12 +37,12 @@ public class HomeController {
     public String home(Model model) {
         List<FeaturedPropertyResponseDTO> featuredProperties = propertyService.getFeaturedProperties(6);
         List<Category> categories = categoryService.getAllCategories();
-
         model.addAttribute(FEATURED_PROPERTIES, featuredProperties);
         model.addAttribute(CATEGORIES, categories);
-
         return INDEX;
     }
+
+
 
 
     @GetMapping("/properties/{id}")

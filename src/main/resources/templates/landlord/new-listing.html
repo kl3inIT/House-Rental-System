@@ -2,13 +2,13 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/main}">
+      layout:decorate="~{layout/landlord}">
 <head>
     <title>Add New Property - RentEase</title>
 </head>
 <body class="bg-gray-50">
-<main layout:fragment="content">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<div layout:fragment="content">
+    <div class="p-6">
         <!-- Header -->
         <div class="mb-8">
             <h1 class="text-3xl font-bold text-gray-900">Add New Property</h1>
@@ -352,6 +352,6 @@
 
     <!-- JavaScript for Vietnamese location and image preview -->
     <script th:src="@{/js/landlord/new-listing.js}"></script>
-</main>
+</div>
 </body>
 </html>

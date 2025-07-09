@@ -13,7 +13,11 @@ public final class ViewNamesConstant {
     public static final String ERROR_403 = "error/403";
     public static final String ERROR_404 = "error/404";
     public static final String ERROR_500 = "error/500";
-    
+
+    // Transaction Views
+    public static final String WALLET_TRANSACTION = "wallet-transactions";
+    public static final String WALLET_DEPOSIT = "wallet-deposit";
+
     // Dashboard Views
     public static final String ADMIN_DASHBOARD = "admin/dashboard";
     public static final String LANDLORD_DASHBOARD = "landlord/dashboard";
@@ -34,6 +38,9 @@ public final class ViewNamesConstant {
     public static final String REDIRECT_LANDLORD_DASHBOARD = "redirect:/landlord/dashboard";
     public static final String REDIRECT_LANDLORD_NEW_LISTING = "redirect:/landlord/properties/new";
     public static final String REDIRECT_USER_PROFILE = "redirect:/user/profile";
+    public static final String REDIRECT_WALLET_TRANSACTION = "redirect:/wallet/transactions";
+
+
 
     // Utility methods for building redirects with parameters
     public static String redirectVerifyOtpWithEmail(String email) {
