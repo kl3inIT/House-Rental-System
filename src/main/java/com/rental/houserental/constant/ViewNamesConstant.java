@@ -21,12 +21,12 @@ public final class ViewNamesConstant {
     // Dashboard Views
     public static final String ADMIN_DASHBOARD = "admin/dashboard";
     public static final String LANDLORD_DASHBOARD = "landlord/dashboard";
-    public static final String LANDLORD_NEW_LISTING = "landlord/new-listing";
-    public static final String LANDLORD_EDIT_LISTING = "landlord/edit-listing";
+    public static final String LANDLORD_PROPERTY_FORM = "landlord/property-form";
     public static final String LANDLORD_PROPERTIES = "landlord/properties";
     
     // User Views
     public static final String USER_PROFILE = "user/profile";
+    public static final String PROPERTY_DETAIL = "property-detail";
 
     // Simple Redirects
     public static final String REDIRECT_INDEX = "redirect:/";
@@ -39,6 +39,7 @@ public final class ViewNamesConstant {
     public static final String REDIRECT_LANDLORD_NEW_LISTING = "redirect:/landlord/properties/new";
     public static final String REDIRECT_USER_PROFILE = "redirect:/user/profile";
     public static final String REDIRECT_WALLET_TRANSACTION = "redirect:/wallet/transactions";
+    public static final String REDIRECT_LANDLORD_PROPERTIES = "redirect:/landlord/properties";
 
 
 

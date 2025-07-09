@@ -23,7 +23,7 @@ public class RentalProperty extends BaseEntity {
     private String title;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "CategoryId", nullable = false, columnDefinition = "NVARCHAR(100)")
+    @JoinColumn(name = "CategoryId", nullable = false)
     private Category category;
 
     @Column(name = "MonthlyRent", nullable = false, precision = 10, scale = 2)
@@ -54,14 +54,8 @@ public class RentalProperty extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private FurnishingType furnishing; // "FULL", "BASIC", "NONE"
 
-    @Column(name = "DepositType", nullable = false, length = 10)
-    private String depositType; // "AMOUNT" hoặc "MONTH"
-
-    @Column(name = "DepositAmount", precision = 10, scale = 2)
-    private BigDecimal depositAmount; // nếu chọn kiểu amount
-
-    @Column(name = "DepositMonths")
-    private Integer depositMonths; // nếu chọn kiểu month
+    @Column(name = "DepositPercentage", nullable = false)
+    private Integer depositPercentage;
 
     @Column(name = "Latitude")
     private Double latitude;
@@ -80,6 +74,9 @@ public class RentalProperty extends BaseEntity {
 
     @Column(name = "PublishedAt")
     private LocalDateTime publishedAt;
+
+    @Column(name = "Views", nullable = false)
+    private Integer views = 0;
 
     @OneToMany(mappedBy = "rentalProperty", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @OrderBy("displayOrder ASC, createdAt ASC")

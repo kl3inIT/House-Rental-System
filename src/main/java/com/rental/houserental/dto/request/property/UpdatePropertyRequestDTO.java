@@ -1,19 +1,21 @@
 package com.rental.houserental.dto.request.property;
 
+import com.rental.houserental.enums.FurnishingType;
+import jakarta.validation.constraints.NotBlank;
+
+
 import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreatePropertyRequestDTO {
-
-    private Long Id;
-
+public class UpdatePropertyRequestDTO {
     @NotBlank(message = "Property title is required")
     @Size(max = 255, message = "Title must be less than 255 characters")
     private String title;
@@ -58,8 +60,8 @@ public class CreatePropertyRequestDTO {
     @Size(max = 2000, message = "Description must be less than 2000 characters")
     private String description;
 
-    @NotBlank(message = "Furnishing is required")
-    private String furnishing; // FULL, BASIC, NONE
+    @NotNull(message = "Furnishing is required")
+    private FurnishingType furnishing; // FULL, BASIC, NONE
 
     @Min(value = 10, message = "Deposit percentage must be at least 10")
     @Max(value = 50, message = "Deposit percentage must be at most 50")
@@ -70,4 +72,6 @@ public class CreatePropertyRequestDTO {
 
     @NotNull(message = "Longitude is required")
     private Double longitude;
+     private String mainImageUrl;
+     private List<String> imageUrls;
 }

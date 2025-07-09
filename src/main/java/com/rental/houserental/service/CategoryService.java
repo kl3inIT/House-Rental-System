@@ -11,4 +11,6 @@ public interface CategoryService {
     List<Category> getAllCategories(); // Alias for findAll for consistency
     
     Category findById(Long id);
+
+
 } 

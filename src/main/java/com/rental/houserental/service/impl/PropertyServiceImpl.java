@@ -1,22 +1,27 @@
 package com.rental.houserental.service.impl;
 
 import com.rental.houserental.dto.request.property.CreatePropertyRequestDTO;
+import com.rental.houserental.dto.request.property.LandlordPropertyFilterDTO;
 import com.rental.houserental.dto.request.property.SearchPropertyCriteriaDTO;
-import com.rental.houserental.dto.response.property.FeaturedPropertyResponseDTO;
-import com.rental.houserental.dto.response.property.SearchPropertyResponseDTO;
+import com.rental.houserental.dto.request.property.UpdatePropertyRequestDTO;
+import com.rental.houserental.dto.response.property.*;
+import com.rental.houserental.entity.Category;
 import com.rental.houserental.entity.PropertyImage;
 import com.rental.houserental.entity.RentalProperty;
 import com.rental.houserental.entity.User;
 import com.rental.houserental.enums.FurnishingType;
 import com.rental.houserental.enums.PropertyStatus;
+import com.rental.houserental.exceptions.common.ResourceNotFoundException;
 import com.rental.houserental.exceptions.property.ImageUploadException;
 import com.rental.houserental.exceptions.property.PropertyNotFoundException;
+import com.rental.houserental.repository.CategoryRepository;
 import com.rental.houserental.repository.PropertyRepository;
 import com.rental.houserental.repository.specification.RentalPropertySpecification;
 
 import com.rental.houserental.service.CategoryService;
 import com.rental.houserental.service.ImageService;
 import com.rental.houserental.service.PropertyService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,9 +33,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
+import java.math.BigDecimal;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -40,9 +44,11 @@ public class PropertyServiceImpl implements PropertyService {
     private final PropertyRepository propertyRepository;
     private final ImageService imageService;
     private final CategoryService categoryService;
+    private final CategoryRepository categoryRepository;
 
     @Override
-    public RentalProperty createProperty(CreatePropertyRequestDTO request, User landlord,
+    @Transactional
+    public void createProperty(CreatePropertyRequestDTO request, User landlord,
                                          MultipartFile[] imageFiles) {
         try {
             RentalProperty property = RentalProperty.builder()
@@ -58,12 +64,11 @@ public class PropertyServiceImpl implements PropertyService {
                     .description(request.getDescription())
                     .propertyStatus(PropertyStatus.DRAFT)
                     .landlord(landlord)
-                    .depositType(request.getDepositType())
-                    .depositAmount(request.getDepositAmount())
                     .furnishing(request.getFurnishing() != null ? FurnishingType.fromString(request.getFurnishing()) : FurnishingType.NONE)
-                    .depositMonths(request.getDepositMonths())
+                    .depositPercentage(request.getDepositPercentage())
                     .latitude(request.getLatitude())
                     .longitude(request.getLongitude())
+                    .views(0)
                     .images(new HashSet<>())
                     .build();
 
@@ -77,15 +82,12 @@ public class PropertyServiceImpl implements PropertyService {
                         image.setRentalProperty(savedProperty);
                     }
                     savedProperty.getImages().addAll(propertyImages);
-                    savedProperty = propertyRepository.save(savedProperty);
                 } catch (Exception e) {
                     // Delete the property since image upload failed
                     propertyRepository.delete(savedProperty);
                     throw new ImageUploadException("Failed to upload images for property. Property creation cancelled.", e);
                 }
             }
-
-            return savedProperty;
             
         } catch (Exception e) {
             log.error("Failed to create property for landlord: {}", landlord.getEmail(), e);
@@ -125,6 +127,155 @@ public class PropertyServiceImpl implements PropertyService {
         return new PageImpl<>(dtoList, pageable, propertyPage.getTotalElements());
     }
 
+    @Override
+    public Page<PropertyListItemDTO> searchPropertiesForLandlord(
+            LandlordPropertyFilterDTO filter, Long landlordId, Pageable pageable) {
+
+        Page<RentalProperty> page = propertyRepository.searchByLandlord(
+                landlordId,
+                filter.getStatus(),
+                filter.getKeyword(),
+                filter.getMinPrice() != null ? filter.getMinPrice() : null,
+                filter.getMaxPrice() != null ? filter.getMaxPrice() : null,
+                pageable
+        );
+        return page.map(this::toPropertyListItemDTO);
+    }
+
+    @Override
+    public PropertyStatsDTO getPropertyStats(Long landlordId, LandlordPropertyFilterDTO filter) {
+        List<Object[]> results = propertyRepository.getStatsByLandlord(
+                landlordId,
+                filter.getStatus(),
+                filter.getKeyword(),
+                filter.getMinPrice(),
+                filter.getMaxPrice()
+        );
+
+        Object[] arr = (results != null && !results.isEmpty()) ? results.get(0) : new Object[11];
+
+        return PropertyStatsDTO.builder()
+                .totalProperties(arr[0] == null ? 0L : ((Number) arr[0]).longValue())
+                .availableCount(arr[1] == null ? 0L : ((Number) arr[1]).longValue())
+                .rentedCount(arr[2] == null ? 0L : ((Number) arr[2]).longValue())
+                .bookedCount(arr[3] == null ? 0L : ((Number) arr[3]).longValue())
+                .draftCount(arr[4] == null ? 0L : ((Number) arr[4]).longValue())
+                .unavailableCount(arr[5] == null ? 0L : ((Number) arr[5]).longValue())
+                .expiredCount(arr[6] == null ? 0L : ((Number) arr[6]).longValue())
+                .adminHiddenCount(arr[7] == null ? 0L : ((Number) arr[7]).longValue())
+                .adminBannedCount(arr[8] == null ? 0L : ((Number) arr[8]).longValue())
+                .totalViews(arr[9] == null ? 0 : ((Number) arr[9]).intValue())
+                .totalRevenue(arr[10] == null ? BigDecimal.ZERO : (BigDecimal) arr[10])
+                .build();
+    }
+
+    @Override
+    public PropertyDetailDTO getPropertyDetailById(Long id) {
+        RentalProperty property = propertyRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Property not found with id " + id));
+        return PropertyDetailDTO.builder()
+                .id(property.getId())
+                .title(property.getTitle())
+                .categoryId(property.getCategory() != null ? property.getCategory().getId() : null)
+                .monthlyRent(property.getMonthlyRent())
+                .bedrooms(property.getBedrooms())
+                .bathrooms(property.getBathrooms())
+                .area(property.getArea())
+                .streetAddress(property.getStreetAddress())
+                .ward(property.getWard())
+                .province(property.getProvince())
+                .description(property.getDescription())
+                .propertyStatus(property.getPropertyStatus())
+                .furnishing(property.getFurnishing() != null ? property.getFurnishing() : FurnishingType.FULL)
+                .depositPercentage(property.getDepositPercentage())
+                .latitude(property.getLatitude())
+                .longitude(property.getLongitude())
+                .mainImageUrl(property.getMainImageUrl())
+                .imageUrls(property.getImages().stream()
+                        .map(PropertyImage::getImageUrl)
+                        .toList())
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public void updateProperty(Long id, UpdatePropertyRequestDTO dto, MultipartFile[] imageFiles) {
+        RentalProperty property = propertyRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Property not found with id " + id));
+
+        property.setTitle(dto.getTitle());
+        property.setDescription(dto.getDescription());
+        property.setMonthlyRent(dto.getMonthlyRent());
+        property.setBedrooms(dto.getBedrooms());
+        property.setBathrooms(dto.getBathrooms());
+        property.setArea(dto.getArea());
+        property.setStreetAddress(dto.getStreetAddress());
+        property.setWard(dto.getWard());
+        property.setProvince(dto.getProvince());
+        property.setDepositPercentage(dto.getDepositPercentage());
+        property.setLatitude(dto.getLatitude());
+        property.setLongitude(dto.getLongitude());
+
+        // Giữ lại các ảnh cũ mà user chọn (theo danh sách URL)
+        Set<PropertyImage> currentImages = property.getImages();
+        List<String> imageUrlsToKeep = dto.getImageUrls() != null ? dto.getImageUrls() : new ArrayList<>();
+
+        // Xóa các ảnh không còn giữ lại
+        currentImages.removeIf(img -> !imageUrlsToKeep.contains(img.getImageUrl()));
+
+        // Đánh lại thứ tự và isMainImage cho ảnh cũ
+        int displayOrder = 0;
+        for (String url : imageUrlsToKeep) {
+            for (PropertyImage img : currentImages) {
+                if (img.getImageUrl().equals(url)) {
+                    img.setDisplayOrder(displayOrder);
+                    img.setIsMainImage(displayOrder == 0); // Ảnh đầu là main
+                    displayOrder++;
+                }
+            }
+        }
+
+        // Xử lý thêm các ảnh mới (nếu có upload)
+        if (imageFiles != null && imageFiles.length > 0) {
+            List<MultipartFile> fileList = Arrays.asList(imageFiles);
+            List<PropertyImage> newImages = imageService.uploadPropertyImages(fileList, property);
+            for (PropertyImage img : newImages) {
+                img.setDisplayOrder(displayOrder);
+                img.setIsMainImage(displayOrder == 0 && imageUrlsToKeep.isEmpty());
+                displayOrder++;
+                property.getImages().add(img);
+            }
+        }
+
+        propertyRepository.save(property);
+    }
+
+
+
+    @Override
+    public void deleteProperty(Long id) {
+        if (!propertyRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Property not found with id " + id);
+        }
+        propertyRepository.deleteById(id);
+
+    }
+
+    private PropertyListItemDTO toPropertyListItemDTO(RentalProperty p) {
+        return PropertyListItemDTO.builder()
+                .id(p.getId())
+                .title(p.getTitle())
+                .propertyStatus(p.getPropertyStatus())
+                .monthlyRent(p.getMonthlyRent())
+                .views(p.getViews())
+                .createAt(p.getCreatedAt())
+                .fullAddress(p.getStreetAddress() + ", " + p.getWard() + ", " + p.getProvince())
+                .bedrooms(p.getBedrooms())
+                .bathrooms(p.getBathrooms())
+                .area(p.getArea())
+                .mainImageUrl(p.getMainImageUrl() != null ? p.getMainImageUrl() : "")
+                .build();
+    }
 
     @Override
     public SearchPropertyResponseDTO getPropertyById(Long id) {

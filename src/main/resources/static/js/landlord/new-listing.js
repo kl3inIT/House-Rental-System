@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const submitBtn = document.getElementById('submit-btn');
     const descriptionTextarea = document.querySelector('textarea[name="description"]');
     const descriptionCount = document.getElementById('description-count');
+    const depositPercentageInput = document.getElementById('depositPercentage');
     
     // Store selected files with unique IDs
     let selectedFiles = [];
@@ -421,7 +422,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function handleFormSubmit(event) {
         event.preventDefault();
-        
+
+        // Kiểm tra nếu số lượng ảnh nhỏ hơn 1
+        if (selectedFiles.length < 1) {
+            showNotification('Please upload at least one image.', 'error');
+            return;
+        }
         // Disable submit button to prevent double submission
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Creating Property...';
@@ -533,6 +539,37 @@ document.addEventListener('DOMContentLoaded', function() {
             clearFieldError(fileInput);
         }
     };
+
+    // Update deposit
+    if (depositPercentageInput) {
+        depositPercentageInput.addEventListener('input', updateDepositAmount);
+    }
+    // Update deposit function
+    function updateDepositAmount() {
+        // Get the deposit percentage value
+        var depositPercentage = document.getElementById('depositPercentage').value;
+        document.getElementById('deposit-percentage-amount').textContent = depositPercentage;
+
+        // Get the monthly rent value
+        var monthlyRent = parseFloat(document.getElementById('monthlyRent').value);
+
+        // Check if the rent is valid
+        if (isNaN(monthlyRent) || monthlyRent <= 0) {
+            document.getElementById('deposit-amount').textContent = '0';
+            return;
+        }
+
+        // Calculate the deposit amount
+        var depositAmount = (depositPercentage / 100) * monthlyRent;
+
+        // Display the deposit amount
+        document.getElementById('deposit-amount').textContent = depositAmount.toFixed(2);
+    }
+
+    // Ensure that the deposit amount is updated when the page loads
+    window.onload = function() {
+        updateDepositAmount();
+    };
 });
 
 // Vietnamese location API functionality using new API structure
@@ -573,7 +610,7 @@ function initializeVietnameseLocations() {
 
 async function loadProvinces() {
     const provinceSelect = document.getElementById('province-select');
-    
+    const selectedProvince = document.getElementById('province-value')?.value || '';
     try {
         // Load all provinces from the new API
         const response = await fetch('https://vietnamlabs.com/api/vietnamprovince');
@@ -589,6 +626,13 @@ async function loadProvinces() {
                 option.textContent = provinceData.province;
                 provinceSelect.appendChild(option);
             });
+
+            // --- Chọn lại giá trị cũ khi edit ---
+            if (selectedProvince) {
+                provinceSelect.value = selectedProvince;
+                // Trigger load ward nếu có sẵn tỉnh
+                loadWards(selectedProvince);
+            }
         } else {
             throw new Error('Invalid API response');
         }
@@ -601,6 +645,7 @@ async function loadProvinces() {
 
 async function loadWards(provinceName) {
     const wardSelect = document.getElementById('ward-select');
+    const selectedWard = document.getElementById('ward-value')?.value || '';
     let allWards = [];
     let offset = 0;
     const limit = 50;
@@ -635,6 +680,10 @@ async function loadWards(provinceName) {
                 wardSelect.appendChild(option);
             });
             wardSelect.disabled = false;
+            // --- Chọn lại ward khi edit ---
+            if (selectedWard) {
+                wardSelect.value = selectedWard;
+            }
         } else {
             wardSelect.innerHTML = '<option value="">Không có dữ liệu phường/xã</option>';
         }
@@ -670,4 +719,26 @@ function addFallbackProvinces() {
         option.textContent = province;
         provinceSelect.appendChild(option);
     });
+
+
+    // Preview image when editing
+    document.addEventListener('DOMContentLoaded', function() {
+        const previewOld = document.getElementById('image-preview-old');
+        const oldImageInput = document.getElementById('oldImageUrls');
+        if (previewOld && oldImageInput) {
+            previewOld.addEventListener('click', function(e) {
+                if (e.target.closest('.remove-image-btn')) {
+                    const btn = e.target.closest('.remove-image-btn');
+                    const url = btn.getAttribute('data-image-url');
+                    // Xóa khỏi giao diện
+                    btn.parentElement.remove();
+                    // Xóa khỏi hidden input
+                    let urls = oldImageInput.value ? oldImageInput.value.split(',') : [];
+                    urls = urls.filter(item => item !== url);
+                    oldImageInput.value = urls.join(',');
+                }
+            });
+        }
+    });
+
 }
