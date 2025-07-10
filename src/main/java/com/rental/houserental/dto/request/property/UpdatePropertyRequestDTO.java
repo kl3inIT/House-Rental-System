@@ -72,6 +72,7 @@ public class UpdatePropertyRequestDTO {
 
     @NotNull(message = "Longitude is required")
     private Double longitude;
-     private String mainImageUrl;
-     private List<String> imageUrls;
+    private String mainImageUrl;
+    private List<String> imageUrls;
+    private List<Long> amenityIds;
 }

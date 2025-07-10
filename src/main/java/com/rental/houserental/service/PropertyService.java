@@ -5,6 +5,7 @@ import com.rental.houserental.dto.request.property.LandlordPropertyFilterDTO;
 import com.rental.houserental.dto.request.property.UpdatePropertyRequestDTO;
 import com.rental.houserental.dto.response.property.*;
 import com.rental.houserental.dto.request.property.SearchPropertyCriteriaDTO;
+import com.rental.houserental.entity.RentalProperty;
 import com.rental.houserental.entity.User;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.data.domain.Page;
@@ -31,4 +32,12 @@ public interface PropertyService {
     void updateProperty(Long id, UpdatePropertyRequestDTO dto, MultipartFile[] imageFiles);
 
     void deleteProperty(Long id);
+
+    List<PropertyDetailDTO> getSimularProperties(Integer limit, Long propertyId);
+
+    void increaseView(Long propertyId);
+
+    List<RentalProperty> getPropertiesByLandlordStatusNotAvailable(Long landlordId);
+
+    List<RentalProperty> getPropertiesByLandlordStatusAvailable(Long landlordId);
 }

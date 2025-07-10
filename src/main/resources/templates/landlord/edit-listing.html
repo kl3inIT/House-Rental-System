@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+     xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+     xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+     layout:decorate="~{layout/landlord}">
+     <head>
+          <title>Edit Listing - RentEase</title>
+     </head>
+     <body class="bg-gray-50">
+          <div layout:fragment="content">
+               <div class="p-6">
+                    <!-- Header -->
+                    <div class="mb-8">
+                         <h1 class="text-3xl font-bold text-gray-900">Edit
+                              Listing</h1>
+                         <p class="text-gray-600 mt-2">Update your listing
+                              details</p>
+                    </div>
+
+                    <form th:action="@{${actionUrl}}"
+                         th:object="${listing}" method="post" class="space-y-8"
+                         id="listing-form" novalidate>
+                         <!-- CSRF Token -->
+                         <input type="hidden" th:name="${_csrf.parameterName}"
+                              th:value="${_csrf.token}" />
+
+                         <!-- Success Message -->
+                         <div th:if="${successMessage}"
+                              class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-6">
+                              <span th:text="${successMessage}"></span>
+                         </div>
+
+                         <!-- Property Information (Read-only) -->
+                         <div class="bg-white rounded-lg shadow-md p-6">
+                              <h2
+                                   class="text-xl font-semibold text-gray-900 mb-6">
+                                   <i
+                                        class="fas fa-home text-blue-600 mr-2"></i>
+                                   Property Information
+                              </h2>
+
+                              <div class="grid grid-cols-1 gap-6">
+                                   <div>
+                                        <label
+                                             class="block text-sm font-medium text-gray-700 mb-1">Property</label>
+                                        <div
+                                             class="p-3 bg-gray-50 rounded-md border">
+                                             <p
+                                                  class="text-sm font-medium text-gray-900"
+                                                  th:text="${listingDetail.propertyTitle}">Property
+                                                  Title</p>
+                                             <p class="text-sm text-gray-600"
+                                                  th:text="${listingDetail.propertyAddress}">Property
+                                                  Address</p>
+                                        </div>
+                                   </div>
+                              </div>
+                         </div>
+
+                         <!-- Listing Details -->
+                         <div class="bg-white rounded-lg shadow-md p-6">
+                              <h2
+                                   class="text-xl font-semibold text-gray-900 mb-6">
+                                   <i
+                                        class="fas fa-calendar-alt text-green-600 mr-2"></i>
+                                   Listing Period
+                              </h2>
+
+                              <div
+                                   class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                   <div>
+                                        <label
+                                             class="block text-sm font-medium text-gray-700 mb-1">Start
+                                             Date *</label>
+                                        <input type="datetime-local"
+                                             th:field="*{startDate}" required
+                                             data-validate="required"
+                                             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                        <div
+                                             class="validation-error text-red-600 text-sm mt-1 hidden"></div>
+                                        <div
+                                             th:if="${#fields.hasErrors('startDate')}"
+                                             class="text-red-600 text-sm mt-1"
+                                             th:errors="*{startDate}"></div>
+                                   </div>
+
+                                   <div>
+                                        <label
+                                             class="block text-sm font-medium text-gray-700 mb-1">End
+                                             Date *</label>
+                                        <input type="datetime-local"
+                                             th:field="*{endDate}" required
+                                             data-validate="required"
+                                             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                        <div
+                                             class="validation-error text-red-600 text-sm mt-1 hidden"></div>
+                                        <div
+                                             th:if="${#fields.hasErrors('endDate')}"
+                                             class="text-red-600 text-sm mt-1"
+                                             th:errors="*{endDate}"></div>
+                                   </div>
+                              </div>
+                         </div>
+
+                         <!-- Pricing -->
+                         <div class="bg-white rounded-lg shadow-md p-6">
+                              <h2
+                                   class="text-xl font-semibold text-gray-900 mb-6">
+                                   <i
+                                        class="fas fa-dollar-sign text-purple-600 mr-2"></i>
+                                   Pricing & Features
+                              </h2>
+
+                              <div
+                                   class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                   <div>
+                                        <label
+                                             class="block text-sm font-medium text-gray-700 mb-1">Listing
+                                             Amount (VND) *</label>
+                                        <div class="relative">
+                                             <span
+                                                  class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">
+                                                  <i
+                                                       class="fas fa-money-bill-wave"></i>
+                                             </span>
+                                             <input type="number"
+                                                  th:field="*{amount}" required
+                                                  placeholder="1800000"
+                                                  step="1000" min="0"
+                                                  data-validate="required,number,min:0"
+                                                  class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                        </div>
+                                        <div
+                                             class="validation-error text-red-600 text-sm mt-1 hidden"></div>
+                                        <div
+                                             th:if="${#fields.hasErrors('amount')}"
+                                             class="text-red-600 text-sm mt-1"
+                                             th:errors="*{amount}"></div>
+                                   </div>
+
+                                   <div>
+                                        <label
+                                             class="block text-sm font-medium text-gray-700 mb-1">Highlight
+                                             Listing</label>
+                                        <div
+                                             class="flex items-center space-x-3 mt-2">
+                                             <label class="flex items-center">
+                                                  <input type="checkbox"
+                                                       th:field="*{isHighlight}"
+                                                       class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                                  <span
+                                                       class="ml-2 text-sm text-gray-700">Make
+                                                       this listing stand
+                                                       out</span>
+                                             </label>
+                                        </div>
+                                        <p
+                                             class="text-xs text-gray-500 mt-1">Highlighted
+                                             listings appear at the top of
+                                             search results</p>
+                                   </div>
+                              </div>
+                         </div>
+
+                         <!-- Description -->
+                         <div class="bg-white rounded-lg shadow-md p-6">
+                              <h2
+                                   class="text-xl font-semibold text-gray-900 mb-6">
+                                   <i
+                                        class="fas fa-align-left text-orange-600 mr-2"></i>
+                                   Listing Description
+                              </h2>
+
+                              <div class="grid grid-cols-1 gap-6">
+                                   <div>
+                                        <label
+                                             class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                                        <textarea th:field="*{description}"
+                                             rows="6" maxlength="2000"
+                                             placeholder="Describe your property listing, special features, terms, or any additional information that would help potential tenants..."
+                                             data-validate="maxLength:2000"
+                                             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"></textarea>
+                                        <div
+                                             class="flex justify-between items-center mt-1">
+                                             <div
+                                                  class="validation-error text-red-600 text-sm hidden"></div>
+                                             <div
+                                                  th:if="${#fields.hasErrors('description')}"
+                                                  class="text-red-600 text-sm"
+                                                  th:errors="*{description}"></div>
+                                             <span
+                                                  class="text-xs text-gray-500">
+                                                  <span
+                                                       id="char-count">0</span>/2000
+                                                  characters
+                                             </span>
+                                        </div>
+                                   </div>
+                              </div>
+                         </div>
+
+                         <!-- Listing Status -->
+                         <div class="bg-white rounded-lg shadow-md p-6">
+                              <h2
+                                   class="text-xl font-semibold text-gray-900 mb-6">
+                                   <i
+                                        class="fas fa-info-circle text-indigo-600 mr-2"></i>
+                                   Listing Status
+                              </h2>
+
+                              <div class="grid grid-cols-1 gap-6">
+                                   <div>
+                                        <label
+                                             class="block text-sm font-medium text-gray-700 mb-1">Current
+                                             Status</label>
+                                        <div
+                                             class="p-3 bg-gray-50 rounded-md border">
+                                             <span
+                                                  class="px-2 py-1 text-xs rounded-full font-medium"
+                                                  th:class="${listingDetail.status == 'active'} ? 'bg-green-100 text-green-800' : 
+                                           (${listingDetail.status == 'expired'} ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800')"
+                                                  th:text="${listingDetail.status}">Active</span>
+                                             <p
+                                                  class="text-sm text-gray-600 mt-1">
+                                                  <span
+                                                       th:if="${listingDetail.status == 'active'}">This
+                                                       listing is currently
+                                                       active and visible to
+                                                       potential tenants.</span>
+                                                  <span
+                                                       th:if="${listingDetail.status == 'expired'}">This
+                                                       listing has expired and
+                                                       is no longer visible to
+                                                       potential tenants.</span>
+                                                  <span
+                                                       th:if="${listingDetail.status == 'upcoming'}">This
+                                                       listing will become
+                                                       active on the start
+                                                       date.</span>
+                                             </p>
+                                        </div>
+                                   </div>
+                              </div>
+                         </div>
+
+                         <!-- Action Buttons -->
+                         <div class="flex justify-end space-x-4 pt-6">
+                              <a href="/landlord/listings"
+                                   class="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
+                                   <i class="fas fa-times mr-2"></i>
+                                   Cancel
+                              </a>
+                              <button type="submit"
+                                   class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
+                                   <i class="fas fa-save mr-2"></i>
+                                   Update Listing
+                              </button>
+                         </div>
+                    </form>
+               </div>
+          </div>
+
+          <!-- Custom JavaScript for form validation -->
+          <script th:inline="javascript">
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('listing-form');
+    const descriptionTextarea = document.querySelector('textarea[name="description"]');
+    const charCount = document.getElementById('char-count');
+    
+    // Character counter for description
+    if (descriptionTextarea) {
+        descriptionTextarea.addEventListener('input', function() {
+            const length = this.value.length;
+            charCount.textContent = length;
+            
+            if (length > 1800) {
+                charCount.classList.add('text-red-600');
+            } else {
+                charCount.classList.remove('text-red-600');
+            }
+        });
+    }
+    
+    // Date validation
+    const startDateInput = document.querySelector('input[name="startDate"]');
+    const endDateInput = document.querySelector('input[name="endDate"]');
+    
+    if (startDateInput && endDateInput) {
+        startDateInput.addEventListener('change', function() {
+            endDateInput.min = this.value;
+        });
+        
+        endDateInput.addEventListener('change', function() {
+            if (this.value && startDateInput.value && this.value <= startDateInput.value) {
+                alert('End date must be after start date');
+                this.value = '';
+            }
+        });
+    }
+    
+    // Form validation
+    form.addEventListener('submit', function(e) {
+        let isValid = true;
+        const requiredFields = form.querySelectorAll('[required]');
+        
+        requiredFields.forEach(field => {
+            if (!field.value.trim()) {
+                isValid = false;
+                field.classList.add('border-red-500');
+                showError(field, 'This field is required');
+            } else {
+                field.classList.remove('border-red-500');
+                hideError(field);
+            }
+        });
+        
+        if (!isValid) {
+            e.preventDefault();
+            alert('Please fill in all required fields');
+        }
+    });
+    
+    function showError(field, message) {
+        let errorDiv = field.parentNode.querySelector('.validation-error');
+        if (!errorDiv) {
+            errorDiv = document.createElement('div');
+            errorDiv.className = 'validation-error text-red-600 text-sm mt-1';
+            field.parentNode.appendChild(errorDiv);
+        }
+        errorDiv.textContent = message;
+        errorDiv.classList.remove('hidden');
+    }
+    
+    function hideError(field) {
+        const errorDiv = field.parentNode.querySelector('.validation-error');
+        if (errorDiv) {
+            errorDiv.classList.add('hidden');
+        }
+    }
+});
+</script>
+     </body>
+</html>

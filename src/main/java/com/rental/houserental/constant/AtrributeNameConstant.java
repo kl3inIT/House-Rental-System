@@ -18,6 +18,9 @@ public final class AtrributeNameConstant {
     public static final String STATUS = "status";
     public static final String EMAIL = "email";
     public static final String USER = "user";
+    public static final String LISTINGS = "listings";
+    public static final String LISTING = "listing";
+    public static final String PROPERTIES = "properties";
     public static final String REGISTER_REQUEST = "registerRequest";
     public static final String LOGIN_REQUEST = "loginRequest";
     public static final String FORGOT_PASSWORD_REQUEST = "forgotPasswordRequest";

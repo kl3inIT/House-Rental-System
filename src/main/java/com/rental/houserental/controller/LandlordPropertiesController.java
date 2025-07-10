@@ -3,11 +3,14 @@ package com.rental.houserental.controller;
 import com.rental.houserental.dto.request.property.CreatePropertyRequestDTO;
 import com.rental.houserental.dto.request.property.LandlordPropertyFilterDTO;
 import com.rental.houserental.dto.request.property.UpdatePropertyRequestDTO;
+import com.rental.houserental.dto.response.property.AmenityDTO;
 import com.rental.houserental.dto.response.property.PropertyDetailDTO;
 import com.rental.houserental.dto.response.property.PropertyListItemDTO;
 import com.rental.houserental.dto.response.property.PropertyStatsDTO;
+import com.rental.houserental.entity.Amenity;
 import com.rental.houserental.entity.User;
 import com.rental.houserental.enums.FurnishingType;
+import com.rental.houserental.service.AmenityService;
 import com.rental.houserental.service.CategoryService;
 import com.rental.houserental.service.PropertyService;
 import com.rental.houserental.service.UserService;
@@ -46,6 +49,7 @@ public class LandlordPropertiesController {
     private final PropertyService propertyService;
     private final UserService userService;
     private final CategoryService categoryService;
+    private final AmenityService amenityService;
 
     @GetMapping("/new")
     public String showCreateForm(Model model, HttpServletRequest request) {
@@ -54,6 +58,7 @@ public class LandlordPropertiesController {
         model.addAttribute(CATEGORIES, categoryService.findAll());
         List<Map<String, String>> types = FurnishingType.getTypeList();
         model.addAttribute(FURNISHING_TYPES, types);
+        model.addAttribute("amenities", amenityService.findAll());
         model.addAttribute("actionUrl", "/landlord/properties");
         return LANDLORD_PROPERTY_FORM;
     }
@@ -84,7 +89,7 @@ public class LandlordPropertiesController {
     public String getAllProperties(
             @ModelAttribute LandlordPropertyFilterDTO filter,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "5") int size,
             Model model,
             Authentication auth
     ) {
@@ -98,6 +103,7 @@ public class LandlordPropertiesController {
         model.addAttribute("stats", stats);
         model.addAttribute("filter", filter);
         model.addAttribute("categories", categoryService.findAll());
+        model.addAttribute("amenities", amenityService.findAll());
         return LANDLORD_PROPERTIES;
     }
 
@@ -109,6 +115,9 @@ public class LandlordPropertiesController {
         List<Map<String, String>> types = FurnishingType.getTypeList();
         model.addAttribute(FURNISHING_TYPES, types);
         model.addAttribute("oldImageUrls", property.getImageUrls());
+        model.addAttribute("amenities", amenityService.findAll());
+        model.addAttribute("selectedAmenityIds", property.getAmenities().stream().map(AmenityDTO::getId)
+                .toList());
         model.addAttribute("actionUrl", "/landlord/properties/edit/" + id);
         return LANDLORD_PROPERTY_FORM;
     }
@@ -125,17 +134,10 @@ public class LandlordPropertiesController {
         return REDIRECT_LANDLORD_PROPERTIES;
     }
 
-    @GetMapping("/view/{id}")
-    public String viewPropertyDetail(@PathVariable Long id, Model model) {
-        PropertyDetailDTO property = propertyService.getPropertyDetailById(id);
-        model.addAttribute("property", property);
-        return PROPERTY_DETAIL;
-    }
-
     @PostMapping("/delete/{id}")
     public String deleteProperty(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         propertyService.deleteProperty(id);
-        redirectAttributes.addFlashAttribute("success", "Property deleted successfully!");
+        redirectAttributes.addFlashAttribute("successMessage", "Property delete successfully!");
         return REDIRECT_LANDLORD_PROPERTIES;
     }
 }

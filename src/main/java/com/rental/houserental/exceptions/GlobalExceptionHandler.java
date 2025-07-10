@@ -3,11 +3,9 @@ package com.rental.houserental.exceptions;
 import com.rental.houserental.exceptions.auth.*;
 import com.rental.houserental.exceptions.booking.InvalidBookingStatusException;
 import com.rental.houserental.exceptions.category.CategoryNotFoundException;
+import com.rental.houserental.exceptions.common.BadRequestException;
 import com.rental.houserental.exceptions.common.ResourceNotFoundException;
-import com.rental.houserental.exceptions.property.InvalidPropertyStatusException;
-import com.rental.houserental.exceptions.property.ImageUploadException;
-import com.rental.houserental.exceptions.property.FileDeleteException;
-import com.rental.houserental.exceptions.property.PropertyNotFoundException;
+import com.rental.houserental.exceptions.property.*;
 import com.rental.houserental.exceptions.transaction.InvalidTransactionTypeException;
 import com.rental.houserental.exceptions.user.*;
 import org.springframework.ui.Model;
@@ -208,5 +206,19 @@ public class GlobalExceptionHandler {
         log.warn("Resource not found: {}", ex.getMessage());
         model.addAttribute(MESSAGE, "The requested resource could not be found.");
         return ERROR_404;
+    }
+
+    @ExceptionHandler(PropertyDeleteException.class)
+    public String handlePropertyDeleteException(PropertyDeleteException ex, RedirectAttributes redirectAttributes) {
+        log.error("Property deletion failed: {}", ex.getMessage());
+        redirectAttributes.addFlashAttribute(ERROR, "Only delete when the building is in DRAFT state!. Please try again later.");
+        return REDIRECT_LANDLORD_PROPERTIES;
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public String handleBadRequestException(BadRequestException ex, Model model) {
+        log.warn("Bad request: {}", ex.getMessage());
+        model.addAttribute(MESSAGE, "The request was invalid. Please check your input and try again.");
+        return GENERIC_ERROR;
     }
 }
