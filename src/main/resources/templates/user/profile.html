@@ -1,247 +1,458 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Profile - RentEase</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script th:src="@{/js/user-profile.js}" defer></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 </head>
+
 <body class="bg-gray-50">
-<!-- Navigation -->
-<nav class="bg-white shadow-lg sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-            <div class="flex items-center">
-                <a href="../index.html" class="text-2xl font-bold text-blue-600">RentEase</a>
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="/" class="text-2xl font-bold text-blue-600">RentEase</a>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="/"
+                        class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Home</a>
+                    <a href="/search-properties"
+                        class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Properties</a>
+                    <a href="/user/profile" class="text-blue-600 px-3 py-2 rounded-md text-sm font-medium">My
+                        Profile</a>
+                    <div class="relative">
+                        <button
+                            class="flex items-center text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+                            <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-semibold mr-2"
+                                th:text="${userProfile.name != null ? userProfile.name.substring(0,1).toUpperCase() : 'U'}">
+                                U
+                            </div>
+                            <span th:text="${userProfile.name != null ? userProfile.name : 'User'}">User</span>
+                            <i class="fas fa-chevron-down ml-1"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
-            <div class="hidden md:flex items-center space-x-8">
-                <a href="../index.html" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Home</a>
-                <a href="search-results.html" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Properties</a>
-                <a href="#" class="text-blue-600 px-3 py-2 rounded-md text-sm font-medium">My Profile</a>
-                <div class="relative">
-                    <button class="flex items-center text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
-                        <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-semibold mr-2">
-                            J
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <!-- Sidebar -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="text-center mb-6">
+                        <div class="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center text-white text-3xl font-bold mx-auto mb-4"
+                            th:text="${userProfile.name != null ? userProfile.name.substring(0,1).toUpperCase() : 'U'}">
+                            U
                         </div>
-                        John Doe
-                        <i class="fas fa-chevron-down ml-1"></i>
-                    </button>
+                        <h2 class="text-xl font-semibold text-gray-900"
+                            th:text="${userProfile.name != null ? userProfile.name : 'User'}">User</h2>
+                        <p class="text-gray-600"
+                            th:text="'Member since ' + ${userProfile.createdAt != null ? #temporals.format(userProfile.createdAt, 'yyyy') : '2023'}">
+                            Member since 2023</p>
+                    </div>
+
+                    <nav class="space-y-2">
+                        <a href="#profile-section"
+                            class="flex items-center px-3 py-2 text-blue-600 bg-blue-50 rounded-md">
+                            <i class="fas fa-user mr-3"></i>
+                            Profile Information
+                        </a>
+                        <a href="#rental-history"
+                            class="flex items-center px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-md">
+                            <i class="fas fa-history mr-3"></i>
+                            Rental History
+                        </a>
+                        <a href="#saved-properties"
+                            class="flex items-center px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-md">
+                            <i class="fas fa-heart mr-3"></i>
+                            Saved Properties
+                        </a>
+                        <a href="#" class="flex items-center px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-md">
+                            <i class="fas fa-bell mr-3"></i>
+                            Notifications
+                        </a>
+                        <a href="#" class="flex items-center px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-md">
+                            <i class="fas fa-cog mr-3"></i>
+                            Settings
+                        </a>
+                        <form th:action="@{/logout}" method="post" class="inline">
+                            <button type="submit"
+                                class="w-full flex items-center px-3 py-2 text-red-600 hover:bg-red-50 rounded-md">
+                                <i class="fas fa-sign-out-alt mr-3"></i>
+                                Logout
+                            </button>
+                        </form>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="lg:col-span-3">
+                <!-- Profile Information -->
+                <div id="profile-section" class="bg-white rounded-lg shadow-md p-6 mb-8">
+                    <!-- Success/Error Messages -->
+                    <div th:if="${success}"
+                        class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
+                        <span th:text="${success}">Success message</span>
+                    </div>
+                    <div th:if="${error}" class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+                        <span th:text="${error}">Error message</span>
+                    </div>
+
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-2xl font-bold text-gray-900">Profile Information</h3>
+                        <button id="editProfileBtn"
+                            class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                            <i class="fas fa-edit mr-2"></i>Edit Profile
+                        </button>
+                    </div>
+
+                    <!-- View Mode -->
+                    <div id="profileViewMode" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                            <input type="text" th:value="${userProfile.name}"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50" readonly>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                            <input type="email" th:value="${userProfile.email}"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50" readonly>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                            <input type="tel"
+                                th:value="${userProfile.phone != null ? userProfile.phone : 'Not provided'}"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50" readonly>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Gender</label>
+                            <input type="text"
+                                th:value="${userProfile.gender != null ? userProfile.gender : 'Not specified'}"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50" readonly>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                            <input type="text"
+                                th:value="${userProfile.address != null ? userProfile.address : 'Not provided'}"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50" readonly>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
+                            <input type="text"
+                                th:value="${userProfile.dateOfBirth != null ? #temporals.format(userProfile.dateOfBirth, 'dd/MM/yyyy') : ''}"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50" readonly>
+                        </div>
+                    </div>
+
+                    <!-- Edit Mode -->
+                    <div id="profileEditMode" class="hidden">
+                        <form th:action="@{/user/profile/update}" method="post" th:object="${updateProfileRequest}">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
+                                    <input type="text" th:field="*{name}" th:value="${userProfile.name}"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                                        required>
+                                    <span th:if="${#fields.hasErrors('name')}" class="text-red-500 text-sm"
+                                        th:errors="*{name}"></span>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+                                    <input type="email" th:field="*{email}" th:value="${userProfile.email}"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                                        readonly required>
+                                    <span th:if="${#fields.hasErrors('email')}" class="text-red-500 text-sm"
+                                        th:errors="*{email}"></span>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                                    <input type="tel" th:field="*{phone}" th:value="${userProfile.phone}"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                                        placeholder="Enter phone number">
+                                    <span th:if="${#fields.hasErrors('phone')}" class="text-red-500 text-sm"
+                                        th:errors="*{phone}"></span>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Gender</label>
+                                    <select th:field="*{gender}"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                        <option value="">Select gender</option>
+                                        <option value="MALE">Male</option>
+                                        <option value="FEMALE">Female</option>
+                                        <option value="OTHER">Other</option>
+                                    </select>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                                    <input type="text" th:field="*{address}" th:value="${userProfile.address}"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                                        placeholder="Enter your address">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
+                                    <input type="text" id="dateOfBirth" name="dateOfBirth" th:field="*{dateOfBirth}"
+                                        placeholder="dd/MM/yyyy"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                </div>
+                            </div>
+                            <div class="flex justify-end space-x-3 mt-6">
+                                <button type="button" id="cancelEditBtn"
+                                    class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+                                    Cancel
+                                </button>
+                                <button type="submit"
+                                    class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                                    Save Changes
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Change Password Section -->
+                <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-2xl font-bold text-gray-900">Change Password</h3>
+                        <button id="changePasswordBtn"
+                            class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">
+                            <i class="fas fa-key mr-2"></i>Change Password
+                        </button>
+                    </div>
+
+                    <!-- Password Form -->
+                    <div id="passwordForm" class="hidden">
+                        <form th:action="@{/user/profile/change-password}" method="post"
+                            th:object="${changePasswordRequest}">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Current Password
+                                        *</label>
+                                    <input type="password" th:field="*{currentPassword}"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                                        required>
+                                    <span th:if="${#fields.hasErrors('currentPassword')}" class="text-red-500 text-sm"
+                                        th:errors="*{currentPassword}"></span>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">New Password *</label>
+                                    <input type="password" th:field="*{newPassword}"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                                        required>
+                                    <span th:if="${#fields.hasErrors('newPassword')}" class="text-red-500 text-sm"
+                                        th:errors="*{newPassword}"></span>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Confirm New Password
+                                        *</label>
+                                    <input type="password" th:field="*{confirmPassword}"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                                        required>
+                                    <span th:if="${#fields.hasErrors('confirmPassword')}" class="text-red-500 text-sm"
+                                        th:errors="*{confirmPassword}"></span>
+                                </div>
+                            </div>
+                            <div class="flex justify-end space-x-3 mt-6">
+                                <button type="button" id="cancelPasswordBtn"
+                                    class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+                                    Cancel
+                                </button>
+                                <button type="submit"
+                                    class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+                                    Change Password
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Current Rental -->
+                <div id="rental-history" class="bg-white rounded-lg shadow-md p-6 mb-8">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-6">Current Rental</h3>
+
+                    <div class="border border-gray-200 rounded-lg p-4">
+                        <div class="flex items-start space-x-4">
+                            <div
+                                class="w-24 h-20 bg-gradient-to-br from-blue-200 to-blue-300 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-home text-blue-500 text-xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="text-lg font-semibold text-gray-900 mb-1">Modern Downtown Apartment</h4>
+                                <p class="text-gray-600 mb-2">
+                                    <i class="fas fa-map-marker-alt mr-1"></i>
+                                    123 Main St, Downtown, New York, NY 10001
+                                </p>
+                                <div class="flex items-center space-x-4 text-sm text-gray-600 mb-3">
+                                    <span><i class="fas fa-bed mr-1"></i>2 Beds</span>
+                                    <span><i class="fas fa-bath mr-1"></i>2 Baths</span>
+                                    <span><i class="fas fa-dollar-sign mr-1"></i>$1,800/mo</span>
+                                </div>
+                                <div class="flex items-center space-x-4">
+                                    <span class="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">Active
+                                        Lease</span>
+                                    <span class="text-sm text-gray-600">Lease ends: Dec 31, 2024</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rental History -->
+                <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-6">Rental History</h3>
+
+                    <div class="space-y-4">
+                        <!-- History Item 1 -->
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <div class="flex items-start space-x-4">
+                                <div
+                                    class="w-20 h-16 bg-gradient-to-br from-gray-200 to-gray-300 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-building text-gray-500"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h4 class="text-lg font-semibold text-gray-900 mb-1">Cozy Studio Apartment</h4>
+                                    <p class="text-gray-600 mb-2">
+                                        <i class="fas fa-map-marker-alt mr-1"></i>
+                                        456 Oak Ave, Midtown, New York, NY 10018
+                                    </p>
+                                    <div class="flex items-center space-x-4 text-sm text-gray-600 mb-2">
+                                        <span><i class="fas fa-calendar mr-1"></i>Jan 2022 - Nov 2023</span>
+                                        <span><i class="fas fa-dollar-sign mr-1"></i>$1,200/mo</span>
+                                    </div>
+                                    <span
+                                        class="px-3 py-1 bg-gray-100 text-gray-800 text-sm rounded-full">Completed</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- History Item 2 -->
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <div class="flex items-start space-x-4">
+                                <div
+                                    class="w-20 h-16 bg-gradient-to-br from-purple-200 to-purple-300 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-home text-purple-500"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h4 class="text-lg font-semibold text-gray-900 mb-1">Shared House Room</h4>
+                                    <p class="text-gray-600 mb-2">
+                                        <i class="fas fa-map-marker-alt mr-1"></i>
+                                        789 Pine St, Brooklyn, NY 11201
+                                    </p>
+                                    <div class="flex items-center space-x-4 text-sm text-gray-600 mb-2">
+                                        <span><i class="fas fa-calendar mr-1"></i>Sep 2020 - Dec 2021</span>
+                                        <span><i class="fas fa-dollar-sign mr-1"></i>$800/mo</span>
+                                    </div>
+                                    <span
+                                        class="px-3 py-1 bg-gray-100 text-gray-800 text-sm rounded-full">Completed</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Saved Properties -->
+                <div id="saved-properties" class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-6">Saved Properties</h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Saved Property 1 -->
+                        <div
+                            class="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+                            <div
+                                class="w-full h-32 bg-gradient-to-br from-blue-200 to-blue-300 flex items-center justify-center">
+                                <i class="fas fa-building text-blue-500 text-3xl"></i>
+                            </div>
+                            <div class="p-4">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h4 class="text-lg font-semibold text-gray-900">Luxury 1BR Condo</h4>
+                                    <button class="text-red-500 hover:text-red-700">
+                                        <i class="fas fa-heart"></i>
+                                    </button>
+                                </div>
+                                <p class="text-gray-600 text-sm mb-2">
+                                    <i class="fas fa-map-marker-alt mr-1"></i>
+                                    Upper East Side, NY
+                                </p>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-lg font-bold text-blue-600">$2,500/mo</span>
+                                    <a href="property-detail.html"
+                                        class="text-blue-600 hover:text-blue-800 text-sm">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Saved Property 2 -->
+                        <div
+                            class="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+                            <div
+                                class="w-full h-32 bg-gradient-to-br from-green-200 to-green-300 flex items-center justify-center">
+                                <i class="fas fa-home text-green-500 text-3xl"></i>
+                            </div>
+                            <div class="p-4">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h4 class="text-lg font-semibold text-gray-900">Spacious 2BR House</h4>
+                                    <button class="text-red-500 hover:text-red-700">
+                                        <i class="fas fa-heart"></i>
+                                    </button>
+                                </div>
+                                <p class="text-gray-600 text-sm mb-2">
+                                    <i class="fas fa-map-marker-alt mr-1"></i>
+                                    Queens, NY
+                                </p>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-lg font-bold text-blue-600">$2,200/mo</span>
+                                    <a href="property-detail.html"
+                                        class="text-blue-600 hover:text-blue-800 text-sm">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</nav>
 
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        <!-- Sidebar -->
-        <div class="lg:col-span-1">
-            <div class="bg-white rounded-lg shadow-md p-6">
-                <div class="text-center mb-6">
-                    <div class="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center text-white text-3xl font-bold mx-auto mb-4">
-            J
-        </div>
-                    <h2 class="text-xl font-semibold text-gray-900">John Doe</h2>
-                    <p class="text-gray-600">Member since 2023</p>
-                </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.querySelector('form[th\\:action*="update"]');
+            if (form) {
+                form.addEventListener('submit', function (e) {
+                    const dobInput = document.getElementById('dateOfBirth');
+                    if (dobInput && dobInput.value) {
+                        let parts = dobInput.value.split('/');
+                        if (parts.length === 3) {
+                            // Thêm số 0 phía trước nếu thiếu
+                            let day = parts[0].padStart(2, '0');
+                            let month = parts[1].padStart(2, '0');
+                            let year = parts[2];
+                            // Nếu năm chỉ có 2 số, chuyển thành 4 số (ví dụ: 04 -> 2004)
+                            if (year.length === 2) {
+                                year = (parseInt(year) > 30 ? '19' : '20') + year;
+                            }
+                            const yyyyMMdd = `${year}-${month}-${day}`;
+                            dobInput.value = yyyyMMdd;
+                        }
+                    }
+                });
+            }
+        });
+        document.addEventListener('DOMContentLoaded', function () {
+            flatpickr("#dateOfBirth", {
+                dateFormat: "d/m/Y", // dd/MM/yyyy
+                allowInput: true
+            });
+        });
+    </script>
 
-                <nav class="space-y-2">
-                    <a href="#" class="flex items-center px-3 py-2 text-blue-600 bg-blue-50 rounded-md">
-                        <i class="fas fa-user mr-3"></i>
-                        Profile Information
-                    </a>
-                    <a href="#" class="flex items-center px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-md">
-                        <i class="fas fa-history mr-3"></i>
-                        Rental History
-                    </a>
-                    <a href="#" class="flex items-center px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-md">
-                        <i class="fas fa-heart mr-3"></i>
-                        Saved Properties
-                    </a>
-                    <a href="#" class="flex items-center px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-md">
-                        <i class="fas fa-bell mr-3"></i>
-                        Notifications
-                    </a>
-                    <a href="#" class="flex items-center px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-md">
-                        <i class="fas fa-cog mr-3"></i>
-                        Settings
-                    </a>
-                    <a href="#" class="flex items-center px-3 py-2 text-red-600 hover:bg-red-50 rounded-md">
-                        <i class="fas fa-sign-out-alt mr-3"></i>
-                        Logout
-                    </a>
-                </nav>
-            </div>
-        </div>
-
-        <!-- Main Content -->
-        <div class="lg:col-span-3">
-            <!-- Profile Information -->
-            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-2xl font-bold text-gray-900">Profile Information</h3>
-                    <button class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
-                        <i class="fas fa-edit mr-2"></i>Edit Profile
-                    </button>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
-                        <input type="text" value="John" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50" readonly>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
-                        <input type="text" value="Doe" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50" readonly>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                        <input type="email" value="john.doe@email.com" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50" readonly>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                        <input type="tel" value="+1 (555) 123-4567" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50" readonly>
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
-                        <input type="text" value="123 Main Street, New York, NY 10001" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50" readonly>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Current Rental -->
-            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-                <h3 class="text-2xl font-bold text-gray-900 mb-6">Current Rental</h3>
-
-                <div class="border border-gray-200 rounded-lg p-4">
-                    <div class="flex items-start space-x-4">
-                        <div class="w-24 h-20 bg-gradient-to-br from-blue-200 to-blue-300 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-home text-blue-500 text-xl"></i>
-                    </div>
-                        <div class="flex-1">
-                            <h4 class="text-lg font-semibold text-gray-900 mb-1">Modern Downtown Apartment</h4>
-                            <p class="text-gray-600 mb-2">
-                                <i class="fas fa-map-marker-alt mr-1"></i>
-                                123 Main St, Downtown, New York, NY 10001
-                            </p>
-                            <div class="flex items-center space-x-4 text-sm text-gray-600 mb-3">
-                                <span><i class="fas fa-bed mr-1"></i>2 Beds</span>
-                                <span><i class="fas fa-bath mr-1"></i>2 Baths</span>
-                                <span><i class="fas fa-dollar-sign mr-1"></i>$1,800/mo</span>
-                            </div>
-                            <div class="flex items-center space-x-4">
-                                <span class="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">Active Lease</span>
-                                <span class="text-sm text-gray-600">Lease ends: Dec 31, 2024</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Rental History -->
-            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-                <h3 class="text-2xl font-bold text-gray-900 mb-6">Rental History</h3>
-
-                <div class="space-y-4">
-                    <!-- History Item 1 -->
-                    <div class="border border-gray-200 rounded-lg p-4">
-                        <div class="flex items-start space-x-4">
-                            <div class="w-20 h-16 bg-gradient-to-br from-gray-200 to-gray-300 rounded-lg flex items-center justify-center">
-                                <i class="fas fa-building text-gray-500"></i>
-                            </div>
-                            <div class="flex-1">
-                                <h4 class="text-lg font-semibold text-gray-900 mb-1">Cozy Studio Apartment</h4>
-                                <p class="text-gray-600 mb-2">
-                                    <i class="fas fa-map-marker-alt mr-1"></i>
-                                    456 Oak Ave, Midtown, New York, NY 10018
-                                </p>
-                                <div class="flex items-center space-x-4 text-sm text-gray-600 mb-2">
-                                    <span><i class="fas fa-calendar mr-1"></i>Jan 2022 - Nov 2023</span>
-                                    <span><i class="fas fa-dollar-sign mr-1"></i>$1,200/mo</span>
-                                </div>
-                                <span class="px-3 py-1 bg-gray-100 text-gray-800 text-sm rounded-full">Completed</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- History Item 2 -->
-                    <div class="border border-gray-200 rounded-lg p-4">
-                        <div class="flex items-start space-x-4">
-                            <div class="w-20 h-16 bg-gradient-to-br from-purple-200 to-purple-300 rounded-lg flex items-center justify-center">
-                                <i class="fas fa-home text-purple-500"></i>
-                            </div>
-                            <div class="flex-1">
-                                <h4 class="text-lg font-semibold text-gray-900 mb-1">Shared House Room</h4>
-                                <p class="text-gray-600 mb-2">
-                                    <i class="fas fa-map-marker-alt mr-1"></i>
-                                    789 Pine St, Brooklyn, NY 11201
-                                </p>
-                                <div class="flex items-center space-x-4 text-sm text-gray-600 mb-2">
-                                    <span><i class="fas fa-calendar mr-1"></i>Sep 2020 - Dec 2021</span>
-                                    <span><i class="fas fa-dollar-sign mr-1"></i>$800/mo</span>
-                                </div>
-                                <span class="px-3 py-1 bg-gray-100 text-gray-800 text-sm rounded-full">Completed</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Saved Properties -->
-            <div class="bg-white rounded-lg shadow-md p-6">
-                <h3 class="text-2xl font-bold text-gray-900 mb-6">Saved Properties</h3>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Saved Property 1 -->
-                    <div class="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
-                        <div class="w-full h-32 bg-gradient-to-br from-blue-200 to-blue-300 flex items-center justify-center">
-                            <i class="fas fa-building text-blue-500 text-3xl"></i>
-                        </div>
-                        <div class="p-4">
-                            <div class="flex justify-between items-start mb-2">
-                                <h4 class="text-lg font-semibold text-gray-900">Luxury 1BR Condo</h4>
-                                <button class="text-red-500 hover:text-red-700">
-                                    <i class="fas fa-heart"></i>
-                                </button>
-                            </div>
-                            <p class="text-gray-600 text-sm mb-2">
-                                <i class="fas fa-map-marker-alt mr-1"></i>
-                                Upper East Side, NY
-                            </p>
-                            <div class="flex justify-between items-center">
-                                <span class="text-lg font-bold text-blue-600">$2,500/mo</span>
-                                <a href="property-detail.html" class="text-blue-600 hover:text-blue-800 text-sm">View Details</a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Saved Property 2 -->
-                    <div class="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
-                        <div class="w-full h-32 bg-gradient-to-br from-green-200 to-green-300 flex items-center justify-center">
-                            <i class="fas fa-home text-green-500 text-3xl"></i>
-                        </div>
-                        <div class="p-4">
-                            <div class="flex justify-between items-start mb-2">
-                                <h4 class="text-lg font-semibold text-gray-900">Spacious 2BR House</h4>
-                                <button class="text-red-500 hover:text-red-700">
-                                    <i class="fas fa-heart"></i>
-                                </button>
-                            </div>
-                            <p class="text-gray-600 text-sm mb-2">
-                                <i class="fas fa-map-marker-alt mr-1"></i>
-                                Queens, NY
-                            </p>
-                            <div class="flex justify-between items-center">
-                                <span class="text-lg font-bold text-blue-600">$2,200/mo</span>
-                                <a href="property-detail.html" class="text-blue-600 hover:text-blue-800 text-sm">View Details</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 </body>
+
 </html>
