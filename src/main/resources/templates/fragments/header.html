@@ -55,7 +55,7 @@
                         <a sec:authorize="isAuthenticated()" th:href="@{/wallet/transactions}"
                            class="flex items-center space-x-2 text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
                             <i class="fas fa-wallet text-lg text-blue-600"></i>
-                            <span th:text="${currentUser.balance} + '₫'"></span>
+                            <span th:text="${currentUser != null ? currentUser.balance : 0}"></span>
                         </a>
                         <!-- Notifications -->
                         <button class="relative text-gray-400 hover:text-gray-600 transition-colors duration-200">

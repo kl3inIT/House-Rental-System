@@ -26,6 +26,10 @@ public final class ViewNamesConstant {
     // User Views
     public static final String USER_PROFILE = "user/profile";
 
+    //Category Views
+    public static final String CATEGORY_NEW = "admin/add-category";
+    public static final String REDIRECT_CATEGORY = "redirect:/admin/categories";
+
     // Simple Redirects
     public static final String REDIRECT_INDEX = "redirect:/";
     public static final String REDIRECT_LOGIN = "redirect:/login";
@@ -37,6 +41,7 @@ public final class ViewNamesConstant {
     public static final String REDIRECT_LANDLORD_NEW_LISTING = "redirect:/landlord/properties/new";
     public static final String REDIRECT_USER_PROFILE = "redirect:/user/profile";
     public static final String REDIRECT_WALLET_TRANSACTION = "redirect:/wallet/transactions";
+
 
 
 

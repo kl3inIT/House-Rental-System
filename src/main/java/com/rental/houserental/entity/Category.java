@@ -14,9 +14,9 @@ import lombok.*;
 @Table(name = "Categories")
 public class Category extends BaseEntity {
 
-    @Column(name = "Name")
+    @Column(name = "Name", columnDefinition = "NVARCHAR(80)")
     private String name;
-    @Column(name = "Description")
+    @Column(name = "Description", columnDefinition = "NVARCHAR(200)")
     private String description;
 
 }
