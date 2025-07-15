@@ -19,7 +19,6 @@ import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
-
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -79,17 +78,17 @@ public class SecurityConfig {
                 // Enable CSRF protection for better security
                 .csrf(csrf -> csrf
                         .ignoringRequestMatchers("/wallet/deposit/webhook")
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                )
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/landlord/**").hasRole("LANDLORD")
-                        .requestMatchers("/user/**").hasRole("USER")
+                        .requestMatchers("/user/**").hasAnyRole("USER", "LANDLORD", "ADMIN")
+                        .requestMatchers("/landlord-upgrade-requests", "/landlord-upgrade-requests/**").hasRole("USER")
                         .requestMatchers("/", "/login", "/perform-login", "/register", "/verify-email/**",
                                 "/forgot-password", "/reset-password/**", "/verify-otp/**", "/resend-otp",
-                                "/css/**", "/js/**", "/images/**", "/output.css", "/wallet/deposit/webhook").permitAll()
-                        .anyRequest().authenticated()
-                )
+                                "/css/**", "/js/**", "/images/**", "/output.css", "/wallet/deposit/webhook")
+                        .permitAll()
+                        .anyRequest().authenticated())
                 .formLogin(form -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/perform-login") // Custom processing URL
@@ -97,31 +96,27 @@ public class SecurityConfig {
                         .passwordParameter("password")
                         .successHandler(authenticationSuccessHandler())
                         .failureHandler(authenticationFailureHandler())
-                        .permitAll()
-                )
+                        .permitAll())
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout=true")
                         .deleteCookies("JSESSIONID", "remember-me")
                         .invalidateHttpSession(true)
                         .clearAuthentication(true)
-                        .permitAll()
-                )
+                        .permitAll())
                 .rememberMe(remember -> remember
                         .key(rememberMeKey)
                         .tokenValiditySeconds(rememberMeValidity)
                         .userDetailsService(userDetailsService)
-                        .rememberMeParameter("remember-me")
-                )
+                        .rememberMeParameter("remember-me"))
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.IF_REQUIRED)
+                        .sessionCreationPolicy(
+                                org.springframework.security.config.http.SessionCreationPolicy.IF_REQUIRED)
                         .maximumSessions(1)
                         .maxSessionsPreventsLogin(false)
-                        .expiredUrl("/login?expired=true")
-                )
+                        .expiredUrl("/login?expired=true"))
                 .exceptionHandling(ex -> ex
-                        .accessDeniedPage("/error/403")
-                );
+                        .accessDeniedPage("/error/403"));
 
         return http.build();
     }

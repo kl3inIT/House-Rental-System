@@ -201,4 +201,11 @@ public class GlobalExceptionHandler {
         model.addAttribute(MESSAGE, "An unexpected error occurred. Please try again later.");
         return ERROR_500;
     }
+
+    @ExceptionHandler(LandlordRequestAlreadyExistsException.class)
+    public String handleLandLordRequestExist(InvalidTransactionTypeException ex, Model model) {
+        log.warn("Landlord request already exist: {}", ex.getMessage());
+        model.addAttribute(MESSAGE, "Landlord request already exist.");
+        return GENERIC_ERROR;
+    }
 }

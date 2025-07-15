@@ -6,23 +6,21 @@ import com.rental.houserental.dto.response.user.UserProfileResponseDTO;
 import com.rental.houserental.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import static com.rental.houserental.constant.ViewNamesConstant.REDIRECT_USER_PROFILE;
 import static com.rental.houserental.constant.ViewNamesConstant.USER_PROFILE;
 
+
 @Controller
+@RequestMapping("/user")
 @RequiredArgsConstructor
 public class UserProfileController {
 
     private final UserService userService;
 
-    @GetMapping("/user/profile")
+    @GetMapping("/profile")
     public String profile(Model model) {
         UserProfileResponseDTO userProfile = userService.getCurrentUserProfile();
         UpdateProfileRequestDTO updateProfileRequest = new UpdateProfileRequestDTO();
@@ -41,71 +39,54 @@ public class UserProfileController {
         return USER_PROFILE; // templates/user/profile.html
     }
 
-    @PostMapping("/user/profile/update")
+    @PostMapping("/profile/update")
     public String updateProfile(@Valid @ModelAttribute("updateProfileRequest") UpdateProfileRequestDTO request,
             BindingResult bindingResult,
-            RedirectAttributes redirectAttributes) {
+            Model model) {
         if (bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("error", "Please check your input and try again");
-            return REDIRECT_USER_PROFILE;
+            model.addAttribute("error", "Please check your input and try again");
+            return USER_PROFILE;
         }
-
         try {
             userService.updateProfile(request);
-            redirectAttributes.addFlashAttribute("success", "Profile updated successfully");
+            model.addAttribute("success", "Profile updated successfully");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            model.addAttribute("error", e.getMessage());
         }
-
-        return REDIRECT_USER_PROFILE;
+        UserProfileResponseDTO userProfile = userService.getCurrentUserProfile();
+        model.addAttribute("userProfile", userProfile);
+        model.addAttribute("updateProfileRequest", request);
+        model.addAttribute("changePasswordRequest", new ChangePasswordRequestDTO());
+        return USER_PROFILE;
     }
 
-    @PostMapping("/user/profile/change-password")
+    @PostMapping("/profile/change-password")
     public String changePassword(@Valid @ModelAttribute("changePasswordRequest") ChangePasswordRequestDTO request,
             BindingResult bindingResult,
-            RedirectAttributes redirectAttributes) {
+            Model model) {
         if (bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("error", "Please check your input and try again");
-            return REDIRECT_USER_PROFILE;
+            model.addAttribute("error", "Please check your input and try again");
+            return USER_PROFILE;
         }
-
         try {
             userService.changePassword(request);
-            redirectAttributes.addFlashAttribute("success", "Password changed successfully");
+            model.addAttribute("success", "Password changed successfully");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            model.addAttribute("error", e.getMessage());
         }
-
-        return REDIRECT_USER_PROFILE;
-    }
-
-    // REST API endpoints for AJAX calls
-    @GetMapping("/api/user/profile")
-    @ResponseBody
-    public ResponseEntity<UserProfileResponseDTO> getProfile() {
-        UserProfileResponseDTO profile = userService.getCurrentUserProfile();
-        return ResponseEntity.ok(profile);
-    }
-
-    @PutMapping("/api/user/profile")
-    @ResponseBody
-    public ResponseEntity<?> updateProfileApi(@Valid @RequestBody UpdateProfileRequestDTO request) {
-        try {
-            UserProfileResponseDTO updatedProfile = userService.updateProfile(request);
-            return ResponseEntity.ok(updatedProfile);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+        UserProfileResponseDTO userProfile = userService.getCurrentUserProfile();
+        UpdateProfileRequestDTO updateProfileRequest = new UpdateProfileRequestDTO();
+        updateProfileRequest.setName(userProfile.getName());
+        updateProfileRequest.setEmail(userProfile.getEmail());
+        updateProfileRequest.setPhone(userProfile.getPhone());
+        updateProfileRequest.setAddress(userProfile.getAddress());
+        updateProfileRequest.setGender(userProfile.getGender());
+        if (userProfile.getDateOfBirth() != null) {
+            updateProfileRequest.setDateOfBirth(userProfile.getDateOfBirth().toLocalDate());
         }
-    }
-
-    @PostMapping("/api/user/change-password")
-    @ResponseBody
-    public ResponseEntity<?> changePasswordApi(@Valid @RequestBody ChangePasswordRequestDTO request) {
-        try {
-            userService.changePassword(request);
-            return ResponseEntity.ok().body("Password changed successfully");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        model.addAttribute("userProfile", userProfile);
+        model.addAttribute("updateProfileRequest", updateProfileRequest);
+        model.addAttribute("changePasswordRequest", request);
+        return USER_PROFILE;
     }
 }

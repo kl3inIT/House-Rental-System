@@ -76,6 +76,7 @@
                             <i class="fas fa-heart mr-3"></i>
                             Saved Properties
                         </a>
+
                         <a href="#" class="flex items-center px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-md">
                             <i class="fas fa-bell mr-3"></i>
                             Notifications
@@ -83,6 +84,11 @@
                         <a href="#" class="flex items-center px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-md">
                             <i class="fas fa-cog mr-3"></i>
                             Settings
+                        </a>
+                        <a href="#" id="landlord-request-link"
+                            class="flex items-center px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-md">
+                            <i class="fas fa-user-plus mr-3"></i>
+                            Upgrade to Landlord
                         </a>
                         <form th:action="@{/logout}" method="post" class="inline">
                             <button type="submit"
@@ -98,7 +104,7 @@
             <!-- Main Content -->
             <div class="lg:col-span-3">
                 <!-- Profile Information -->
-                <div id="profile-section" class="bg-white rounded-lg shadow-md p-6 mb-8">
+                <div id="profile-section" class="profile-section bg-white rounded-lg shadow-md p-6 mb-8">
                     <!-- Success/Error Messages -->
                     <div th:if="${success}"
                         class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
@@ -220,7 +226,7 @@
                 </div>
 
                 <!-- Change Password Section -->
-                <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                <div class="profile-section bg-white rounded-lg shadow-md p-6 mb-8">
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-2xl font-bold text-gray-900">Change Password</h3>
                         <button id="changePasswordBtn"
@@ -276,7 +282,7 @@
                 </div>
 
                 <!-- Current Rental -->
-                <div id="rental-history" class="bg-white rounded-lg shadow-md p-6 mb-8">
+                <div id="rental-history" class="profile-section bg-white rounded-lg shadow-md p-6 mb-8">
                     <h3 class="text-2xl font-bold text-gray-900 mb-6">Current Rental</h3>
 
                     <div class="border border-gray-200 rounded-lg p-4">
@@ -307,7 +313,7 @@
                 </div>
 
                 <!-- Rental History -->
-                <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                <div class="profile-section bg-white rounded-lg shadow-md p-6 mb-8">
                     <h3 class="text-2xl font-bold text-gray-900 mb-6">Rental History</h3>
 
                     <div class="space-y-4">
@@ -360,7 +366,7 @@
                 </div>
 
                 <!-- Saved Properties -->
-                <div id="saved-properties" class="bg-white rounded-lg shadow-md p-6">
+                <div id="saved-properties" class="profile-section bg-white rounded-lg shadow-md p-6">
                     <h3 class="text-2xl font-bold text-gray-900 mb-6">Saved Properties</h3>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -417,9 +423,60 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Section cho nâng cấp landlord, mặc định ẩn -->
+                <div class="profile-section" id="landlord-request-section" style="display:none; margin-top: 24px;">
+                </div>
             </div>
         </div>
     </div>
+
+    <!-- Modal: Landlord Upgrade Request -->
+    <div id="landlordUpgradeModal"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 hidden">
+        <div
+            class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md relative border-t-8 border-blue-600 animate-fadeIn">
+            <button onclick="closeLandlordModal()"
+                class="absolute top-3 right-3 text-gray-400 hover:text-gray-700 text-2xl transition-colors">&times;</button>
+            <div class="flex flex-col items-center mb-4">
+                <div class="bg-blue-100 text-blue-600 rounded-full p-3 mb-2 shadow">
+                    <i class="fas fa-crown fa-2x"></i>
+                </div>
+                <h2 class="text-2xl font-extrabold mb-1 text-blue-700 tracking-tight">Request Landlord Upgrade</h2>
+                <p class="text-gray-500 text-sm text-center">Tell us why you want to become a Landlord. Your request
+                    will be reviewed by our admin team.</p>
+            </div>
+            <form id="landlordUpgradeForm" action="/landlord-upgrade-requests" method="post" class="space-y-4">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <label for="reason" class="block font-semibold text-gray-700 mb-1">Reason for Upgrade <span
+                        class="text-red-500">*</span></label>
+                <textarea id="reason" name="reason" required maxlength="300"
+                    class="w-full border-2 border-blue-200 rounded-lg p-3 min-h-[90px] focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition placeholder-gray-400 text-gray-800 text-base shadow-sm"
+                    placeholder="Share your motivation, experience, or plans as a Landlord..."></textarea>
+                <button type="submit"
+                    class="w-full py-2 rounded-lg font-bold text-white bg-gradient-to-r from-blue-500 to-blue-700 shadow-lg hover:from-blue-600 hover:to-blue-800 transition text-lg tracking-wide flex items-center justify-center gap-2">
+                    <i class="fas fa-paper-plane"></i> Submit Request
+                </button>
+            </form>
+        </div>
+    </div>
+    <style>
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fadeIn {
+            animation: fadeIn 0.4s cubic-bezier(.4, 0, .2, 1);
+        }
+    </style>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -451,6 +508,23 @@
                 allowInput: true
             });
         });
+    </script>
+
+    <script>
+        // Mở modal khi bấm nút
+        document.addEventListener('DOMContentLoaded', function () {
+            var link = document.getElementById('landlord-request-link');
+            if (link) {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.getElementById('landlordUpgradeModal').classList.remove('hidden');
+                });
+            }
+        });
+        // Đóng modal chỉ ẩn modal, không reload trang
+        function closeLandlordModal() {
+            document.getElementById('landlordUpgradeModal').classList.add('hidden');
+        }
     </script>
 
 </body>

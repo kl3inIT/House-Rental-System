@@ -134,4 +134,59 @@ document.addEventListener('DOMContentLoaded', function () {
             }, 5000);
         }
     }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    const landlordLink = document.getElementById('landlord-request-link');
+    const landlordSection = document.getElementById('landlord-request-section');
+    if (landlordLink && landlordSection) {
+        landlordLink.addEventListener('click', function (e) {
+            e.preventDefault();
+            document.querySelectorAll('.profile-section').forEach(sec => sec.style.display = 'none');
+            landlordSection.style.display = 'block';
+
+            fetch('/landlord-upgrade-requests')
+                .then(res => res.json())
+                .then(data => {
+                    if (!data || data.length === 0 || data[0].status === 'REJECTED') {
+                        landlordSection.innerHTML = `
+                            <form id="landlord-request-form" class="max-w-md mx-auto bg-white p-6 rounded shadow">
+                                <h3 class="text-xl font-bold mb-4">Request to become Landlord</h3>
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 mb-1">Full Name</label>
+                                    <input type="text" id="landlord-fullname" class="w-full border px-3 py-2 rounded" required>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 mb-1">Phone</label>
+                                    <input type="tel" id="landlord-phone" class="w-full border px-3 py-2 rounded" required>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 mb-1">Reason</label>
+                                    <textarea id="landlord-reason" class="w-full border px-3 py-2 rounded" rows="3" required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary bg-blue-600 text-white px-4 py-2 rounded">Send Request</button>
+                            </form>
+                        `;
+                        document.getElementById('landlord-request-form').onsubmit = function (ev) {
+                            ev.preventDefault();
+                            const fullName = document.getElementById('landlord-fullname').value;
+                            const phone = document.getElementById('landlord-phone').value;
+                            const reason = document.getElementById('landlord-reason').value;
+                            fetch(`/landlord-upgrade-requests?fullName=${encodeURIComponent(fullName)}&phone=${encodeURIComponent(phone)}&reason=${encodeURIComponent(reason)}`, { method: 'POST' })
+                                .then(res => {
+                                    if (res.ok) {
+                                        landlordSection.innerHTML = '<span class="text-info">Request sent, please wait for approval.</span>';
+                                    } else {
+                                        landlordSection.innerHTML = '<span class="text-danger">Request failed.</span>';
+                                    }
+                                });
+                        };
+                    } else if (data[0].status === 'PENDING') {
+                        landlordSection.innerHTML = '<span class="text-warning">Your request is pending approval...</span>';
+                    } else if (data[0].status === 'APPROVED') {
+                        landlordSection.innerHTML = '<span class="text-success">You are now a Landlord!</span>';
+                    }
+                });
+        });
+    }
 }); 

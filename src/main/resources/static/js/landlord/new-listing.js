@@ -1,47 +1,47 @@
 // Image preview functionality and form validation
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const imageUpload = document.getElementById('image-upload');
     const imagePreview = document.getElementById('image-preview');
     const form = document.getElementById('property-form');
     const submitBtn = document.getElementById('submit-btn');
     const descriptionTextarea = document.querySelector('textarea[name="description"]');
     const descriptionCount = document.getElementById('description-count');
-    
+
     // Store selected files with unique IDs
     let selectedFiles = [];
     let fileIdCounter = 0;
 
     // Initialize validation
     initializeFormValidation();
-    
+
     // Initialize image upload
     if (imageUpload) {
         imageUpload.addEventListener('change', handleImageUpload);
-        
+
         // Initialize drag and drop functionality
         const dropZone = imageUpload.parentElement;
-        
-        dropZone.addEventListener('dragover', function(e) {
+
+        dropZone.addEventListener('dragover', function (e) {
             e.preventDefault();
             dropZone.classList.add('border-blue-500', 'bg-blue-50');
         });
-        
-        dropZone.addEventListener('dragleave', function(e) {
+
+        dropZone.addEventListener('dragleave', function (e) {
             e.preventDefault();
             dropZone.classList.remove('border-blue-500', 'bg-blue-50');
         });
-        
-        dropZone.addEventListener('drop', function(e) {
+
+        dropZone.addEventListener('drop', function (e) {
             e.preventDefault();
             dropZone.classList.remove('border-blue-500', 'bg-blue-50');
-            
+
             const files = Array.from(e.dataTransfer.files);
             if (files.length > 0) {
                 // Simulate file input change
                 const dt = new DataTransfer();
                 files.forEach(file => dt.items.add(file));
                 imageUpload.files = dt.files;
-                
+
                 // Trigger the change event
                 handleImageUpload({ target: imageUpload });
             }
@@ -50,11 +50,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Set up event delegation for remove buttons
     if (imagePreview) {
-        imagePreview.addEventListener('click', function(e) {
+        imagePreview.addEventListener('click', function (e) {
             if (e.target.closest('.remove-image-btn')) {
                 e.preventDefault();
                 e.stopPropagation();
-                
+
                 const button = e.target.closest('.remove-image-btn');
                 const fileId = parseInt(button.getAttribute('data-file-id'));
                 removeImagePreview(fileId);
@@ -78,23 +78,23 @@ document.addEventListener('DOMContentLoaded', function() {
     function initializeFormValidation() {
         // Add event listeners for real-time validation
         const validateFields = document.querySelectorAll('[data-validate]');
-        
+
         validateFields.forEach(field => {
             // Validate on blur
-            field.addEventListener('blur', function() {
+            field.addEventListener('blur', function () {
                 validateField(this);
             });
 
             // Validate on input for text fields
             if (field.type === 'text' || field.type === 'number' || field.tagName === 'TEXTAREA') {
-                field.addEventListener('input', function() {
+                field.addEventListener('input', function () {
                     clearFieldError(this);
                 });
             }
 
             // Validate on change for select fields
             if (field.tagName === 'SELECT') {
-                field.addEventListener('change', function() {
+                field.addEventListener('change', function () {
                     validateField(this);
                 });
             }
@@ -104,81 +104,81 @@ document.addEventListener('DOMContentLoaded', function() {
     function validateField(field) {
         const rules = field.getAttribute('data-validate').split(',');
         const errorContainer = field.parentElement.querySelector('.validation-error');
-        
+
         clearFieldError(field);
 
         for (let rule of rules) {
             const [ruleName, ruleValue] = rule.split(':');
             const error = validateRule(field, ruleName.trim(), ruleValue?.trim());
-            
+
             if (error) {
                 showFieldError(field, error, errorContainer);
                 return false;
             }
         }
-        
+
         return true;
     }
 
     function validateRule(field, rule, value) {
         const fieldValue = field.value.trim();
-        
+
         switch (rule) {
             case 'required':
                 if (!fieldValue) {
                     return `${getFieldLabel(field)} is required.`;
                 }
                 break;
-                
+
             case 'maxLength':
                 if (fieldValue.length > parseInt(value)) {
                     return `${getFieldLabel(field)} must be less than ${value} characters.`;
                 }
                 break;
-                
+
             case 'number':
                 if (fieldValue && isNaN(fieldValue)) {
                     return `${getFieldLabel(field)} must be a valid number.`;
                 }
                 break;
-                
+
             case 'min':
                 if (fieldValue && parseFloat(fieldValue) < parseFloat(value)) {
                     return `${getFieldLabel(field)} must be at least ${value}.`;
                 }
                 break;
-                
+
             case 'imageFiles':
                 return validateImageFiles(field);
         }
-        
+
         return null;
     }
 
     function validateImageFiles(field) {
         const files = field.files;
-        
+
         if (!files || files.length === 0) {
             return null; // Images are optional
         }
-        
+
         if (files.length > 10) {
             return 'You can upload maximum 10 images.';
         }
-        
+
         const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
         const maxSize = 5 * 1024 * 1024; // 5MB
-        
+
         for (let file of files) {
             if (!allowedTypes.includes(file.type)) {
                 return 'Only JPG and PNG images are allowed.';
             }
-            
+
             if (file.size > maxSize) {
                 return `Image "${file.name}" is too large. Maximum size is 5MB.`;
             }
         }
-        
+
         return null;
     }
 
@@ -190,7 +190,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function showFieldError(field, message, errorContainer) {
         field.classList.add('border-red-500');
         field.classList.remove('border-gray-300');
-        
+
         if (errorContainer) {
             errorContainer.textContent = message;
             errorContainer.classList.remove('hidden');
@@ -200,7 +200,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function clearFieldError(field) {
         field.classList.remove('border-red-500');
         field.classList.add('border-gray-300');
-        
+
         const errorContainer = field.parentElement.querySelector('.validation-error');
         if (errorContainer) {
             errorContainer.classList.add('hidden');
@@ -211,40 +211,40 @@ document.addEventListener('DOMContentLoaded', function() {
     function handleImageUpload(event) {
         const files = Array.from(event.target.files);
         const errorContainer = event.target.parentElement.parentElement.querySelector('.validation-error');
-        
+
         // Don't process if no files selected
         if (files.length === 0) {
             return;
         }
-        
+
         // Clear previous errors
         clearFieldError(event.target);
-        
+
         // Add new files to selectedFiles array (limit to 10 total)
         const remainingSlots = 10 - selectedFiles.length;
-        
+
         if (remainingSlots <= 0) {
             showFieldError(event.target, 'Maximum 10 images already selected.', errorContainer);
             event.target.value = ''; // Clear the input
             return;
         }
-        
+
         const filesToAdd = files.slice(0, remainingSlots).map(file => ({
             file: file,
             id: ++fileIdCounter
         }));
-        
+
         if (files.length > remainingSlots) {
             showFieldError(event.target, `You can only upload ${remainingSlots} more images (10 maximum total).`, errorContainer);
         }
-        
+
         selectedFiles = selectedFiles.concat(filesToAdd);
-        
+
         // Validate all selected files
         const tempInput = document.createElement('input');
         tempInput.type = 'file';
         tempInput.files = createFileList(selectedFiles.map(item => item.file));
-        
+
         const error = validateImageFiles(tempInput);
         if (error) {
             // Remove the newly added files if validation fails
@@ -253,37 +253,37 @@ document.addEventListener('DOMContentLoaded', function() {
             updateImagePreview();
             return;
         }
-        
+
         // Update the file input and preview
         updateFileInput();
         updateImagePreview();
     }
-    
+
     function createFileList(files) {
         const dt = new DataTransfer();
         files.forEach(file => dt.items.add(file));
         return dt.files;
     }
-    
+
     function updateFileInput() {
         const fileInput = document.getElementById('image-upload');
         fileInput.files = createFileList(selectedFiles.map(item => item.file));
     }
-    
+
     function updateImagePreview() {
         imagePreview.innerHTML = '';
-        
+
         // Update file counter and button text
         const fileCount = document.getElementById('file-count');
         const selectedCount = document.getElementById('selected-count');
         const uploadText = document.getElementById('upload-text');
-        
+
         if (selectedFiles.length > 0) {
             imagePreview.classList.remove('hidden');
             fileCount.classList.remove('hidden');
             selectedCount.textContent = selectedFiles.length;
             uploadText.textContent = selectedFiles.length >= 10 ? 'Maximum reached' : 'Add More Images';
-            
+
             selectedFiles.forEach((fileItem, index) => {
                 createImagePreviewItem(fileItem.file, index, fileItem.id);
             });
@@ -292,14 +292,14 @@ document.addEventListener('DOMContentLoaded', function() {
             fileCount.classList.add('hidden');
             uploadText.textContent = 'Select Images';
         }
-        
+
         // Update upload button state
         updateUploadButtonState();
     }
-    
+
     function createImagePreviewItem(file, index, fileId) {
         const reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = function (e) {
             // Create container - removed overflow-hidden to prevent clipping of remove button
             const container = document.createElement('div');
             container.className = 'relative group bg-gray-100 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 flex flex-col items-center';
@@ -345,50 +345,50 @@ document.addEventListener('DOMContentLoaded', function() {
 
             imagePreview.appendChild(container);
         };
-        reader.onerror = function() {
+        reader.onerror = function () {
             console.error('Error reading file:', file.name);
             showNotification(`Failed to load image: ${file.name}`, 'error');
         };
         reader.readAsDataURL(file);
     }
-    
+
     function removeImagePreview(fileId) {
         // Find and remove file from selectedFiles array by ID
         const initialLength = selectedFiles.length;
         selectedFiles = selectedFiles.filter(item => item.id !== fileId);
-        
+
         // Check if file was actually removed
         if (selectedFiles.length === initialLength) {
             console.warn('File not found for removal:', fileId);
             return;
         }
-        
+
         // Update file input
         updateFileInput();
-        
+
         // Refresh preview (this will renumber all items)
         updateImagePreview();
-        
+
         // Show notification
         showNotification('Image removed successfully', 'success');
-        
+
         // Clear any validation errors if files are now within limits
         const fileInput = document.getElementById('image-upload');
         if (selectedFiles.length <= 10) {
             clearFieldError(fileInput);
         }
-        
+
         // If no files left, clear the file input value
         if (selectedFiles.length === 0) {
             fileInput.value = '';
         }
     }
-    
+
     function updateUploadButtonState() {
         const uploadButton = document.querySelector('label[for="image-upload"]');
         const fileInput = document.getElementById('image-upload');
         const uploadText = document.getElementById('upload-text');
-        
+
         if (selectedFiles.length >= 10) {
             uploadButton.classList.add('bg-gray-400', 'cursor-not-allowed');
             uploadButton.classList.remove('bg-blue-600', 'hover:bg-blue-700');
@@ -405,7 +405,7 @@ document.addEventListener('DOMContentLoaded', function() {
         function updateCount() {
             const count = descriptionTextarea.value.length;
             descriptionCount.textContent = count;
-            
+
             if (count > 2000) {
                 descriptionCount.parentElement.classList.add('text-red-600');
                 descriptionCount.parentElement.classList.remove('text-gray-500');
@@ -414,23 +414,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 descriptionCount.parentElement.classList.add('text-gray-500');
             }
         }
-        
+
         descriptionTextarea.addEventListener('input', updateCount);
         updateCount(); // Initialize count
     }
 
     function handleFormSubmit(event) {
         event.preventDefault();
-        
+
         // Disable submit button to prevent double submission
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Creating Property...';
-        
+
         // Validate all fields
         const validateFields = document.querySelectorAll('[data-validate]');
         let isValid = true;
         let firstInvalidField = null;
-        
+
         validateFields.forEach(field => {
             const fieldValid = validateField(field);
             if (!fieldValid && !firstInvalidField) {
@@ -440,56 +440,56 @@ document.addEventListener('DOMContentLoaded', function() {
                 isValid = false;
             }
         });
-        
+
         // Check if province and ward are selected properly
         const provinceSelect = document.getElementById('province-select');
         const wardSelect = document.getElementById('ward-select');
-        
+
         if (provinceSelect.value && !wardSelect.value) {
-            showFieldError(wardSelect, 'Please select a ward.', 
-                         wardSelect.parentElement.querySelector('.validation-error'));
+            showFieldError(wardSelect, 'Please select a ward.',
+                wardSelect.parentElement.querySelector('.validation-error'));
             isValid = false;
             if (!firstInvalidField) {
                 firstInvalidField = wardSelect;
             }
         }
-        
+
         if (!isValid) {
             // Re-enable submit button
             submitBtn.disabled = false;
             submitBtn.innerHTML = '<i class="fas fa-save mr-2"></i>Create Property';
-            
+
             // Scroll to first invalid field
             if (firstInvalidField) {
                 firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 firstInvalidField.focus();
             }
-            
+
             // Show general error message
             showNotification('Please fix the errors above before submitting.', 'error');
             return;
         }
-        
+
         // If validation passes, submit the form
         form.submit();
     }
 
+
+
     function showNotification(message, type = 'info') {
         // Create notification element
         const notification = document.createElement('div');
-        notification.className = `fixed top-4 right-4 z-50 p-4 rounded-md shadow-lg max-w-sm ${
-            type === 'error' ? 'bg-red-50 border border-red-200 text-red-800' : 
-            type === 'success' ? 'bg-green-50 border border-green-200 text-green-800' :
-            'bg-blue-50 border border-blue-200 text-blue-800'
-        }`;
-        
+        notification.className = `fixed top-4 right-4 z-50 p-4 rounded-md shadow-lg max-w-sm ${type === 'error' ? 'bg-red-50 border border-red-200 text-red-800' :
+                type === 'success' ? 'bg-green-50 border border-green-200 text-green-800' :
+                    'bg-blue-50 border border-blue-200 text-blue-800'
+            }`;
+
         notification.innerHTML = `
             <div class="flex items-center">
                 <div class="flex-shrink-0">
-                    <i class="fas ${
-                        type === 'error' ? 'fa-exclamation-circle' :
-                        type === 'success' ? 'fa-check-circle' : 'fa-info-circle'
-                    }"></i>
+                    <i class="fas ${type === 'error' ? 'fa-exclamation-circle' :
+                type === 'success' ? 'fa-check-circle' : 'fa-info-circle'
+            }"></i>
                 </div>
                 <div class="ml-3">
                     <p class="text-sm font-medium">${message}</p>
@@ -501,9 +501,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
             </div>
         `;
-        
+
         document.body.appendChild(notification);
-        
+
         // Auto remove after 5 seconds
         setTimeout(() => {
             if (notification.parentNode) {
@@ -513,19 +513,19 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Make helper functions globally available for debugging
-    window.getSelectedFiles = function() {
+    window.getSelectedFiles = function () {
         return selectedFiles.map(item => item.file);
     };
-    
-    window.getSelectedFilesWithIds = function() {
+
+    window.getSelectedFilesWithIds = function () {
         return selectedFiles;
     };
-    
-    window.clearAllImages = function() {
+
+    window.clearAllImages = function () {
         selectedFiles = [];
         updateFileInput();
         updateImagePreview();
-        
+
         // Clear the file input value
         const fileInput = document.getElementById('image-upload');
         if (fileInput) {
@@ -548,12 +548,12 @@ function initializeVietnameseLocations() {
     loadProvinces();
 
     // Load wards when province is selected
-    provinceSelect.addEventListener('change', function() {
+    provinceSelect.addEventListener('change', function () {
         const selectedProvince = this.value;
-        
+
         wardSelect.innerHTML = '<option value="">Đang tải...</option>';
         wardSelect.disabled = true;
-        
+
         // Clear any validation errors for ward
         const wardErrorContainer = wardSelect.parentElement.querySelector('.validation-error');
         if (wardErrorContainer) {
@@ -561,7 +561,7 @@ function initializeVietnameseLocations() {
         }
         wardSelect.classList.remove('border-red-500');
         wardSelect.classList.add('border-gray-300');
-        
+
         if (selectedProvince) {
             loadWards(selectedProvince);
         } else {
@@ -573,16 +573,16 @@ function initializeVietnameseLocations() {
 
 async function loadProvinces() {
     const provinceSelect = document.getElementById('province-select');
-    
+
     try {
         // Load all provinces from the new API
         const response = await fetch('https://vietnamlabs.com/api/vietnamprovince');
         const data = await response.json();
-        
+
         if (data.success && data.data) {
             // Clear existing options except the first one
             provinceSelect.innerHTML = '<option value="">Chọn tỉnh/thành phố</option>';
-            
+
             data.data.forEach(provinceData => {
                 const option = document.createElement('option');
                 option.value = provinceData.province;

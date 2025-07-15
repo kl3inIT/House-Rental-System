@@ -1,206 +1,233 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/landlord}">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/landlord}">
+
 <head>
     <title>Settings - RentEase</title>
 </head>
-<body class="bg-gray-50">
-<main layout:fragment="content">
-    <div class="p-6">
-        <!-- Header -->
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">Settings</h1>
-            <p class="text-gray-600 mt-2">Manage your account and preferences</p>
-        </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Settings Navigation -->
-            <div class="lg:col-span-1">
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <nav class="space-y-2">
-                        <a href="#profile" class="flex items-center px-3 py-2 text-blue-600 bg-blue-50 rounded-md">
-                            <i class="fas fa-user mr-3"></i>
-                            Profile Information
-                        </a>
-                        <a href="#security" class="flex items-center px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-md">
-                            <i class="fas fa-shield-alt mr-3"></i>
-                            Security
-                        </a>
-                        <a href="#notifications" class="flex items-center px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-md">
-                            <i class="fas fa-bell mr-3"></i>
-                            Notifications
-                        </a>
-                        <a href="#billing" class="flex items-center px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-md">
-                            <i class="fas fa-credit-card mr-3"></i>
-                            Billing
-                        </a>
-                        <a href="#preferences" class="flex items-center px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-md">
-                            <i class="fas fa-cog mr-3"></i>
-                            Preferences
-                        </a>
-                    </nav>
-                </div>
+<body class="bg-gray-50">
+    <main layout:fragment="content">
+        <div class="p-6">
+            <!-- Header -->
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-gray-900">Settings</h1>
+                <p class="text-gray-600 mt-2">Manage your account and preferences</p>
             </div>
 
-            <!-- Settings Content -->
-            <div class="lg:col-span-2 space-y-8">
-                <!-- Profile Information -->
-                <div id="profile" class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="text-xl font-bold text-gray-900 mb-6">Profile Information</h2>
-                    
-                    <form class="space-y-6">
-                        <div class="flex items-center space-x-6">
-                            <div class="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
-                                <span th:text="${#strings.substring(user.firstName, 0, 1).toUpperCase()}">L</span>
-                            </div>
-                            <div>
-                                <button type="button" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 text-sm">
-                                    Change Photo
-                                </button>
-                                <p class="text-sm text-gray-500 mt-1">JPG, PNG or GIF. Max size 2MB.</p>
-                            </div>
-                        </div>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Settings Navigation -->
+                <div class="lg:col-span-1">
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <nav class="space-y-2">
+                            <a href="#profile" class="flex items-center px-3 py-2 text-blue-600 bg-blue-50 rounded-md">
+                                <i class="fas fa-user mr-3"></i>
+                                Profile Information
+                            </a>
+                            <a href="#security"
+                                class="flex items-center px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-md">
+                                <i class="fas fa-shield-alt mr-3"></i>
+                                Security
+                            </a>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
-                                <input type="text" th:value="${user.firstName}" 
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
-                                <input type="text" th:value="${user.lastName}" 
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            </div>
-                        </div>
+                            <a href="#notifications"
+                                class="flex items-center px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-md">
+                                <i class="fas fa-bell mr-3"></i>
+                                Notifications
+                            </a>
 
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                            <input type="email" th:value="${user.email}" 
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-                            <input type="tel" th:value="${user.phoneNumber}" 
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Bio</label>
-                            <textarea rows="4" placeholder="Tell us about yourself..."
-                                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
-                        </div>
-
-                        <div class="flex justify-end">
-                            <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700">
-                                Save Changes
-                            </button>
-                        </div>
-                    </form>
+                            <a href="#billing"
+                                class="flex items-center px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-md">
+                                <i class="fas fa-credit-card mr-3"></i>
+                                Billing
+                            </a>
+                            <a href="#preferences"
+                                class="flex items-center px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-md">
+                                <i class="fas fa-cog mr-3"></i>
+                                Preferences
+                            </a>
+                        </nav>
+                    </div>
                 </div>
 
-                <!-- Security -->
-                <div id="security" class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="text-xl font-bold text-gray-900 mb-6">Security</h2>
-                    
-                    <div class="space-y-6">
-                        <div>
-                            <h3 class="text-lg font-medium text-gray-900 mb-4">Change Password</h3>
-                            <form class="space-y-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Current Password</label>
-                                    <input type="password" 
-                                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <!-- Settings Content -->
+                <div class="lg:col-span-2 space-y-8">
+                    <!-- Profile Information -->
+                    <div id="profile" class="bg-white rounded-lg shadow-md p-6">
+                        <h2 class="text-xl font-bold text-gray-900 mb-6">Profile Information</h2>
+
+                        <form class="space-y-6">
+                            <div class="flex items-center space-x-6">
+                                <div
+                                    class="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                                    <span th:text="${#strings.substring(user.firstName, 0, 1).toUpperCase()}">L</span>
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">New Password</label>
-                                    <input type="password" 
-                                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    <button type="button"
+                                        class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 text-sm">
+                                        Change Photo
+                                    </button>
+                                    <p class="text-sm text-gray-500 mt-1">JPG, PNG or GIF. Max size 2MB.</p>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                                    <input type="text" th:value="${user.firstName}"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Confirm New Password</label>
-                                    <input type="password" 
-                                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                                    <input type="text" th:value="${user.lastName}"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                                 </div>
-                                <div class="flex justify-end">
-                                    <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700">
-                                        Update Password
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                <input type="email" th:value="${user.email}"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                                <input type="tel" th:value="${user.phoneNumber}"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Bio</label>
+                                <textarea rows="4" placeholder="Tell us about yourself..."
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                            </div>
+
+                            <div class="flex justify-end">
+                                <button type="submit"
+                                    class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700">
+                                    Save Changes
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Security -->
+                    <div id="security" class="bg-white rounded-lg shadow-md p-6">
+                        <h2 class="text-xl font-bold text-gray-900 mb-6">Security</h2>
+
+                        <div class="space-y-6">
+                            <div>
+                                <h3 class="text-lg font-medium text-gray-900 mb-4">Change Password</h3>
+                                <form class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Current
+                                            Password</label>
+                                        <input type="password"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+                                        <input type="password"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Confirm New
+                                            Password</label>
+                                        <input type="password"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    </div>
+                                    <div class="flex justify-end">
+                                        <button type="submit"
+                                            class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700">
+                                            Update Password
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <div class="border-t pt-6">
+                                <h3 class="text-lg font-medium text-gray-900 mb-4">Two-Factor Authentication</h3>
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-sm text-gray-700">Add an extra layer of security to your account
+                                        </p>
+                                        <p class="text-xs text-gray-500">Currently disabled</p>
+                                    </div>
+                                    <button
+                                        class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 text-sm">
+                                        Enable
                                     </button>
                                 </div>
-                            </form>
+                            </div>
                         </div>
+                    </div>
 
-                        <div class="border-t pt-6">
-                            <h3 class="text-lg font-medium text-gray-900 mb-4">Two-Factor Authentication</h3>
+                    <!-- Notifications -->
+                    <div id="notifications" class="bg-white rounded-lg shadow-md p-6">
+                        <h2 class="text-xl font-bold text-gray-900 mb-6">Notifications</h2>
+
+                        <div class="space-y-4">
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <p class="text-sm text-gray-700">Add an extra layer of security to your account</p>
-                                    <p class="text-xs text-gray-500">Currently disabled</p>
+                                    <p class="text-sm font-medium text-gray-900">New rental requests</p>
+                                    <p class="text-xs text-gray-500">Get notified when someone requests to rent your
+                                        property</p>
                                 </div>
-                                <button class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 text-sm">
-                                    Enable
-                                </button>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" checked class="sr-only peer">
+                                    <div
+                                        class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600">
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-900">Booking confirmations</p>
+                                    <p class="text-xs text-gray-500">Receive notifications when bookings are confirmed
+                                    </p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" checked class="sr-only peer">
+                                    <div
+                                        class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600">
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-900">Payment reminders</p>
+                                    <p class="text-xs text-gray-500">Get reminded about upcoming rent payments</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" class="sr-only peer">
+                                    <div
+                                        class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600">
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-900">Property maintenance</p>
+                                    <p class="text-xs text-gray-500">Notifications about property maintenance and
+                                        repairs</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" checked class="sr-only peer">
+                                    <div
+                                        class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600">
+                                    </div>
+                                </label>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Notifications -->
-                <div id="notifications" class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="text-xl font-bold text-gray-900 mb-6">Notifications</h2>
-                    
-                    <div class="space-y-4">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-sm font-medium text-gray-900">New rental requests</p>
-                                <p class="text-xs text-gray-500">Get notified when someone requests to rent your property</p>
-                            </div>
-                            <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" checked class="sr-only peer">
-                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                            </label>
-                        </div>
-
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-sm font-medium text-gray-900">Booking confirmations</p>
-                                <p class="text-xs text-gray-500">Receive notifications when bookings are confirmed</p>
-                            </div>
-                            <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" checked class="sr-only peer">
-                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                            </label>
-                        </div>
-
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-sm font-medium text-gray-900">Payment reminders</p>
-                                <p class="text-xs text-gray-500">Get reminded about upcoming rent payments</p>
-                            </div>
-                            <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" class="sr-only peer">
-                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                            </label>
-                        </div>
-
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-sm font-medium text-gray-900">Property maintenance</p>
-                                <p class="text-xs text-gray-500">Notifications about property maintenance and repairs</p>
-                            </div>
-                            <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" checked class="sr-only peer">
-                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                            </label>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</main>
+    </main>
 </body>
-</html> 
+
+</html>
