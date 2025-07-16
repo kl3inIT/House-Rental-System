@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Landlord Request Update - RentEase</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            color: #2563eb;
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .info-icon {
+            color: #f59e0b;
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .title {
+            color: #dc2626;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .content {
+            margin-bottom: 30px;
+        }
+
+        .greeting {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .message {
+            font-size: 16px;
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+
+        .reason-box {
+            background-color: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .reason-title {
+            color: #dc2626;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .reason-text {
+            color: #374151;
+            font-style: italic;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background-color: #2563eb;
+            color: #ffffff;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .cta-button:hover {
+            background-color: #1d4ed8;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .next-steps {
+            background-color: #f8fafc;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .step-item {
+            margin-bottom: 10px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .step-item:before {
+            content: "→";
+            color: #2563eb;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">RentEase</div>
+            <div class="info-icon">📋</div>
+        </div>
+
+        <div class="title">Landlord Request Update</div>
+
+        <div class="content">
+            <div class="greeting">Hello <span th:text="${user.name}">User</span>,</div>
+
+            <div class="message">
+                Thank you for your interest in becoming a landlord on RentEase.
+                We have reviewed your application and unfortunately, we are unable to approve your request at this time.
+            </div>
+
+            <div class="reason-box">
+                <div class="reason-title">Reason for Rejection:</div>
+                <div class="reason-text" th:text="${reason}">Reason will be displayed here</div>
+            </div>
+
+            <div class="next-steps">
+                <h3 style="margin-top: 0; color: #374151;">What you can do next:</h3>
+                <div class="step-item">Review the feedback provided above</div>
+                <div class="step-item">Address any issues mentioned in the rejection reason</div>
+                <div class="step-item">Submit a new application with updated information</div>
+                <div class="step-item">Contact our support team if you need clarification</div>
+            </div>
+
+            <div class="message">
+                We encourage you to address the concerns mentioned and submit a new application.
+                We're here to help you succeed as a landlord on our platform.
+            </div>
+
+            <div style="text-align: center;">
+                <a href="http://localhost:8080/landlord-upgrade-requests" class="cta-button">
+                    Submit New Application
+                </a>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>If you have any questions about this decision, please don't hesitate to contact our support team.</p>
+            <p>Thank you for your understanding.</p>
+            <p style="margin-top: 20px;">
+                <strong>RentEase Team</strong><br>
+                Making rental management simple and efficient
+            </p>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -63,4 +63,45 @@ public class EmailServiceImpl implements EmailService {
             throw new FaildToSendEmailException("Failed to send password reset email");
         }
     }
+
+    @Override
+    public void sendLandlordRequestRejectionEmail(User user, String reason) {
+        Context context = new Context();
+        context.setVariable("user", user);
+        context.setVariable("reason", reason);
+        String emailContent = templateEngine.process("email/landlord-request-rejected", context);
+
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            helper.setTo(user.getEmail());
+            helper.setSubject("Your Landlord Upgrade Request - Rejected");
+            helper.setText(emailContent, true);
+            mailSender.send(message);
+            log.info("Landlord request rejection email sent to: {}", user.getEmail());
+        } catch (MessagingException e) {
+            log.error("Failed to send landlord request rejection email to: {}", user.getEmail(), e);
+            throw new FaildToSendEmailException("Failed to send landlord request rejection email");
+        }
+    }
+
+    @Override
+    public void sendLandlordRequestApprovalEmail(User user) {
+        Context context = new Context();
+        context.setVariable("user", user);
+        String emailContent = templateEngine.process("email/landlord-request-approved", context);
+
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            helper.setTo(user.getEmail());
+            helper.setSubject("Your Landlord Upgrade Request - Approved!");
+            helper.setText(emailContent, true);
+            mailSender.send(message);
+            log.info("Landlord request approval email sent to: {}", user.getEmail());
+        } catch (MessagingException e) {
+            log.error("Failed to send landlord request approval email to: {}", user.getEmail(), e);
+            throw new FaildToSendEmailException("Failed to send landlord request approval email");
+        }
+    }
 }

@@ -5,7 +5,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.math.BigDecimal;
@@ -14,17 +17,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.rental.houserental.entity.LandlordUpgradeRequest;
+import com.rental.houserental.enums.LandlordUpgradeRequestStatus;
+import com.rental.houserental.service.LandlordUpgradeRequestService;
+
 @Controller
 @RequestMapping("/admin")
 @PreAuthorize("hasRole('ADMIN')")
 @RequiredArgsConstructor
 public class AdminDashboardController {
 
+    private final LandlordUpgradeRequestService requestService;
+
     @GetMapping("/dashboard")
     public String dashboard(Model model, HttpServletRequest request) {
         model.addAttribute("currentUri", request.getRequestURI());
         model.addAttribute("title", "Admin Dashboard - RentEase");
-        
+
         // Dashboard Statistics - using hardcoded values for now
         Map<String, Object> dashboardStats = new HashMap<>();
         dashboardStats.put("totalUsers", 2847);
@@ -93,10 +102,10 @@ public class AdminDashboardController {
     public String users(Model model, HttpServletRequest request) {
         model.addAttribute("currentUri", request.getRequestURI());
         model.addAttribute("title", "Manage Users - Admin Dashboard");
-        
+
         // Mock user data
         List<Map<String, Object>> users = new ArrayList<>();
-        
+
         Map<String, Object> user1 = new HashMap<>();
         user1.put("id", 1L);
         user1.put("name", "John Doe");
@@ -135,10 +144,10 @@ public class AdminDashboardController {
     public String properties(Model model, HttpServletRequest request) {
         model.addAttribute("currentUri", request.getRequestURI());
         model.addAttribute("title", "Manage Properties - Admin Dashboard");
-        
+
         // Mock property data
         List<Map<String, Object>> properties = new ArrayList<>();
-        
+
         Map<String, Object> property1 = new HashMap<>();
         property1.put("id", 1L);
         property1.put("name", "Modern Downtown Apartment");
@@ -183,10 +192,10 @@ public class AdminDashboardController {
     public String bookings(Model model, HttpServletRequest request) {
         model.addAttribute("currentUri", request.getRequestURI());
         model.addAttribute("title", "Manage Bookings - Admin Dashboard");
-        
+
         // Mock booking data
         List<Map<String, Object>> bookings = new ArrayList<>();
-        
+
         Map<String, Object> booking1 = new HashMap<>();
         booking1.put("id", "BK-2024-001");
         booking1.put("tenantName", "John Doe");
@@ -235,10 +244,10 @@ public class AdminDashboardController {
     public String categories(Model model, HttpServletRequest request) {
         model.addAttribute("currentUri", request.getRequestURI());
         model.addAttribute("title", "Manage Categories - Admin Dashboard");
-        
+
         // Mock category data
         List<Map<String, Object>> categories = new ArrayList<>();
-        
+
         Map<String, Object> category1 = new HashMap<>();
         category1.put("id", 1L);
         category1.put("name", "Apartment");
@@ -281,15 +290,14 @@ public class AdminDashboardController {
     }
 
 
-
     @GetMapping("/reviews")
     public String reviews(Model model, HttpServletRequest request) {
         model.addAttribute("currentUri", request.getRequestURI());
         model.addAttribute("title", "Manage Reviews - Admin Dashboard");
-        
+
         // Mock review data
         List<Map<String, Object>> reviews = new ArrayList<>();
-        
+
         Map<String, Object> review1 = new HashMap<>();
         review1.put("id", 1L);
         review1.put("tenantName", "John Doe");
@@ -335,56 +343,82 @@ public class AdminDashboardController {
     public String landlordRequests(Model model, HttpServletRequest request) {
         model.addAttribute("currentUri", request.getRequestURI());
         model.addAttribute("title", "Landlord Requests - Admin Dashboard");
-        
-        // Mock landlord request data
+
+        List<LandlordUpgradeRequest> entityList = requestService.getAllRequests();
+
+        // Chuyển sang List<Map> cho template
         List<Map<String, Object>> requests = new ArrayList<>();
-        
-        Map<String, Object> request1 = new HashMap<>();
-        request1.put("id", 1L);
-        request1.put("userName", "Michael Chen");
-        request1.put("userEmail", "michael.chen@email.com");
-        request1.put("requestDate", "Jan 15, 2024");
-        request1.put("reason", "I own several properties and want to list them for rent");
-        request1.put("status", "Pending");
-        request1.put("documents", "Property ownership certificates, ID verification");
-        requests.add(request1);
+        for (LandlordUpgradeRequest entity : entityList) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", entity.getId());
+            map.put("userName", entity.getUser() != null ? entity.getUser().getName() : "");
+            map.put("userEmail", entity.getUser() != null ? entity.getUser().getEmail() : "");
+            map.put("requestDate",
+                    entity.getCreatedAt() != null
+                            ? entity.getCreatedAt()
+                            .format(java.time.format.DateTimeFormatter
+                                    .ofPattern("dd MMM yyyy HH:mm"))
+                            : "");
 
-        Map<String, Object> request2 = new HashMap<>();
-        request2.put("id", 2L);
-        request2.put("userName", "Lisa Wang");
-        request2.put("userEmail", "lisa.wang@email.com");
-        request2.put("requestDate", "Jan 14, 2024");
-        request2.put("reason", "Inherited properties from family and need to manage them");
-        request2.put("status", "Pending");
-        request2.put("documents", "Inheritance documents, property deeds");
-        requests.add(request2);
+            map.put("reason", entity.getReason() != null ? entity.getReason() : "");
+            String status = entity.getStatus() != null
+                    ? entity.getStatus().name().substring(0, 1).toUpperCase()
+                    + entity.getStatus().name().substring(1).toLowerCase()
+                    : "";
+            map.put("status", status);
+            requests.add(map);
+        }
 
-        Map<String, Object> request3 = new HashMap<>();
-        request3.put("id", 3L);
-        request3.put("userName", "David Kim");
-        request3.put("userEmail", "david.kim@email.com");
-        request3.put("requestDate", "Jan 13, 2024");
-        request3.put("reason", "Recently purchased investment properties");
-        request3.put("status", "Approved");
-        request3.put("documents", "Purchase agreements, property titles");
-        requests.add(request3);
-
-        // Calculate counts
-        long pendingCount = requests.stream()
-                .filter(r -> "Pending".equals(r.get("status")))
-                .count();
-        long approvedCount = requests.stream()
-                .filter(r -> "Approved".equals(r.get("status")))
-                .count();
-        long rejectedCount = requests.stream()
-                .filter(r -> "Rejected".equals(r.get("status")))
-                .count();
+        long pendingCount = requests.stream().filter(r -> "Pending".equals(r.get("status"))).count();
+        long approvedCount = requests.stream().filter(r -> "Approved".equals(r.get("status"))).count();
+        long rejectedCount = requests.stream().filter(r -> "Rejected".equals(r.get("status"))).count();
 
         model.addAttribute("requests", requests);
         model.addAttribute("pendingCount", pendingCount);
         model.addAttribute("approvedCount", approvedCount);
         model.addAttribute("rejectedCount", rejectedCount);
         return "admin/landlord-requests";
+    }
+
+    // Xem tất cả request landlord upgrade
+    @GetMapping("/landlord-upgrade-requests")
+    public String getLandlordUpgradeRequests(
+            @RequestParam(required = false) LandlordUpgradeRequestStatus status,
+            Model model) {
+        List<LandlordUpgradeRequest> requests = (status != null)
+                ? requestService.getRequestsByStatus(status)
+                : requestService.getRequestsByStatus(LandlordUpgradeRequestStatus.PENDING);
+        model.addAttribute("requests", requests);
+        return "admin/landlord-requests";
+    }
+
+    // Duyệt request
+    @PostMapping("/landlord-upgrade-requests/{id}/approve")
+    public String approveLandlordRequest(@PathVariable Long id) {
+        requestService.approveRequest(id);
+        return "redirect:/admin/landlord-requests";
+    }
+
+    // Hiển thị form reject
+    @GetMapping("/landlord-upgrade-requests/{id}/reject-form")
+    public String showRejectForm(@PathVariable Long id, Model model) {
+        LandlordUpgradeRequest request = requestService.getRequestById(id);
+        if (request == null) {
+            return "redirect:/admin/landlord-requests";
+        }
+        model.addAttribute("request", request);
+        model.addAttribute("title", "Reject Landlord Request - Admin Dashboard");
+        return "admin/reject-landlord-request";
+    }
+
+    // Từ chối request
+    @PostMapping("/landlord-upgrade-requests/{id}/reject")
+    public String rejectLandlordRequest(@PathVariable Long id, @RequestParam String reason) {
+        if (reason == null || reason.trim().isEmpty()) {
+            return "redirect:/admin/landlord-upgrade-requests/" + id + "/reject-form?error=reason-required";
+        }
+        requestService.rejectRequest(id, reason.trim());
+        return "redirect:/admin/landlord-requests?success=request-rejected";
     }
 
     @GetMapping("/reports")

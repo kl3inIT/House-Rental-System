@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layout/admin}">
+
+<head>
+    <title>Test Page - Admin Dashboard</title>
+</head>
+
+<body>
+    <div layout:fragment="content">
+        <div class="p-6">
+            <!-- Header -->
+            <div class="flex justify-between items-center mb-8">
+                <div>
+                    <h1 class="text-3xl font-bold text-white">Test Page</h1>
+                    <p class="text-gray-300 mt-2">Simple test page for admin dashboard</p>
+                </div>
+            </div>
+
+            <!-- Test Content -->
+            <div class="bg-gray-800 rounded-lg shadow-md p-6 border border-gray-700">
+                <h2 class="text-xl font-semibold text-white mb-4">Test Content</h2>
+                <p class="text-gray-300 mb-4">This is a simple test page for the admin dashboard.</p>
+
+                <div class="bg-gray-700 rounded-md p-4">
+                    <h3 class="text-lg font-medium text-white mb-2">Test Information</h3>
+                    <ul class="text-gray-300 space-y-1">
+                        <li>• Page loaded successfully</li>
+                        <li>• Admin layout applied</li>
+                        <li>• Basic styling working</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

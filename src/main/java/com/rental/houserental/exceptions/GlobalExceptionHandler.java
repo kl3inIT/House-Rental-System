@@ -201,6 +201,13 @@ public class GlobalExceptionHandler {
         return ERROR_500;
     }
 
+    @ExceptionHandler(LandlordRequestAlreadyExistsException.class)
+    public String handleLandLordRequestExist(InvalidTransactionTypeException ex, Model model) {
+        log.warn("Landlord request already exist: {}", ex.getMessage());
+        model.addAttribute(MESSAGE, "Landlord request already exist.");
+        return GENERIC_ERROR;
+    }
+
     @ExceptionHandler(ResourceNotFoundException.class)
     public String handleResourceNotFoundException(ResourceNotFoundException ex, Model model) {
         log.warn("Resource not found: {}", ex.getMessage());

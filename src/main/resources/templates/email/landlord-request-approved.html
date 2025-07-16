@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Landlord Request Approved - RentEase</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            color: #2563eb;
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .success-icon {
+            color: #10b981;
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .title {
+            color: #10b981;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .content {
+            margin-bottom: 30px;
+        }
+
+        .greeting {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .message {
+            font-size: 16px;
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background-color: #2563eb;
+            color: #ffffff;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .cta-button:hover {
+            background-color: #1d4ed8;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .features {
+            background-color: #f8fafc;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .feature-item {
+            margin-bottom: 10px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .feature-item:before {
+            content: "✓";
+            color: #10b981;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">RentEase</div>
+            <div class="success-icon">🎉</div>
+        </div>
+
+        <div class="title">Congratulations! Your Landlord Request is Approved!</div>
+
+        <div class="content">
+            <div class="greeting">Hello <span th:text="${user.name}">User</span>,</div>
+
+            <div class="message">
+                Great news! Your request to become a landlord on RentEase has been approved.
+                You can now start listing your properties and managing your rental business.
+            </div>
+
+            <div class="features">
+                <h3 style="margin-top: 0; color: #374151;">What you can do now:</h3>
+                <div class="feature-item">List unlimited properties for rent</div>
+                <div class="feature-item">Manage booking requests from tenants</div>
+                <div class="feature-item">Track your rental income and analytics</div>
+                <div class="feature-item">Communicate directly with potential tenants</div>
+                <div class="feature-item">Access landlord dashboard and tools</div>
+            </div>
+
+            <div class="message">
+                Ready to get started? Click the button below to access your landlord dashboard and list your first
+                property.
+            </div>
+
+            <div style="text-align: center;">
+                <a href="http://localhost:8080/landlord/dashboard" class="cta-button">
+                    Go to Landlord Dashboard
+                </a>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>If you have any questions, please don't hesitate to contact our support team.</p>
+            <p>Thank you for choosing RentEase!</p>
+            <p style="margin-top: 20px;">
+                <strong>RentEase Team</strong><br>
+                Making rental management simple and efficient
+            </p>
+        </div>
+    </div>
+</body>
+
+</html>

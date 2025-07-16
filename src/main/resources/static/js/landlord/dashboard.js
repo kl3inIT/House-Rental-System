@@ -1,5 +1,5 @@
 // Landlord Dashboard JavaScript
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     initializeDashboard();
     initializeCharts();
     initializeQuickActions();
@@ -15,7 +15,7 @@ function initializeDashboard() {
 function initializeStatistics() {
     // Update statistics with animation
     const statElements = document.querySelectorAll('.stat-number');
-    
+
     statElements.forEach(element => {
         const finalValue = parseInt(element.getAttribute('data-value') || '0');
         animateNumber(element, 0, finalValue, 1000);
@@ -24,22 +24,22 @@ function initializeStatistics() {
 
 function animateNumber(element, start, end, duration) {
     const startTime = performance.now();
-    
+
     function updateNumber(currentTime) {
         const elapsed = currentTime - startTime;
         const progress = Math.min(elapsed / duration, 1);
-        
+
         // Easing function for smooth animation
         const easeOutQuart = 1 - Math.pow(1 - progress, 4);
         const currentValue = Math.floor(start + (end - start) * easeOutQuart);
-        
+
         element.textContent = currentValue.toLocaleString();
-        
+
         if (progress < 1) {
             requestAnimationFrame(updateNumber);
         }
     }
-    
+
     requestAnimationFrame(updateNumber);
 }
 
@@ -54,7 +54,7 @@ function initializeCharts() {
 function initializeRevenueChart() {
     const ctx = document.getElementById('revenueChart');
     if (!ctx) return;
-    
+
     const chart = new Chart(ctx, {
         type: 'line',
         data: {
@@ -80,7 +80,7 @@ function initializeRevenueChart() {
                 y: {
                     beginAtZero: true,
                     ticks: {
-                        callback: function(value) {
+                        callback: function (value) {
                             return '$' + value.toLocaleString();
                         }
                     }
@@ -93,7 +93,7 @@ function initializeRevenueChart() {
 function initializePropertyChart() {
     const ctx = document.getElementById('propertyChart');
     if (!ctx) return;
-    
+
     const chart = new Chart(ctx, {
         type: 'doughnut',
         data: {
@@ -122,9 +122,9 @@ function initializePropertyChart() {
 function initializeQuickActions() {
     // Quick action buttons
     const quickActions = document.querySelectorAll('.quick-action');
-    
+
     quickActions.forEach(action => {
-        action.addEventListener('click', function(e) {
+        action.addEventListener('click', function (e) {
             const actionType = this.getAttribute('data-action');
             handleQuickAction(actionType);
         });
@@ -132,7 +132,7 @@ function initializeQuickActions() {
 }
 
 function handleQuickAction(actionType) {
-    switch(actionType) {
+    switch (actionType) {
         case 'new-listing':
             window.location.href = '/landlord/properties/new';
             break;
@@ -153,12 +153,12 @@ function handleQuickAction(actionType) {
 function initializeRecentActivity() {
     // Add click handlers for recent activity items
     const activityItems = document.querySelectorAll('.activity-item');
-    
+
     activityItems.forEach(item => {
-        item.addEventListener('click', function() {
+        item.addEventListener('click', function () {
             const activityType = this.getAttribute('data-type');
             const activityId = this.getAttribute('data-id');
-            
+
             if (activityType === 'booking') {
                 window.location.href = `/landlord/bookings/${activityId}`;
             } else if (activityType === 'message') {
@@ -173,11 +173,11 @@ function initializeRecentActivity() {
 function initializeNotifications() {
     // Handle notification interactions
     const notificationItems = document.querySelectorAll('.notification-item');
-    
+
     notificationItems.forEach(item => {
         const markReadBtn = item.querySelector('.mark-read');
         if (markReadBtn) {
-            markReadBtn.addEventListener('click', function(e) {
+            markReadBtn.addEventListener('click', function (e) {
                 e.stopPropagation();
                 const notificationId = this.getAttribute('data-id');
                 markNotificationAsRead(notificationId, item);
@@ -192,13 +192,13 @@ function markNotificationAsRead(notificationId, element) {
     const originalText = btn.innerHTML;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
     btn.disabled = true;
-    
+
     // Simulate API call
     setTimeout(() => {
         element.classList.add('opacity-50');
         element.classList.add('line-through');
         btn.innerHTML = '<i class="fas fa-check text-green-500"></i>';
-        
+
         // Remove from DOM after animation
         setTimeout(() => {
             element.remove();
@@ -210,11 +210,11 @@ function markNotificationAsRead(notificationId, element) {
 function updateNotificationCount() {
     const countElement = document.getElementById('notification-count');
     const notifications = document.querySelectorAll('.notification-item');
-    
+
     if (countElement) {
         const newCount = Math.max(0, parseInt(countElement.textContent) - 1);
         countElement.textContent = newCount;
-        
+
         if (newCount === 0) {
             countElement.classList.add('hidden');
         }

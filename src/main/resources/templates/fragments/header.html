@@ -8,10 +8,12 @@
                 <div class="flex items-center space-x-8">
                     <a th:href="@{/}" class="text-2xl font-bold text-blue-600">RentEase</a>
                     <div class="hidden md:flex space-x-8">
-                        <a th:href="@{/}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
+                        <a th:href="@{/}"
+                           class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
                             <i class="fas fa-home mr-1"></i>Home
                         </a>
-                        <a th:href="@{/properties/search}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
+                        <a th:href="@{/properties/search}"
+                           class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
                             <i class="fas fa-building mr-1"></i>Properties
                         </a>
 
@@ -60,26 +62,30 @@
                         <!-- Notifications -->
                         <button class="relative text-gray-400 hover:text-gray-600 transition-colors duration-200">
                             <i class="fas fa-bell text-lg"></i>
-                            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">3</span>
+                            <span
+                                class="notification-count absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center hidden">0</span>
                         </button>
 
                         <!-- User Dropdown -->
                         <div class="relative group">
-                            <button class="flex items-center space-x-2 text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
-                                <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-semibold">
-                                    <span sec:authentication="name" th:text="${#strings.substring(#authentication.name, 0, 1).toUpperCase()}">U</span>
+                            <button
+                                class="flex items-center space-x-2 text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
+                                <div
+                                    class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-semibold">
+                                    <span th:text="${#strings.substring(currentUser.name, 0, 1).toUpperCase()}">U</span>
                                 </div>
-                                <span sec:authentication="name" class="hidden lg:block"></span>
+                                <span th:text="${currentUser.name}" class="hidden lg:block"></span>
                                 <i class="fas fa-chevron-down text-xs"></i>
                             </button>
 
                             <!-- Dropdown Menu -->
-                            <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                            <div
+                                class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                                 <div class="py-1">
                                     <!-- User Info -->
                                     <div class="px-4 py-2 border-b border-gray-100">
-                                        <p class="text-sm font-medium text-gray-900" sec:authentication="name"></p>
-                                        <p class="text-xs text-gray-500" sec:authentication="principal.authorities"></p>
+                                        <p class="text-sm font-medium text-gray-900" th:text="${currentUser.name}"></p>
+                                        <p class="text-xs text-gray-500" th:text="${currentUser.role}"></p>
                                     </div>
 
                                     <!-- Profile Link -->
@@ -123,7 +129,8 @@
 
                 <!-- Mobile menu button -->
                 <div class="flex md:hidden">
-                    <button type="button" class="mobile-menu-button inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 transition-colors duration-200">
+                    <button type="button"
+                            class="mobile-menu-button inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 transition-colors duration-200">
                         <span class="sr-only">Open main menu</span>
                         <i class="fas fa-bars"></i>
                     </button>
@@ -135,10 +142,12 @@
         <div class="md:hidden hidden mobile-menu">
             <div class="px-2 pt-2 pb-3 space-y-1 bg-white border-t border-gray-200">
                 <!-- Navigation Links -->
-                <a th:href="@{/}" class="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">
+                <a th:href="@{/}"
+                   class="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">
                     <i class="fas fa-home mr-2"></i>Home
                 </a>
-                <a th:href="@{/properties/search}" class="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">
+                <a th:href="@{/properties/search}"
+                   class="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">
                     <i class="fas fa-building mr-2"></i>Properties
                 </a>
 
@@ -153,7 +162,7 @@
                     <i class="fas fa-key mr-2"></i>My Properties
                 </a>
 
-                <a sec:authorize="hasRole('USER')" th:href="@{/user/my-bookings}"
+                <a th:href="@{/my-bookings}"
                    class="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">
                     <i class="fas fa-calendar-check mr-2"></i>My Bookings
                 </a>
@@ -167,10 +176,12 @@
                 <div class="border-t border-gray-200 pt-4">
                     <!-- When NOT authenticated -->
                     <div sec:authorize="!isAuthenticated()" class="space-y-2">
-                        <a th:href="@{/login}" class="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">
+                        <a th:href="@{/login}"
+                           class="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">
                             <i class="fas fa-sign-in-alt mr-2"></i>Sign In
                         </a>
-                        <a th:href="@{/register}" class="bg-blue-600 text-white block px-3 py-2 rounded-md text-base font-medium hover:bg-blue-700">
+                        <a th:href="@{/register}"
+                           class="bg-blue-600 text-white block px-3 py-2 rounded-md text-base font-medium hover:bg-blue-700">
                             <i class="fas fa-user-plus mr-2"></i>Get Started
                         </a>
                     </div>
@@ -186,14 +197,16 @@
                         <a th:href="@{/user/profile}" class="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">
                             <i class="fas fa-user mr-2"></i>Profile
                         </a>
-                        <a th:href="@{/user/settings}" class="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">
+                        <a th:href="@{/user/settings}"
+                           class="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">
                             <i class="fas fa-cog mr-2"></i>Settings
                         </a>
 
                         <!-- Logout -->
                         <form th:action="@{/logout}" method="post" class="px-3">
-                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-                            <button type="submit" class="text-red-600 hover:text-red-800 block w-full text-left py-2 rounded-md text-base font-medium">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                            <button type="submit"
+                                    class="text-red-600 hover:text-red-800 block w-full text-left py-2 rounded-md text-base font-medium">
                                 <i class="fas fa-sign-out-alt mr-2"></i>Sign Out
                             </button>
                         </form>
@@ -203,4 +216,5 @@
         </div>
     </nav>
 </div>
-</html> 
+
+</html>

@@ -1,10 +1,14 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${title} ?: 'RentEase'">RentEase</title>
+
+    <!-- User ID for WebSocket notifications -->
+    <meta name="user-id" th:content="${currentUser.id}" sec:authorize="isAuthenticated()">
 
     <!-- Custom CSS -->
     <link th:href="@{/css/main.css}" rel="stylesheet">
@@ -15,22 +19,27 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
+    <!-- WebSocket Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.6.1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+
     <!-- Custom JS -->
     <script type="module" th:src="@{/js/main.js}" defer></script>
+    <script th:src="@{/js/notifications.js}" defer></script>
 </head>
-<body class="min-h-screen flex flex-col bg-gray-50">
-<!-- Header -->
-<header th:replace="~{fragments/header :: header}"></header>
 
-<!-- Main Content -->
-<main class="flex-1">
-    <div th:replace="~{fragments/messages :: messages}"></div>
-    <div layout:fragment="content"></div>
-</main>
+<body class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <header th:replace="~{fragments/header :: header}"></header>
 
-<!-- Footer -->
-<footer class="mt-auto" th:replace="~{fragments/footer :: footer}"></footer>
-<!-- Page-specific scripts -->
-<div layout:fragment="script"></div>
+    <!-- Main Content -->
+    <main>
+        <div th:replace="~{fragments/messages :: messages}"></div>
+        <div layout:fragment="content"></div>
+    </main>
+
+    <!-- Footer -->
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
 </body>
+
 </html>
