@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/admin}">
+<head>
+    <title>Manage Transactions - Admin Dashboard</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="p-6">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-white">Manage Transactions</h1>
+                <p class="text-gray-300 mt-2">Monitor payment processing and financial transactions</p>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-gray-800 rounded-lg shadow-md p-6 border border-gray-700">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-blue-900 text-blue-300">
+                        <i class="fas fa-credit-card text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-300">Total Revenue</p>
+                        <p th:text="${stats.revenue}" class="text-2xl font-bold text-white">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-800 rounded-lg shadow-md p-6 border border-gray-700">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-green-900 text-green-300">
+                        <i class="fas fa-check-circle text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-300">Total deposit transaction</p>
+                        <p th:text="${stats.totalDepositTransaction}" class="text-2xl font-bold text-white">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-800 rounded-lg shadow-md p-6 border border-gray-700">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-yellow-900 text-yellow-300">
+                        <i class="fas fa-clock text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-300">Total user deposit</p>
+                        <p th:text="${stats.totalUserDeposit}" class="text-2xl font-bold text-white">78</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Filter row -->
+        <form th:object="${transactionRequest}" method="get" action="/admin/transactions"
+              class="flex flex-row items-end gap-2 mb-6 w-full">
+
+            <!-- Type -->
+            <div class="flex flex-col w-full" style="max-width:18%">
+                <label for="type" class="block text-xs font-medium text-gray-300 mb-1">Type</label>
+                <select id="type" th:field="*{type}"
+                        class="border border-gray-600 rounded-md px-2 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-800 text-white">
+                    <option value="">All</option>
+                    <option th:each="t : ${types}" th:value="${t}" th:text="${t}"></option>
+                </select>
+                <span th:if="${#fields.hasErrors('type')}" th:errors="*{type}"
+                      class="text-red-500 text-xs min-h-[18px] mt-1"></span>
+            </div>
+
+            <!-- Amount from -->
+            <div class="flex flex-col w-full" style="max-width:15%">
+                <label for="amountFrom" class="block text-xs font-medium text-gray-300 mb-1">Amount from</label>
+                <input type="number" id="amountFrom" th:field="*{amountFrom}"
+                       class="border border-gray-600 rounded-md px-2 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-800 text-white"
+                       min="1">
+                <span th:if="${#fields.hasErrors('amountFrom')}" th:errors="*{amountFrom}"
+                      class="text-red-500 text-xs min-h-[18px] mt-1"></span>
+            </div>
+
+            <!-- Amount to -->
+            <div class="flex flex-col w-full" style="max-width:15%">
+                <label for="amountTo" class="block text-xs font-medium text-gray-300 mb-1">Amount to</label>
+                <input type="number" id="amountTo" th:field="*{amountTo}"
+                       class="border border-gray-600 rounded-md px-2 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-800 text-white"
+                       min="1">
+                <span th:if="${#fields.hasErrors('amountTo')}" th:errors="*{amountTo}"
+                      class="text-red-500 text-xs min-h-[18px] mt-1"></span>
+            </div>
+
+            <!-- Date from -->
+            <div class="flex flex-col w-full" style="max-width:20%">
+                <label for="dateFrom" class="block text-xs font-medium text-gray-300 mb-1">Date from</label>
+                <input type="date" id="dateFrom" th:field="*{dateFrom}"
+                       class="border border-gray-600 rounded-md px-2 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-800 text-white">
+                <span th:if="${#fields.hasErrors('dateFrom')}" th:errors="*{dateFrom}"
+                      class="text-red-500 text-xs min-h-[18px] mt-1"></span>
+            </div>
+
+            <!-- Date to -->
+            <div class="flex flex-col w-full" style="max-width:20%">
+                <label for="dateTo" class="block text-xs font-medium text-gray-300 mb-1">Date to</label>
+                <input type="date" id="dateTo" th:field="*{dateTo}"
+                       class="border border-gray-600 rounded-md px-2 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-800 text-white">
+                <span th:if="${#fields.hasErrors('dateTo')}" th:errors="*{dateTo}"
+                      class="text-red-500 text-xs min-h-[18px] mt-1"></span>
+            </div>
+
+            <!-- User email -->
+            <div class="flex flex-col w-full" style="max-width:22%">
+                <label for="userEmail" class="block text-xs font-medium text-gray-300 mb-1">User Email</label>
+                <input type="text" id="userEmail" th:field="*{userEmail}"
+                       placeholder="Search by email..."
+                       class="border border-gray-600 rounded-md px-2 py-2 w-full bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <span th:if="${#fields.hasErrors('userEmail')}" th:errors="*{userEmail}"
+                      class="text-red-500 text-xs min-h-[18px] mt-1"></span>
+            </div>
+
+            <!-- Submit -->
+            <div class="flex flex-col w-full justify-end" style="max-width:12%">
+                <button type="submit"
+                        class="bg-blue-600 text-white w-full py-2 rounded-md font-medium hover:bg-blue-700 transition-colors duration-200 shadow mt-auto">
+                    Filter
+                </button>
+            </div>
+        </form>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-base divide-y-2 divide-gray-700 rounded-lg bg-gray-800">
+                <thead class="bg-gray-700 text-base">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Type
+                    </th>
+                    <th class="px-6 py-3 text-right text-xs font-semibold text-gray-300 uppercase tracking-wider">
+                        Amount
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">
+                        User
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">
+                        Description
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Date
+                    </th>
+                    <th class="px-6 py-3 text-right text-xs font-semibold text-gray-300 uppercase tracking-wider">
+                        Balance
+                    </th>
+                </tr>
+                </thead>
+                <tbody class="bg-gray-800 divide-y-2 divide-gray-700">
+                <!--/* @thymesVar id="tx" type="com.rental.houserental.dto.response.transaction.TransactionResponseDTO" */-->
+                <tr th:each="tx : ${transactions.content}" class="border-b border-gray-200 hover:bg-gray-700 transition">
+                    <td class="px-6 py-4 whitespace-nowrap font-semibold uppercase text-left"
+                        th:text="${tx.type}"
+                        th:classappend="
+                                ${tx.type == 'DEPOSIT'} ? 'text-green-600' :
+                                (${tx.type == 'WITHDRAW'} ? 'text-yellow-500' :
+                                (${tx.type == 'PAYMENT'} ? 'text-blue-600' :
+                                (${tx.type == 'REFUND'} ? 'text-red-500' : 'text-gray-700')))
+                            ">
+                        DEPOSIT
+                    </td>
+                    <td class="px-6 py-4 text-gray-300 whitespace-nowrap text-right font-semibold"
+                        th:text="${tx.amount % 1 == 0} ? ${#numbers.formatInteger(tx.amount, 0, 'COMMA')} + '₫' : ${#numbers.formatDecimal(tx.amount, 0, 'COMMA', 2, 'POINT')} + '₫'">
+                        1,000,000₫
+                    </td>
+                    <td class="px-6 py-4 text-gray-300 whitespace-nowrap text-left font-semibold"
+                        style="max-width: 350px;">
+                        <span th:text="${tx.userEmail}">user@gmail.com</span>
+                    </td>
+                    <td class="px-6 py-4 text-gray-300 whitespace-nowrap text-left font-semibold"
+                        style="max-width: 350px;">
+                        <span th:text="${tx.description}">Top up wallet</span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-gray-400 text-left"
+                        th:text="${#dates.format(tx.date, 'HH:mm dd/MM/yyyy')}">
+                        09:12 07/08/2025
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right font-semibold text-blue-400"
+                        th:text="${tx.balanceAfter % 1 == 0} ? ${#numbers.formatInteger(tx.balanceAfter, 0, 'COMMA')} + '₫' : ${#numbers.formatDecimal(tx.balanceAfter, 0, 'COMMA', 2, 'POINT')} + '₫'">
+                        2,000,000₫
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(transactions)}">
+                    <td colspan="5" class="px-6 py-4 text-center text-gray-400">No transactions found</td>
+
+                </tbody>
+            </table>
+            <div class="mt-4 flex justify-end space-x-2" th:if="${transactions.totalPages > 0}">
+                <div class="mt-4 flex justify-end space-x-2">
+                    <a th:if="${transactions.hasPrevious()}"
+                       th:href="@{/admin/transactions(page=${transactions.number - 1}, size=${transactions.size}, size=${transactions.size},
+                        type=${transactionRequest.type},
+                        amountFrom=${transactionRequest.amountFrom},
+                        amountTo=${transactionRequest.amountTo},
+                        dateFrom=${transactionRequest.dateFrom},
+                        dateTo=${transactionRequest.dateTo})}"
+                       class="px-3 py-1 rounded border text-gray-600 hover:bg-gray-100">
+                        &laquo; Prev
+                    </a>
+
+                    <a th:each="i : ${#numbers.sequence(0, transactions.totalPages - 1)}"
+                       th:href="@{/admin/transactions(
+                        page=${i},
+                        size=${transactions.size},
+                        type=${transactionRequest.type},
+                        amountFrom=${transactionRequest.amountFrom},
+                        amountTo=${transactionRequest.amountTo},
+                        dateFrom=${transactionRequest.dateFrom},
+                        dateTo=${transactionRequest.dateTo}
+                    )}"
+                       th:text="${i + 1}"
+                       th:classappend="${i == transactions.number} ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-gray-100'"
+                       class="px-3 py-1 rounded border">
+                    </a>
+
+                    <a th:if="${transactions.hasNext()}"
+                       th:href="@{/admin/transactions(page=${transactions.number + 1}, size=${transactions.size}, size=${transactions.size},
+                        type=${transactionRequest.type},
+                        amountFrom=${transactionRequest.amountFrom},
+                        amountTo=${transactionRequest.amountTo},
+                        dateFrom=${transactionRequest.dateFrom},
+                        dateTo=${transactionRequest.dateTo})}"
+                       class="px-3 py-1 rounded border text-gray-600 hover:bg-gray-100">
+                        Next &raquo;
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

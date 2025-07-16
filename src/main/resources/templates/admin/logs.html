@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/admin}">
+<head>
+    <title th:text="${title}">System Logs - Admin Dashboard</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="p-6">
+            <!-- Header -->
+            <div class="flex justify-between items-center mb-8">
+                <div>
+                    <h1 class="text-3xl font-bold text-white">System Logs</h1>
+                    <p class="text-gray-300 mt-2">Monitor system activity and troubleshoot issues</p>
+                </div>
+                <div class="flex space-x-2">
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                        <i class="fas fa-download mr-2"></i>Export Logs
+                    </button>
+                    <button class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700">
+                        <i class="fas fa-trash mr-2"></i>Clear Logs
+                    </button>
+                </div>
+            </div>
+
+            <!-- Log Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-gray-800 rounded-lg shadow-md p-6 border border-gray-700">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-blue-900 text-blue-300">
+                            <i class="fas fa-info-circle text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-300">Info Logs</p>
+                            <p class="text-2xl font-bold text-white">1,234</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-800 rounded-lg shadow-md p-6 border border-gray-700">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-yellow-900 text-yellow-300">
+                            <i class="fas fa-exclamation-triangle text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-300">Warnings</p>
+                            <p class="text-2xl font-bold text-white">45</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-800 rounded-lg shadow-md p-6 border border-gray-700">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-red-900 text-red-300">
+                            <i class="fas fa-times-circle text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-300">Errors</p>
+                            <p class="text-2xl font-bold text-white">12</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-800 rounded-lg shadow-md p-6 border border-gray-700">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-purple-900 text-purple-300">
+                            <i class="fas fa-shield-alt text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-300">Security</p>
+                            <p class="text-2xl font-bold text-white">8</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="bg-gray-800 rounded-lg shadow-md p-6 mb-8 border border-gray-700">
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1">Log Level</label>
+                        <select class="w-full px-3 py-2 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 text-white">
+                            <option>All Levels</option>
+                            <option>INFO</option>
+                            <option>WARNING</option>
+                            <option>ERROR</option>
+                            <option>SECURITY</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1">Module</label>
+                        <select class="w-full px-3 py-2 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 text-white">
+                            <option>All Modules</option>
+                            <option>Authentication</option>
+                            <option>Payment</option>
+                            <option>Property</option>
+                            <option>User</option>
+                            <option>System</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1">Date Range</label>
+                        <select class="w-full px-3 py-2 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 text-white">
+                            <option>Last 24 hours</option>
+                            <option>Last 7 days</option>
+                            <option>Last 30 days</option>
+                            <option>Custom range</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1">Search</label>
+                        <input type="text" placeholder="Search logs..." class="w-full px-3 py-2 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 text-white">
+                    </div>
+                    <div class="flex items-end">
+                        <button class="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                            <i class="fas fa-search mr-2"></i>Filter
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Logs Table -->
+            <div class="bg-gray-800 rounded-lg shadow-md overflow-hidden border border-gray-700">
+                <div class="px-6 py-4 border-b border-gray-600">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-lg font-semibold text-white">System Logs</h3>
+                        <div class="flex space-x-2">
+                            <button class="text-gray-300 hover:text-white">
+                                <i class="fas fa-sync mr-1"></i>Refresh
+                            </button>
+                            <button class="text-gray-300 hover:text-white">
+                                <i class="fas fa-filter mr-1"></i>Filter
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-600">
+                        <thead class="bg-gray-700">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Timestamp</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Level</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Module</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">User</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Message</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">IP Address</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-gray-800 divide-y divide-gray-600">
+                            <tr class="hover:bg-gray-700">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    2024-01-15 14:30:25
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">INFO</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Authentication</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">john.doe@email.com</td>
+                                <td class="px-6 py-4 text-sm text-gray-900">User successfully logged in</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">192.168.1.100</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <button class="text-blue-600 hover:text-blue-900">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    2024-01-15 14:28:10
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">WARNING</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Payment</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">sarah.j@email.com</td>
+                                <td class="px-6 py-4 text-sm text-gray-900">Payment processing delayed</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">192.168.1.101</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <button class="text-blue-600 hover:text-blue-900">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    2024-01-15 14:25:45
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">ERROR</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">System</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">system</td>
+                                <td class="px-6 py-4 text-sm text-gray-900">Database connection timeout</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">127.0.0.1</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <button class="text-blue-600 hover:text-blue-900">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    2024-01-15 14:20:15
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 py-1 text-xs rounded-full bg-purple-100 text-purple-800">SECURITY</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Authentication</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">unknown</td>
+                                <td class="px-6 py-4 text-sm text-gray-900">Failed login attempt from suspicious IP</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">203.0.113.45</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <button class="text-blue-600 hover:text-blue-900">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    2024-01-15 14:15:30
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">INFO</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Property</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">michael.chen@email.com</td>
+                                <td class="px-6 py-4 text-sm text-gray-900">New property listing created</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">192.168.1.102</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <button class="text-blue-600 hover:text-blue-900">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <p class="text-sm text-gray-700">
+                                Showing <span class="font-medium">1</span> to <span class="font-medium">10</span> of <span class="font-medium">1,234</span> results
+                            </p>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button class="px-3 py-2 text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button class="px-3 py-2 text-white bg-blue-600 border border-blue-600 rounded-md">1</button>
+                            <button class="px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">2</button>
+                            <button class="px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">3</button>
+                            <button class="px-3 py-2 text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

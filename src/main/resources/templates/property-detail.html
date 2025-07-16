@@ -65,10 +65,11 @@
 
                     <!-- Action Buttons -->
                     <div class="flex flex-wrap gap-3 mb-6 items-center">
-                        <button th:if="${property.getPropertyStatus() != 'BOOKED'}" sec:authorize="isAuthenticated()"
-                                class="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 font-medium transition-colors duration-200 flex items-center gap-2">
+                        <!-- Nút Book Now nổi bật nhất -->
+                        <a th:if="${property.getPropertyStatus() != 'BOOKED'}" sec:authorize="isAuthenticated()" th:href="@{'/booking/' + ${property.id}}"
+                                class="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 font-medium transition-colors duration-200 flex items-center gap-2" style="text-decoration: none;">
                             <i class="fas fa-calendar-check mr-2"></i>Book Now
-                        </button>
+                        </a>
 
                         <button th:if="${property.getPropertyStatus() == 'BOOKED'}"
                                 class="bg-gray-300 text-gray-500 px-8 py-3 text-lg rounded-xl cursor-not-allowed font-semibold transition-colors duration-200 flex items-center gap-2">

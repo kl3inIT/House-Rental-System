@@ -52,11 +52,11 @@ public class RentalProperty extends BaseEntity {
     @Column(name = "Description", nullable = false, columnDefinition = "NVARCHAR(2000)")
     private String description;
 
-    @Column(name = "Furnishing", nullable = false, length = 20)
+    @Column(name = "Furnishing", length = 20)
     @Enumerated(EnumType.STRING)
     private FurnishingType furnishing; // "FULL", "BASIC", "NONE"
 
-    @Column(name = "DepositPercentage", nullable = false)
+    @Column(name = "DepositPercentage")
     private Integer depositPercentage;
 
     @Column(name = "Latitude")
@@ -77,7 +77,7 @@ public class RentalProperty extends BaseEntity {
     @Column(name = "PublishedAt")
     private LocalDateTime publishedAt;
 
-    @Column(name = "Views", nullable = false)
+    @Column(name = "Views")
     private Integer views = 0;
 
     @OneToMany(mappedBy = "rentalProperty", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)

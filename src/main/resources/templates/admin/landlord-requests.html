@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/admin}">
+<head>
+    <title th:text="${title}">Landlord Requests - Admin Dashboard</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="p-6">
+            <!-- Header -->
+            <div class="flex justify-between items-center mb-8">
+                <div>
+                    <h1 class="text-3xl font-bold text-white">Landlord Requests</h1>
+                    <p class="text-gray-300 mt-2">Review and approve user requests to become landlords</p>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-gray-800 rounded-lg shadow-md p-6 border border-gray-700">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-blue-900 text-blue-300">
+                            <i class="fas fa-user-plus text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-300">Total Requests</p>
+                            <p class="text-2xl font-bold text-white" th:text="${requests.size()}">15</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-800 rounded-lg shadow-md p-6 border border-gray-700">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-yellow-900 text-yellow-300">
+                            <i class="fas fa-clock text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-300">Pending</p>
+                            <p class="text-2xl font-bold text-white" th:text="${pendingCount}">12</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-800 rounded-lg shadow-md p-6 border border-gray-700">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-green-900 text-green-300">
+                            <i class="fas fa-check-circle text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-300">Approved</p>
+                            <p class="text-2xl font-bold text-white" th:text="${approvedCount}">3</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-800 rounded-lg shadow-md p-6 border border-gray-700">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-red-900 text-red-300">
+                            <i class="fas fa-times-circle text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-300">Rejected</p>
+                            <p class="text-2xl font-bold text-white" th:text="${rejectedCount}">0</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Requests List -->
+            <div class="space-y-6">
+                <div th:each="request : ${requests}" class="bg-gray-800 rounded-lg shadow-md overflow-hidden border border-gray-700"
+                     th:class="|bg-gray-800 rounded-lg shadow-md overflow-hidden border border-gray-700 ${
+                       request.status == 'Pending' ? 'border-l-4 border-yellow-400' :
+                       request.status == 'Approved' ? 'border-l-4 border-green-400' :
+                       'border-l-4 border-red-400'
+                     }|">
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="flex items-center">
+                                <img src="/placeholder.svg?height=48&width=48" alt="User" class="w-12 h-12 rounded-full mr-4">
+                                <div>
+                                    <h3 class="text-lg font-semibold text-white" th:text="${request.userName}">Michael Chen</h3>
+                                    <p class="text-gray-300" th:text="${request.userEmail}">michael.chen@email.com</p>
+                                    <p class="text-sm text-gray-400">Requested: <span th:text="${request.requestDate}">Jan 15, 2024</span></p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <span th:class="|px-3 py-1 text-sm rounded-full ${
+                                  request.status == 'Pending' ? 'bg-yellow-900 text-yellow-300' :
+                                  request.status == 'Approved' ? 'bg-green-900 text-green-300' :
+                                  'bg-red-900 text-red-300'
+                                }|" 
+                                      th:text="${request.status}">Pending</span>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <h4 class="font-medium text-white mb-2">Reason for Request:</h4>
+                            <p class="text-gray-300" th:text="${request.reason}">I own several properties and want to list them for rent</p>
+                        </div>
+
+                        <div class="mb-4">
+                            <h4 class="font-medium text-white mb-2">Documents Provided:</h4>
+                            <p class="text-gray-300" th:text="${request.documents}">Property ownership certificates, ID verification</p>
+                        </div>
+
+                        <div class="flex flex-wrap gap-2">
+                            <button class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 text-sm">
+                                <i class="fas fa-eye mr-1"></i>View Details
+                            </button>
+                            <button class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 text-sm">
+                                <i class="fas fa-check mr-1"></i>Approve
+                            </button>
+                            <button class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 text-sm">
+                                <i class="fas fa-times mr-1"></i>Reject
+                            </button>
+                            <button class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 text-sm">
+                                <i class="fas fa-envelope mr-1"></i>Contact User
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="flex justify-center mt-8">
+                <nav class="flex space-x-2">
+                    <button class="px-3 py-2 text-gray-400 bg-gray-800 border border-gray-600 rounded-md hover:bg-gray-700">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="px-3 py-2 text-white bg-blue-600 border border-blue-600 rounded-md">1</button>
+                    <button class="px-3 py-2 text-gray-400 bg-gray-800 border border-gray-600 rounded-md hover:bg-gray-700">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 
