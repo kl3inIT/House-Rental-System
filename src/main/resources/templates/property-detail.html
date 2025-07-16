@@ -64,22 +64,39 @@
                     </div>
 
                     <!-- Action Buttons -->
-                    <div class="flex flex-wrap gap-3 mb-6">
-                        <button sec:authorize="isAuthenticated()" 
-                                class="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 font-medium transition-colors duration-200">
-                            <i class="fas fa-calendar-check mr-2"></i>Schedule Tour
+                    <div class="flex flex-wrap gap-3 mb-6 items-center">
+                        <!-- Nút Book Now nổi bật nhất -->
+                        <a th:if="${property.getPropertyStatus() != 'BOOKED'}" sec:authorize="isAuthenticated()" th:href="@{'/booking/' + ${property.id}}"
+                                class="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 font-medium transition-colors duration-200 flex items-center gap-2" style="text-decoration: none;">
+                            <i class="fas fa-calendar-check mr-2"></i>Book Now
+                        </a>
+
+                        <!-- Nếu đã booked -->
+                        <button th:if="${property.getPropertyStatus() == 'BOOKED'}"
+                                class="bg-gray-300 text-gray-500 px-8 py-3 text-lg rounded-xl cursor-not-allowed font-semibold transition-colors duration-200 flex items-center gap-2">
+                            <i class="fas fa-check text-xl"></i>
+                            Already Booked
                         </button>
+
+                        <!-- Contact Landlord -->
                         <button sec:authorize="isAuthenticated()"
-                                class="bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 font-medium transition-colors duration-200">
-                            <i class="fas fa-envelope mr-2"></i>Contact Landlord
+                                class="bg-white border border-green-600 text-green-700 px-6 py-3 rounded-md hover:bg-green-50 font-medium flex items-center gap-2 transition-colors duration-200">
+                            <i class="fas fa-envelope text-lg"></i>
+                            Contact Landlord
                         </button>
+
+                        <!-- Save Property -->
                         <button sec:authorize="isAuthenticated()"
-                                class="border border-gray-300 text-gray-700 px-6 py-3 rounded-md hover:bg-gray-50 font-medium transition-colors duration-200">
-                            <i class="far fa-heart mr-2"></i>Save Property
+                                class="bg-white border border-gray-300 text-gray-600 px-6 py-3 rounded-md hover:bg-gray-50 font-medium flex items-center gap-2 transition-colors duration-200">
+                            <i class="far fa-heart text-lg"></i>
+                            Save Property
                         </button>
+
+                        <!-- Nếu chưa đăng nhập -->
                         <a sec:authorize="!isAuthenticated()" th:href="@{/login}"
-                           class="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 font-medium transition-colors duration-200">
-                            <i class="fas fa-sign-in-alt mr-2"></i>Login to Contact
+                           class="bg-blue-100 text-blue-600 px-6 py-3 rounded-md hover:bg-blue-200 font-medium flex items-center gap-2 transition-colors duration-200 border border-blue-200">
+                            <i class="fas fa-sign-in-alt text-lg"></i>
+                            Login to Book
                         </a>
                     </div>
 

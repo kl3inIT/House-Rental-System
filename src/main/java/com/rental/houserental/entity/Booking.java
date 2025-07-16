@@ -24,10 +24,13 @@ public class Booking extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "Status", nullable = false, length = 50)
     @Builder.Default
-    private BookingStatus status = BookingStatus.PENDING;
+    private BookingStatus status = BookingStatus.CONFIRMED;
+
+    @Column(name = "Deposit", nullable = false)
+    private Double deposit;
 
     @Column(name = "Amount", nullable = false)
-    private double amount;
+    private Double amount;
 
     @Column(name = "Note", columnDefinition = "TEXT")
     private String note;

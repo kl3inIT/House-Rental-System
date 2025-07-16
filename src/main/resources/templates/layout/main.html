@@ -18,17 +18,19 @@
     <!-- Custom JS -->
     <script type="module" th:src="@{/js/main.js}" defer></script>
 </head>
-<body class="min-h-screen bg-gray-50">
+<body class="min-h-screen flex flex-col bg-gray-50">
 <!-- Header -->
 <header th:replace="~{fragments/header :: header}"></header>
 
 <!-- Main Content -->
-<main>
+<main class="flex-1">
     <div th:replace="~{fragments/messages :: messages}"></div>
     <div layout:fragment="content"></div>
 </main>
 
 <!-- Footer -->
-<footer th:replace="~{fragments/footer :: footer}"></footer>
+<footer class="mt-auto" th:replace="~{fragments/footer :: footer}"></footer>
+<!-- Page-specific scripts -->
+<div layout:fragment="script"></div>
 </body>
-</html> 
+</html>

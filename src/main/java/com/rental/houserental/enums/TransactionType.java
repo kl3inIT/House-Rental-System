@@ -11,8 +11,10 @@ import java.util.Map;
 public enum TransactionType {
     DEPOSIT("Deposit", "User deposits money into the system."),
     WITHDRAW("Withdraw", "User withdraws money from the system."),
+    RECEIVE_PAYMENT("Receive Payment", "Landlord receives payment from user."),
     PAYMENT("Payment", "User pays for a rental property."),
-    REFUND("Refund", "Refund issued to the user.");
+    REFUND("Refund", "Refund issued to the user."),
+    RECEIVE_REFUND("Receive Refund", "User receives a refund for a payment.");
 
     private final String displayName;
     private final String description;

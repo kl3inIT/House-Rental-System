@@ -3,6 +3,7 @@ package com.rental.houserental.exceptions;
 import com.rental.houserental.exceptions.auth.*;
 import com.rental.houserental.exceptions.booking.InvalidBookingStatusException;
 import com.rental.houserental.exceptions.category.CategoryNotFoundException;
+import com.rental.houserental.exceptions.common.ResourceNotFoundException;
 import com.rental.houserental.exceptions.property.InvalidPropertyStatusException;
 import com.rental.houserental.exceptions.property.ImageUploadException;
 import com.rental.houserental.exceptions.property.FileDeleteException;
@@ -200,5 +201,12 @@ public class GlobalExceptionHandler {
         log.error("Unexpected error: {}", ex.getMessage());
         model.addAttribute(MESSAGE, "An unexpected error occurred. Please try again later.");
         return ERROR_500;
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public String handleResourceNotFoundException(ResourceNotFoundException ex, Model model) {
+        log.warn("Resource not found: {}", ex.getMessage());
+        model.addAttribute(MESSAGE, "The requested resource could not be found.");
+        return ERROR_404;
     }
 }

@@ -25,6 +25,8 @@ public class TransactionRequestDTO {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate dateTo;
 
+    private String userEmail;
+
     private int page = 0;
     private int size = 4;
 

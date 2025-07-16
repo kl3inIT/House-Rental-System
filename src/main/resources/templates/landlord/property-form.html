@@ -11,16 +11,21 @@
     <div class="p-6">
         <!-- Header -->
         <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">Add New Property</h1>
-            <p class="text-gray-600 mt-2">Fill in the details to list your property</p>
+            <h1 class="text-3xl font-bold text-gray-900"
+                th:text="${property.id == null ? 'Add New Property' : 'Update Property'}">
+            </h1>
+
+            <p class="text-gray-600 mt-2"
+               th:text="${property == null || property.id == null ? 'Fill in the details to list your property' :'Update details of your property'}"></p>
         </div>
 
-        <form th:action="@{/landlord/properties}" th:object="${property}" method="post" enctype="multipart/form-data"
-              class="space-y-8" id="property-form" novalidate>
+        <form th:action="@{${actionUrl}}"
+              th:object="${property}" method="post" enctype="multipart/form-data" class="space-y-8" id="property-form" novalidate>
             <!-- CSRF Token -->
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 
             <!-- Basic Information -->
+            <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
             <div class="bg-white rounded-lg shadow-md p-6">
                 <h2 class="text-xl font-semibold text-gray-900 mb-6">Basic Information</h2>
 
@@ -49,7 +54,7 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Monthly Rent ($) *</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Monthly Rent (VND) *</label>
                         <input type="number" th:field="*{monthlyRent}" required placeholder="1800" step="0.01" min="0"
                                data-validate="required,number,min:0"
                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
@@ -70,15 +75,9 @@
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Bedrooms *</label>
-                        <select th:field="*{bedrooms}" required data-validate="required"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            <option value="">Select bedrooms</option>
-                            <option value="0">Studio</option>
-                            <option value="1">1 Bedroom</option>
-                            <option value="2">2 Bedrooms</option>
-                            <option value="3">3 Bedrooms</option>
-                            <option value="4">4+ Bedrooms</option>
-                        </select>
+                        <input type="number" th:field="*{bedrooms}" required min="0" step="1"
+                               placeholder="Enter number of bedrooms"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         <div class="validation-error text-red-600 text-sm mt-1 hidden"></div>
                         <div th:if="${#fields.hasErrors('bedrooms')}" class="text-red-600 text-sm mt-1"
                              th:errors="*{bedrooms}"></div>
@@ -86,19 +85,53 @@
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Bathrooms *</label>
-                        <select th:field="*{bathrooms}" required data-validate="required"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            <option value="">Select bathrooms</option>
-                            <option value="1">1 Bathroom</option>
-                            <option value="2">2 Bathrooms</option>
-                            <option value="3">3 Bathrooms</option>
-                            <option value="4">4 Bathrooms</option>
-                            <option value="5">5+ Bathrooms</option>
-                        </select>
+                        <input type="number" th:field="*{bathrooms}" required min="1" step="1"
+                               placeholder="Enter number of bathrooms"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         <div class="validation-error text-red-600 text-sm mt-1 hidden"></div>
                         <div th:if="${#fields.hasErrors('bathrooms')}" class="text-red-600 text-sm mt-1"
                              th:errors="*{bathrooms}"></div>
                     </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Furnishing *</label>
+                        <select th:field="*{furnishing}" required
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option th:each="type : ${furnishingTypes}"
+                                    th:value="${type.code}"
+                                    th:text="${type.displayName}">
+                            </option>
+                        </select>
+                        <div th:if="${#fields.hasErrors('furnishing')}" class="text-red-600 text-sm mt-1"
+                             th:errors="*{furnishing}"></div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Deposit Percentage *</label>
+                        <div class="flex flex-col gap-2">
+                            <!-- Nhập tỷ lệ phần trăm đặt cọc -->
+                            <div id="depositByPercentage" class="mt-2">
+                                <input type="range" min="10" max="50" step="5" value="10" th:value="*{depositPercentage}" th:field="*{depositPercentage}" id="depositPercentage"
+                                       class="w-full">
+                                <div class="flex justify-between text-sm text-gray-600 mt-1">
+                                    <span>10%</span>
+                                    <span>50%</span>
+                                </div>
+                                <div class="text-sm text-gray-600 mt-2">
+                                    Deposit percentage: <span id="deposit-percentage-amount" class="font-semibold">10</span>%
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hiển thị số tiền cọc -->
+                    <div class="mt-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Deposit Amount (VND)</label>
+                        <div class="text-sm text-gray-600">
+                            Deposit amount: <span id="deposit-amount" class="font-semibold">0</span> VND
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
@@ -118,10 +151,11 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Tỉnh/Thành phố *</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Province/City *</label>
+                        <input type="hidden" id="province-value" th:value="*{province}" />
                         <select th:field="*{province}" required id="province-select" data-validate="required"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            <option value="">Chọn tỉnh/thành phố</option>
+                            <option value="">Select province/city</option>
                         </select>
                         <div class="validation-error text-red-600 text-sm mt-1 hidden"></div>
                         <div th:if="${#fields.hasErrors('province')}" class="text-red-600 text-sm mt-1"
@@ -129,16 +163,73 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Phường/Xã *</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Ward/Commune *</label>
+                        <input type="hidden" id="ward-value" th:value="*{ward}" />
                         <select th:field="*{ward}" required id="ward-select" disabled data-validate="required"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100">
-                            <option value="">Chọn tỉnh/thành phố trước</option>
+                            <option value="">Select province/city first</option>
                         </select>
                         <div class="validation-error text-red-600 text-sm mt-1 hidden"></div>
                         <div th:if="${#fields.hasErrors('ward')}" class="text-red-600 text-sm mt-1"
                              th:errors="*{ward}"></div>
                     </div>
                 </div>
+
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Select Location on Map *</label>
+                    <div id="map" style="height: 350px;" class="mb-2 rounded-lg border border-gray-300"></div>
+                    <input type="hidden" id="latitude" name="latitude" th:field="*{latitude}"/>
+                    <input type="hidden" id="longitude" name="longitude" th:field="*{longitude}"/>
+                </div>
+                <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBMKQc8KNgL_tzcdPYuvpTacsHtLDQrW3o"></script>
+                <script>
+                    let marker;
+                    function initMap() {
+                        // Lấy giá trị hiện tại của input (do Thymeleaf render ra)
+                        let lat = parseFloat(document.getElementById("latitude").value);
+                        let lng = parseFloat(document.getElementById("longitude").value);
+
+                        // Nếu chưa có thì lấy mặc định Hà Nội
+                        if (isNaN(lat) || isNaN(lng)) {
+                            lat = 21.0285;
+                            lng = 105.8542;
+                        }
+
+                        const defaultPos = { lat, lng };
+                        const map = new google.maps.Map(document.getElementById("map"), {
+                            zoom: 15,
+                            center: defaultPos,
+                        });
+
+                        marker = new google.maps.Marker({
+                            position: defaultPos,
+                            map,
+                            draggable: true,
+                        });
+
+                        marker.addListener("dragend", function (event) {
+                            document.getElementById("latitude").value = event.latLng.lat();
+                            document.getElementById("longitude").value = event.latLng.lng();
+                        });
+
+                        map.addListener("click", function (event) {
+                            marker.setPosition(event.latLng);
+                            document.getElementById("latitude").value = event.latLng.lat();
+                            document.getElementById("longitude").value = event.latLng.lng();
+                        });
+
+                        // Gán lại cho chắc chắn (để đúng value trên input khi mở form)
+                        document.getElementById("latitude").value = lat;
+                        document.getElementById("longitude").value = lng;
+                    }
+
+                    window.onload = function() {
+                        if (document.getElementById('map')) {
+                            initMap();
+                        }
+                    };
+                </script>
+
             </div>
 
             <!-- Description -->
@@ -188,6 +279,25 @@
                     <!-- Images will be previewed here via JavaScript with individual remove buttons -->
                 </div>
 
+                <!-- Preview old images when editing -->
+                <div id="image-preview-old" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+                    <div th:each="url, iterStat : ${oldImageUrls}"
+                         class="relative group bg-gray-100 rounded-lg shadow-sm flex flex-col items-center"
+                         th:attr="data-image-url=${url}">
+                        <img th:src="${url}" class="w-32 h-32 md:w-40 md:h-40 object-cover rounded-lg mx-auto"
+                             th:alt="'Property image ' + ${iterStat.index + 1}"/>
+                        <button type="button"
+                                class="remove-image-btn absolute -top-2 -right-2 w-7 h-7 bg-red-600 hover:bg-red-700 text-white rounded-full flex items-center justify-center transition"
+                                th:attr="data-image-url=${url}">
+                            <i class="fas fa-times text-sm font-bold"></i>
+                        </button>
+                        <div class="absolute bottom-1 left-1 bg-white text-gray-700 text-xs px-1.5 py-0.5 rounded font-medium shadow-sm">
+                            #<span th:text="${iterStat.index + 1}"></span>
+                        </div>
+                    </div>
+                </div>
+                <input type="hidden" name="oldImageUrls" id="oldImageUrls" th:value="${#strings.arrayJoin(oldImageUrls, ',')}">
+
                 <!-- Template for image preview item (hidden, used by JavaScript) -->
                 <template id="image-preview-template">
                     <div class="relative group bg-gray-100 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 flex flex-col items-center">
@@ -215,7 +325,8 @@
             <div class="flex flex-col sm:flex-row gap-4">
                 <button type="submit" id="submit-btn"
                         class="flex-1 bg-blue-600 text-white py-3 px-6 rounded-md hover:bg-blue-700 font-medium transition-colors duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed">
-                    <i class="fas fa-save mr-2"></i>Create Property
+                    <i class="fas fa-save mr-2"></i>
+                    <span th:text="${property.id == null ? 'Create Property' : 'Update Property'}"></span>
                 </button>
                 <a th:href="@{/landlord/dashboard}"
                    class="flex-1 text-center border border-gray-300 text-gray-700 py-3 px-6 rounded-md hover:bg-gray-50 font-medium transition-colors duration-200">

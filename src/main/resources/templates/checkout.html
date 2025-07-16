@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Booking - RentEase</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <style>
+        @keyframes fade-in {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .animate-fade-in {
+            animation: fade-in 0.2s ease-out;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center px-4">
+<div class="bg-white rounded-lg shadow-xl w-full max-w-2xl my-12">
+    <form id="bookingForm" class="p-6 space-y-6" th:object="${propertyBooking}" th:action="@{'/booking/' + ${propertyCheckout.id}}" method="post">
+        <!-- Hidden price/deposit -->
+        <input type="hidden" id="monthlyRent" th:value="${propertyCheckout.price}" value="1800000"/>
+        <input type="hidden" id="depositPercent" th:value="${propertyCheckout.percentageDeposit}" value="30"/>
+
+        <!-- Property Info -->
+        <input th:value="${propertyCheckout.id}" type="hidden" name="id">
+        <div class="flex items-center gap-4">
+            <img th:src="${propertyCheckout.image}" th:alt="${propertyCheckout.name}"
+                 alt="Property" class="w-20 h-20 rounded-lg object-cover"/>
+            <div>
+                <h2 th:text="${propertyCheckout.name}" class="text-xl font-semibold text-blue-800">Sunshine
+                    Apartment</h2>
+                <p th:text="${propertyCheckout.address}" class="text-sm text-gray-500">123 Main St, City Center</p>
+                <p th:text="${propertyCheckout.price} + ' VND/month'" class="text-sm text-gray-600">1,800,000
+                    VND/month</p>
+            </div>
+        </div>
+
+        <!-- Renter & Landlord -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Renter -->
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 flex gap-3">
+                <div class="w-12 h-12 bg-blue-200 rounded-full flex items-center justify-center">
+                    <i class="fas fa-user text-blue-700 text-xl"></i>
+                </div>
+                <div>
+                    <div class="font-semibold text-blue-900 flex items-center gap-2">
+                        <span th:text="${propertyCheckout.renterName}">Nguyen Van A</span>
+                        <span class="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded">Renter</span>
+                    </div>
+                    <div class="text-sm text-gray-600 mt-1 flex items-center gap-1">
+                        <i class="fas fa-envelope text-blue-400"></i>
+                        <span th:text="${propertyCheckout.renterEmail}">renter@example.com</span>
+                        <input type="hidden" th:value="${propertyCheckout.renterEmail}" name="renterEmail"/>
+                    </div>
+                    <div class="text-sm text-gray-600 mt-1 flex items-center gap-1">
+                        <i class="fas fa-phone text-blue-400"></i>
+                        <span th:text="${propertyCheckout.renterPhone}">0123456789</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Landlord -->
+            <div class="bg-green-50 border border-green-200 rounded-lg p-4 flex gap-3">
+                <div class="w-12 h-12 bg-green-200 rounded-full flex items-center justify-center">
+                    <i class="fas fa-user-tie text-green-700 text-xl"></i>
+                </div>
+                <div>
+                    <div class="font-semibold text-green-900 flex items-center gap-2">
+                        <span th:text="${propertyCheckout.landlordName}">Nguyen Van B</span>
+                        <span class="text-xs bg-green-100 text-green-600 px-2 py-0.5 rounded">Landlord</span>
+                    </div>
+                    <div class="text-sm text-gray-600 mt-1 flex items-center gap-1">
+                        <i class="fas fa-envelope text-green-400"></i>
+                        <span th:text="${propertyCheckout.landlordEmail}"
+                              name="landlordEmail">landlord@example.com</span>
+                        <input type="hidden" th:value="${propertyCheckout.landlordEmail}" name="landlordEmail"/>
+                    </div>
+                    <div class="text-sm text-gray-600 mt-1 flex items-center gap-1">
+                        <i class="fas fa-phone text-green-400"></i>
+                        <span th:text="${propertyCheckout.landlordPhone}">0987654321</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rental Date -->
+        <div>
+            <label class="font-medium text-gray-700 block mb-1">Start Date</label>
+            <input type="date" id="startDate" name="startDate"
+                   class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                   th:value="${propertyBooking.startDate != null ? propertyBooking.startDate : #dates.format(#dates.createNow(), 'yyyy-MM-dd')}" />
+        </div>
+
+        <!-- Rental Duration -->
+        <div>
+            <label class="font-medium text-gray-700 block mb-1">Number of Months</label>
+            <select id="months" th:field="*{durationInMonths}"
+                    class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                <option value="1">1 month</option>
+                <option value="2">2 months</option>
+                <option value="3">3 months</option>
+                <option value="6">6 months</option>
+                <option value="12">12 months</option>
+            </select>
+        </div>
+
+        <!-- Rental Period -->
+        <div class="flex items-center gap-2 bg-blue-50 px-4 py-3 rounded">
+            <i class="fas fa-calendar-alt text-blue-500"></i>
+            <span class="text-sm text-gray-700">Rental period:</span>
+            <span id="rentalPeriod" class="text-sm font-semibold text-blue-700">--/--/---- - --/--/----</span>
+        </div>
+
+        <!-- Note -->
+        <div>
+            <label class="font-medium text-gray-700 block mb-1">Note (optional)</label>
+            <textarea rows="2" th:text="${propertyBooking.note}"
+                      class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                      placeholder="Any special requests?"></textarea>
+        </div>
+
+        <!-- Pricing Breakdown -->
+        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+            <h3 class="font-medium text-gray-700 mb-2">Pricing Breakdown</h3>
+            <div class="flex justify-between text-sm mb-1">
+                <span>Monthly Rent</span>
+                <span th:text="${#numbers.formatDecimal(propertyCheckout.price, 0, 'COMMA', 0, 'POINT')} + ' VND'">1,800,000 VND</span>
+            </div>
+            <div class="flex justify-between text-sm mb-1">
+                <span>Total Rent</span>
+                <span id="summaryTotal">1,800,000 VND</span>
+                <input type="hidden" name="totalAmount" id="totalAmount" th:value="${propertyCheckout.price}"/>
+            </div>
+            <div class="flex justify-between text-sm mb-1">
+                <span th:text="'Deposit (' + ${propertyCheckout.percentageDeposit} + '%)'" name="depositAmount">Deposit (30%)</span>
+                <span id="summaryDeposit">540,000 VND</span>
+                <input type="hidden" name="depositAmount" id="depositAmount"
+                       th:value="${propertyCheckout.price} * ${propertyCheckout.percentageDeposit} / 100"/>
+            </div>
+        </div>
+
+        <!-- Payment Method -->
+        <div>
+            <label class="font-medium text-gray-700 block mb-1">Payment Method</label>
+            <div class="flex items-center border border-blue-500 bg-blue-50 rounded px-4 py-3 justify-between">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-wallet text-blue-600 text-xl"></i>
+                    <span class="font-semibold text-blue-700">Wallet</span>
+                    <span
+                            th:text="| (Balance: ${#numbers.formatDecimal(propertyCheckout.renterBalance, 0, 'COMMA', 0, 'POINT')} VND) |"
+                            class="text-xs text-gray-400 ml-2">
+                        (Balance: 2,000,000 VND)
+                    </span>
+                </div>
+                <a th:href="@{/wallet/deposit}" target="_blank">
+                    <button type="button"
+                            class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm flex items-center gap-1">
+                        <i class="fas fa-plus-circle"></i> Top Up
+                    </button>
+                </a>
+            </div>
+
+            <div th:if="${error}" class="text-red-600 text-sm mt-1 ml-1">
+                ⚠️ Your wallet balance is not enough to pay the deposit. Please top up.
+            </div>
+        </div>
+
+        <!-- Confirm Button -->
+        <button id="confirmBtn" type="button"
+                class="w-full bg-blue-600 text-white py-3 rounded font-semibold text-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 mt-2">
+            <i class="fas fa-check-circle"></i> Confirm & Pay <span id="summaryPay" class="ml-2">540,000 VND</span>
+        </button>
+    </form>
+</div>
+
+<!-- Confirmation Modal -->
+<div id="confirmationModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 animate-fade-in">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center">
+                <i class="fas fa-exclamation-circle text-2xl"></i>
+            </div>
+            <h2 class="text-xl font-bold text-gray-800">Confirm Your Booking</h2>
+        </div>
+        <div class="text-gray-700 text-sm leading-relaxed">
+            Are you sure you want to proceed with this booking?
+            <ul class="list-disc pl-5 mt-3 space-y-1">
+                <li><span class="font-medium text-blue-700">Full refund</span> if cancelled more than 24 hours before start date.</li>
+                <li><span class="font-medium text-red-600">Lose full of your deposit</span> if cancelled within 24 hours of the start date.</li>
+            </ul>
+        </div>
+        <div class="flex justify-end gap-3 mt-6">
+            <button id="cancelModal" type="button"
+                    class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition">
+                Cancel
+            </button>
+            <button id="confirmModal" type="button"
+                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
+                <i class="fas fa-check-circle"></i> Confirm & Continue
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const startDateInput = document.getElementById('startDate');
+        const today = new Date();
+        const todayStr = today.toISOString().split('T')[0];
+
+        // Tính ngày giới hạn tối đa (7 ngày kể từ hôm nay)
+        const maxDate = new Date();
+        maxDate.setDate(today.getDate() + 7);
+        const maxDateStr = maxDate.toISOString().split('T')[0];
+
+        // Gán min và max cho input
+        startDateInput.setAttribute('min', todayStr);
+        startDateInput.setAttribute('max', maxDateStr);
+
+        // Nếu người dùng nhập tay và vượt giới hạn thì reset về hôm nay
+        if (startDateInput.value < todayStr || startDateInput.value > maxDateStr) {
+            startDateInput.value = todayStr;
+        }
+
+        const monthsInput = document.getElementById('months');
+        const monthlyRent = parseInt(document.getElementById('monthlyRent').value);
+        const depositPercent = parseInt(document.getElementById('depositPercent').value);
+        const rentalPeriodSpan = document.getElementById('rentalPeriod');
+
+        function addMonths(dateStr, months) {
+            const date = new Date(dateStr);
+            const newDate = new Date(date.setMonth(date.getMonth() + months));
+            newDate.setDate(newDate.getDate() - 1);
+            return newDate;
+        }
+
+        function formatVND(amount) {
+            return amount.toLocaleString('vi-VN') + ' VND';
+        }
+
+        function formatDate(date) {
+            return new Date(date).toLocaleDateString('en-GB');
+        }
+
+        function updateSummary() {
+            const months = parseInt(monthsInput.value);
+            const startDate = startDateInput.value;
+            const total = months * monthlyRent;
+            const deposit = Math.round(total * depositPercent / 100);
+
+            document.getElementById('summaryTotal').innerText = formatVND(total);
+            document.getElementById('summaryDeposit').innerText = formatVND(deposit);
+            document.getElementById('summaryPay').innerText = formatVND(deposit);
+            document.getElementById('totalAmount').innerText = formatVND(total);
+            document.getElementById('depositAmount').innerText = formatVND(deposit);
+            if (startDate) {
+                const endDate = addMonths(startDate, months);
+                rentalPeriodSpan.innerText = `${formatDate(startDate)} - ${formatDate(endDate)}`;
+            } else {
+                rentalPeriodSpan.innerText = '';
+            }
+        }
+
+        monthsInput.addEventListener('change', updateSummary);
+        startDateInput.addEventListener('change', updateSummary);
+        updateSummary();
+    });
+
+
+    const confirmBtn = document.getElementById('confirmBtn');
+    const modal = document.getElementById('confirmationModal');
+    const cancelModal = document.getElementById('cancelModal');
+    const confirmModal = document.getElementById('confirmModal');
+    const bookingForm = document.getElementById('bookingForm');
+
+    // Show modal on click
+    confirmBtn.addEventListener('click', () => {
+        modal.classList.remove('hidden');
+    });
+
+    // Hide modal on cancel
+    cancelModal.addEventListener('click', () => {
+        modal.classList.add('hidden');
+    });
+
+    // Submit form on confirm
+    confirmModal.addEventListener('click', () => {
+        modal.classList.add('hidden');
+        bookingForm.submit();
+    });
+</script>
+</body>
+</html>

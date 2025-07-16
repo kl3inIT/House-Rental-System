@@ -1,5 +1,6 @@
 package com.rental.houserental.entity;
 
+import com.rental.houserental.enums.FurnishingType;
 import com.rental.houserental.enums.PropertyStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -49,6 +50,19 @@ public class RentalProperty extends BaseEntity {
     @Column(name = "Description", nullable = false, columnDefinition = "TEXT")
     private String description;
 
+    @Column(name = "Furnishing", length = 20)
+    @Enumerated(EnumType.STRING)
+    private FurnishingType furnishing; // "FULL", "BASIC", "NONE"
+
+    @Column(name = "DepositPercentage")
+    private Integer depositPercentage;
+
+    @Column(name = "Latitude")
+    private Double latitude;
+
+    @Column(name = "Longitude")
+    private Double longitude;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "PropertyStatus")
     @Builder.Default
@@ -60,6 +74,9 @@ public class RentalProperty extends BaseEntity {
 
     @Column(name = "PublishedAt")
     private LocalDateTime publishedAt;
+
+    @Column(name = "Views")
+    private Integer views = 0;
 
     @OneToMany(mappedBy = "rentalProperty", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @OrderBy("displayOrder ASC, createdAt ASC")
