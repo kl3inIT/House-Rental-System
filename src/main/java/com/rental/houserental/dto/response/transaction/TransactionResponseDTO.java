@@ -15,4 +15,5 @@ public class TransactionResponseDTO {
     private String receiver;
     private String date;
     private double balanceAfter;
+    private String userEmail;
 }

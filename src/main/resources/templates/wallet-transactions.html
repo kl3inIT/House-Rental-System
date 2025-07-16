@@ -96,7 +96,7 @@
                     th:text="${tx.amount % 1 == 0} ? ${#numbers.formatInteger(tx.amount, 0, 'COMMA')} + '₫' : ${#numbers.formatDecimal(tx.amount, 0, 'COMMA', 2, 'POINT')} + '₫'">
                     1,000,000₫
                 </td>
-                <td class="px-6 py-4 whitespace-pre-line text-gray-700 text-left" style="max-width: 350px;">
+                <td class="px-6 py-4  text-gray-700 text-left" style="max-width: 350px;">
                     <span th:text="${tx.description}">Top up wallet</span>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-gray-500 text-left"

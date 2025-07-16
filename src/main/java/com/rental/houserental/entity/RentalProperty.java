@@ -1,12 +1,15 @@
 package com.rental.houserental.entity;
 
+import com.rental.houserental.enums.FurnishingType;
 import com.rental.houserental.enums.PropertyStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -46,8 +49,21 @@ public class RentalProperty extends BaseEntity {
     @Column(name = "Province", nullable = false, columnDefinition = "NVARCHAR(100)")
     private String province;
 
-    @Column(name = "Description", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "Description", nullable = false, columnDefinition = "NVARCHAR(2000)")
     private String description;
+
+    @Column(name = "Furnishing", length = 20)
+    @Enumerated(EnumType.STRING)
+    private FurnishingType furnishing; // "FULL", "BASIC", "NONE"
+
+    @Column(name = "DepositPercentage")
+    private Integer depositPercentage;
+
+    @Column(name = "Latitude")
+    private Double latitude;
+
+    @Column(name = "Longitude")
+    private Double longitude;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "PropertyStatus")
@@ -60,6 +76,9 @@ public class RentalProperty extends BaseEntity {
 
     @Column(name = "PublishedAt")
     private LocalDateTime publishedAt;
+
+    @Column(name = "Views")
+    private Integer views = 0;
 
     @OneToMany(mappedBy = "rentalProperty", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @OrderBy("displayOrder ASC, createdAt ASC")
@@ -89,5 +108,14 @@ public class RentalProperty extends BaseEntity {
 
     @OneToMany(mappedBy = "rentalProperty", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Listing> listings = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "RentalPropertyAmenities",
+            joinColumns = @JoinColumn(name = "property_id"),
+            inverseJoinColumns = @JoinColumn(name = "amenity_id")
+    )
+    private Set<Amenity> amenities = new HashSet<>();
+
 
 }

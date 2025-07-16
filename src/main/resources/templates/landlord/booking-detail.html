@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/landlord}">
+<head>
+    <title>Manage Bookings - Landlord Dashboard</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="max-w-5xl mx-auto mt-10 p-8 bg-white rounded-lg shadow-md">
+        <h1 class="text-2xl font-bold text-blue-700 mb-6 flex items-center">
+            <i class="fas fa-file-invoice mr-2"></i>Booking Detail
+        </h1>
+
+        <!-- Property Info -->
+        <div class="mb-8">
+            <h2 class="text-lg font-semibold text-gray-700 mb-2 flex items-center">
+                <i class="fas fa-building mr-2"></i>Property Information
+            </h2>
+            <div class="flex items-center mb-2">
+                <img th:src="${bookingDetail.propertyImage}" alt="Property"
+                     class="w-16 h-16 rounded mr-4 object-cover">
+                <div>
+                    <div class="font-semibold text-gray-900" th:text="${bookingDetail.propertyName}">Property Name</div>
+                    <div class="text-sm text-gray-500" th:text="${bookingDetail.propertyAddress}">Address</div>
+                    <div class="text-xs text-gray-400">Monthly Price: <span
+                            th:text="${bookingDetail.propertyPrice} + ' VND'">123</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- User & Landlord Info -->
+        <div class="mb-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Renter -->
+            <div>
+                <h2 class="text-lg font-semibold text-gray-700 mb-2 flex items-center">
+                    <i class="fas fa-user mr-2"></i>Renter
+                </h2>
+                <div class="flex items-center mb-2">
+                    <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold mr-3">
+                        <span th:text="${#strings.substring(bookingDetail.renterName, 0, 1)}">N</span>
+                    </div>
+                    <div>
+                        <div class="font-semibold text-gray-900" th:text="${bookingDetail.renterName}">Nguyen Van Nhat
+                        </div>
+                        <div class="text-sm text-gray-500" th:text="${bookingDetail.renterEmail}">email</div>
+                        <div class="text-xs text-gray-400">Phone: <span
+                                th:text="${bookingDetail.renterPhone}">0987</span></div>
+                    </div>
+                </div>
+            </div>
+            <!-- Landlord -->
+            <div>
+                <h2 class="text-lg font-semibold text-gray-700 mb-2 flex items-center">
+                    <i class="fas fa-user-tie mr-2"></i>Landlord
+                </h2>
+                <div class="flex items-center mb-2">
+                    <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center text-white font-bold mr-3">
+                        <span th:text="${#strings.substring(bookingDetail.landlordName, 0, 1)}">L</span>
+                    </div>
+                    <div>
+                        <div class="font-semibold text-gray-900" th:text="${bookingDetail.landlordName}">Landlord Name
+                        </div>
+                        <div class="text-sm text-gray-500" th:text="${bookingDetail.landlordEmail}">email</div>
+                        <div class="text-xs text-gray-400">Phone: <span
+                                th:text="${bookingDetail.landlordPhone}">0912</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Booking Info -->
+        <div class="mb-8">
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-gray-500">Booking ID:</span>
+                <span class="font-mono font-semibold text-blue-700"
+                      th:text="'#' + ${bookingDetail.bookingId}">#001</span>
+            </div>
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-gray-500">Status:</span>
+                <span class="inline-block px-2 py-1 text-xs rounded bg-green-100 text-green-700 font-semibold"
+                      th:text="${bookingDetail.bookingStatus}">Confirmed</span>
+            </div>
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-gray-500">Booking Date:</span>
+                <span th:text="${#temporals.format(bookingDetail.bookingDate, 'HH:mm yyyy/MM/dd')}">
+                    10:00 01/05/2024
+                </span>
+            </div>
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-gray-500">Rental Period:</span>
+                <span>
+                    <span th:text="${bookingDetail.startDate}">2024-06-01</span> →
+                    <span th:text="${bookingDetail.endDate}">2024-06-10</span>
+                </span>
+            </div>
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-gray-500">Duration:</span>
+                <span th:text="${bookingDetail.durationInMonths} + ' month(s)'">1 month</span>
+            </div>
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-gray-500">Note:</span>
+                <span th:text="${bookingDetail.note}">Check-in after 2PM</span>
+            </div>
+        </div>
+
+        <!-- Payment Info -->
+        <div class="mb-8">
+            <h2 class="text-lg font-semibold text-gray-700 mb-2 flex items-center">
+                <i class="fas fa-wallet mr-2"></i>Payment Information
+            </h2>
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-gray-500">Deposit Amount:</span>
+                <span class="font-semibold text-yellow-600"
+                      th:text="${#numbers.formatInteger(bookingDetail.depositAmount, 0, 'COMMA')} + ' VND'">
+                    1,000,000₫
+                </span>
+            </div>
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-gray-500">Total Amount:</span>
+                <span class="font-semibold text-blue-700"
+                      th:text="${#numbers.formatInteger(bookingDetail.totalAmount, 0, 'COMMA')} + ' VND'">
+                    5,000,000₫
+                </span>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex justify-between items-center mt-8 gap-4">
+            <a th:href="@{/landlord/bookings}"
+               class="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300 transition">Back to My Bookings</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

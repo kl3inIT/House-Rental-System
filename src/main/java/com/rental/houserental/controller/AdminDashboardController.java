@@ -289,28 +289,6 @@ public class AdminDashboardController {
         return "admin/categories";
     }
 
-<<<<<<< HEAD
-    @GetMapping("/transactions")
-    public String transactions(Model model, HttpServletRequest request) {
-        model.addAttribute("currentUri", request.getRequestURI());
-        model.addAttribute("title", "Manage Transactions - Admin Dashboard");
-
-        // Mock transaction data
-        List<Map<String, Object>> transactions = new ArrayList<>();
-
-        Map<String, Object> transaction1 = new HashMap<>();
-        transaction1.put("id", "PAY-2024-001");
-        transaction1.put("landlordName", "John Smith");
-        transaction1.put("landlordEmail", "john@example.com");
-        transaction1.put("propertyName", "Modern 2BR Apartment");
-        transaction1.put("amount", new BigDecimal("63.00"));
-        transaction1.put("method", "Credit Card");
-        transaction1.put("date", "Jan 15, 2024");
-        transaction1.put("status", "Successful");
-        transactions.add(transaction1);
-=======
->>>>>>> main
-
 
     @GetMapping("/reviews")
     public String reviews(Model model, HttpServletRequest request) {
@@ -378,14 +356,14 @@ public class AdminDashboardController {
             map.put("requestDate",
                     entity.getCreatedAt() != null
                             ? entity.getCreatedAt()
-                                    .format(java.time.format.DateTimeFormatter
-                                            .ofPattern("dd MMM yyyy HH:mm"))
+                            .format(java.time.format.DateTimeFormatter
+                                    .ofPattern("dd MMM yyyy HH:mm"))
                             : "");
 
             map.put("reason", entity.getReason() != null ? entity.getReason() : "");
             String status = entity.getStatus() != null
                     ? entity.getStatus().name().substring(0, 1).toUpperCase()
-                            + entity.getStatus().name().substring(1).toLowerCase()
+                    + entity.getStatus().name().substring(1).toLowerCase()
                     : "";
             map.put("status", status);
             requests.add(map);
