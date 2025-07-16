@@ -1,6 +1,7 @@
 package com.rental.houserental.enums;
 
 import com.rental.houserental.exceptions.booking.InvalidBookingStatusException;
+import com.rental.houserental.exceptions.transaction.InvalidTransactionTypeException;
 import lombok.Getter;
 
 import java.util.Arrays;
@@ -9,10 +10,11 @@ import java.util.Map;
 
 @Getter
 public enum BookingStatus {
+
     CONFIRMED("Confirmed", "Booking and deposit successful."),
     ACTIVE("Active", "The tenant has checked in and is currently staying."),
     COMPLETED("Completed", "The stay has been completed successfully."),
-    CANCELLED("Cancelled", "The booking was cancelled");
+    CANCELED("Cancelled", "The booking was cancelled");
 
     private final String displayName;
     private final String description;
@@ -23,11 +25,20 @@ public enum BookingStatus {
     }
 
     public static BookingStatus fromString(String status) {
+        if(status == null || status.trim().isEmpty()) {
+            return null;
+        }
         try {
             return BookingStatus.valueOf(status.trim().toUpperCase());
         } catch (IllegalArgumentException e) {
-            throw new InvalidBookingStatusException("Invalid booking status: " + status);
+            throw new InvalidTransactionTypeException("Invalid transaction type: " + status);
         }
+    }
+
+    public static List<String> getAllTypes() {
+        return Arrays.stream(BookingStatus.values())
+                .map(BookingStatus::getDisplayName)
+                .toList();
     }
 
     public boolean isConfirmed() {
@@ -43,7 +54,7 @@ public enum BookingStatus {
     }
 
     public boolean isCancelled() {
-        return this == CANCELLED;
+        return this == CANCELED;
     }
 
     public static List<Map<String, String>> getStatusList() {

@@ -1,24 +1,13 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      >
+      layout:decorate="~{layout/landlord}">
 <head>
-    <title>Booking Detail - RentEase</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-    <style>
-        @keyframes fade-in {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-        }
-        .animate-fade-in {
-            animation: fade-in 0.2s ease-out;
-        }
-    </style>
+    <title>Manage Bookings - Landlord Dashboard</title>
 </head>
 <body>
-<div>
-    <div class="max-w-2xl mx-auto mt-10 p-8 bg-white rounded-lg shadow-md">
+<div layout:fragment="content">
+    <div class="max-w-5xl mx-auto mt-10 p-8 bg-white rounded-lg shadow-md">
         <h1 class="text-2xl font-bold text-blue-700 mb-6 flex items-center">
             <i class="fas fa-file-invoice mr-2"></i>Booking Detail
         </h1>
@@ -138,71 +127,10 @@
 
         <!-- Action Buttons -->
         <div class="flex justify-between items-center mt-8 gap-4">
-            <a th:href="@{/my-bookings}"
+            <a th:href="@{/landlord/bookings}"
                class="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300 transition">Back to My Bookings</a>
-
-            <button id="cancelBookingBtn"
-                    th:if="${bookingDetail.bookingStatus == 'CONFIRMED'}"
-                    class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition">
-                Cancel Booking
-            </button>
         </div>
     </div>
 </div>
-<!-- Modal -->
-<div id="cancelModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
-    <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full animate-fade-in">
-        <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
-            <i class="fas fa-triangle-exclamation text-red-600 mr-2"></i>Confirm Cancellation
-        </h2>
-        <p class="text-sm text-gray-600 mb-4"
-           th:if="${isRefundable}">
-            You will receive a full refund of your deposit
-            <span class="font-semibold text-green-700"
-                  th:text="${#numbers.formatInteger(bookingDetail.depositAmount, 0, 'COMMA')} + ' VND'">1,000,000₫</span>
-            because the cancellation was made within 24 hours of placing the booking.
-        </p>
-        <p class="text-sm text-gray-600 mb-4"
-           th:unless="${isRefundable}">
-            You will <span class="font-bold text-red-600">lose your deposit</span> of
-            <span class="font-semibold text-red-700" th:text="${#numbers.formatInteger(bookingDetail.depositAmount, 0, 'COMMA')} + ' VND'">1,000,000₫</span>
-            because the cancellation was made more than 24 hours after booking. Free cancellations are only accepted within 24 hours of placing the booking.
-        </p>
-        <div class="flex justify-end gap-4 mt-6">
-            <button type="button" id="closeCancelModalBtn"
-                    class="px-4 py-2 bg-gray-100 text-gray-800 rounded hover:bg-gray-200 transition">
-                No, Go Back
-            </button>
-            <form th:action="@{/my-bookings/{id}/cancel(id=${bookingDetail.bookingId})}" method="post">
-                <button type="submit"
-                        class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition">
-                    Yes, Cancel
-                </button>
-            </form>
-        </div>
-    </div>
-</div>
-
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const cancelBtn = document.getElementById('cancelBookingBtn');
-        const modal = document.getElementById('cancelModal');
-        const closeBtn = document.getElementById('closeCancelModalBtn');
-
-        if (cancelBtn && modal) {
-            cancelBtn.addEventListener('click', function () {
-                modal.classList.remove('hidden');
-            });
-        }
-
-        if (closeBtn && modal) {
-            closeBtn.addEventListener('click', function () {
-                modal.classList.add('hidden');
-            });
-        }
-    });
-</script>
-
 </body>
 </html>

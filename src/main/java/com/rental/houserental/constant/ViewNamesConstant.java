@@ -29,6 +29,11 @@ public final class ViewNamesConstant {
     // User Views
     public static final String USER_PROFILE = "user/profile";
     public static final String PROPERTY_DETAIL = "property-detail";
+    public static final String MY_BOOKING = "my-bookings";
+    public static final String BOOKING_DETAIL = "booking-detail";
+
+    // Checkout View
+    public static final String CHECKOUT = "checkout";
 
     // Simple Redirects
     public static final String REDIRECT_INDEX = "redirect:/";
@@ -42,7 +47,7 @@ public final class ViewNamesConstant {
     public static final String REDIRECT_USER_PROFILE = "redirect:/user/profile";
     public static final String REDIRECT_WALLET_TRANSACTION = "redirect:/wallet/transactions";
     public static final String REDIRECT_LANDLORD_PROPERTIES = "redirect:/landlord/properties";
-
+    public static final String REDIRECT_MY_BOOKING = "redirect:/my-bookings";
 
 
     // Utility methods for building redirects with parameters

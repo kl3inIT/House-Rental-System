@@ -26,8 +26,11 @@ public class Booking extends BaseEntity {
     @Builder.Default
     private BookingStatus status = BookingStatus.CONFIRMED;
 
+    @Column(name = "Deposit", nullable = false)
+    private Double deposit;
+
     @Column(name = "Amount", nullable = false)
-    private double amount;
+    private Double amount;
 
     @Column(name = "Note", columnDefinition = "TEXT")
     private String note;

@@ -1,21 +1,18 @@
 package com.rental.houserental.service.impl;
 
-import com.rental.houserental.dto.request.property.CreatePropertyRequestDTO;
-import com.rental.houserental.dto.request.property.LandlordPropertyFilterDTO;
-import com.rental.houserental.dto.request.property.SearchPropertyCriteriaDTO;
-import com.rental.houserental.dto.request.property.UpdatePropertyRequestDTO;
+import com.rental.houserental.dto.request.property.*;
 import com.rental.houserental.dto.response.property.*;
-import com.rental.houserental.entity.Category;
-import com.rental.houserental.entity.PropertyImage;
-import com.rental.houserental.entity.RentalProperty;
-import com.rental.houserental.entity.User;
+import com.rental.houserental.entity.*;
+import com.rental.houserental.enums.BookingStatus;
 import com.rental.houserental.enums.FurnishingType;
 import com.rental.houserental.enums.PropertyStatus;
+import com.rental.houserental.enums.TransactionType;
+import com.rental.houserental.exceptions.booking.InvalidBookingStatusException;
 import com.rental.houserental.exceptions.common.ResourceNotFoundException;
 import com.rental.houserental.exceptions.property.ImageUploadException;
 import com.rental.houserental.exceptions.property.PropertyNotFoundException;
-import com.rental.houserental.repository.CategoryRepository;
-import com.rental.houserental.repository.PropertyRepository;
+import com.rental.houserental.exceptions.user.UserNotFoundException;
+import com.rental.houserental.repository.*;
 import com.rental.houserental.repository.specification.RentalPropertySpecification;
 
 import com.rental.houserental.service.CategoryService;
@@ -30,11 +27,18 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+
+import static com.rental.houserental.constant.ErrorMessageConstant.MSG_400;
 
 @Service
 @RequiredArgsConstructor
@@ -44,7 +48,7 @@ public class PropertyServiceImpl implements PropertyService {
     private final PropertyRepository propertyRepository;
     private final ImageService imageService;
     private final CategoryService categoryService;
-    private final CategoryRepository categoryRepository;
+    private final UserRepository userRepository;
 
     @Override
     @Transactional
@@ -259,6 +263,41 @@ public class PropertyServiceImpl implements PropertyService {
         }
         propertyRepository.deleteById(id);
 
+    }
+
+    @Override
+    public PropertyCheckoutDTO getPropertyToCheckoutById(Long id) {
+        RentalProperty property = propertyRepository.findById(id)
+                .orElseThrow(() -> new PropertyNotFoundException("Property not found with ID: " + id));
+        User currentUser = getCurrentUser();
+        User landlord = property.getLandlord();
+        return PropertyCheckoutDTO.builder()
+                .id(property.getId())
+                .name(property.getTitle())
+                .address(property.getStreetAddress() + ", " + property.getWard() + ", " + property.getProvince())
+                .image(property.getMainImageUrl())
+                .renterName(currentUser.getName())
+                .renterEmail(currentUser.getEmail())
+                .renterPhone(currentUser.getPhone())
+                .landlordName(landlord.getName())
+                .landlordEmail(landlord.getEmail())
+                .landlordPhone(landlord.getPhone())
+                .price(property.getMonthlyRent().doubleValue())
+                .percentageDeposit(property.getDepositPercentage().longValue())
+                .renterBalance(currentUser.getBalance())
+                .build();
+    }
+
+
+    public RentalProperty findPropertyById(Long id) {
+        return propertyRepository.findById(id)
+                .orElseThrow(() -> new PropertyNotFoundException("Property not found with ID: " + id));
+    }
+
+    public User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        return userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("User not found", MSG_400));
     }
 
     private PropertyListItemDTO toPropertyListItemDTO(RentalProperty p) {

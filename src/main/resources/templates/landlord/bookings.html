@@ -1,183 +1,213 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/landlord}">
 <head>
-    <title>Bookings - RentEase</title>
+    <title>Manage Bookings - Landlord Dashboard</title>
 </head>
-<body class="bg-gray-50">
-<main layout:fragment="content">
+<body>
+<div layout:fragment="content">
     <div class="p-6">
         <!-- Header -->
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">Bookings</h1>
-            <p class="text-gray-600 mt-2">Manage active rental agreements and leases</p>
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800">Manage Bookings</h1>
+                <p class="text-gray-500 mt-2">View and manage all property bookings</p>
+            </div>
         </div>
 
-        <!-- Stats -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <div class="bg-white rounded-lg shadow-md p-6">
+        <!-- Stats (Fake Data) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                        <i class="fas fa-calendar-check text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500">Total Bookings</p>
+                        <p class="text-2xl font-bold text-gray-800">12</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
                 <div class="flex items-center">
                     <div class="p-3 rounded-full bg-green-100 text-green-600">
                         <i class="fas fa-check-circle text-xl"></i>
                     </div>
                     <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-600">Active</p>
-                        <p class="text-2xl font-bold text-gray-900">8</p>
-                    </div>
-                </div>
-            </div>
-            <div class="bg-white rounded-lg shadow-md p-6">
-                <div class="flex items-center">
-                    <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
-                        <i class="fas fa-clock text-xl"></i>
-                    </div>
-                    <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-600">Expiring Soon</p>
-                        <p class="text-2xl font-bold text-gray-900">2</p>
-                    </div>
-                </div>
-            </div>
-            <div class="bg-white rounded-lg shadow-md p-6">
-                <div class="flex items-center">
-                    <div class="p-3 rounded-full bg-blue-100 text-blue-600">
-                        <i class="fas fa-dollar-sign text-xl"></i>
-                    </div>
-                    <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-600">Monthly Revenue</p>
-                        <p class="text-2xl font-bold text-gray-900">$18,400</p>
-                    </div>
-                </div>
-            </div>
-            <div class="bg-white rounded-lg shadow-md p-6">
-                <div class="flex items-center">
-                    <div class="p-3 rounded-full bg-purple-100 text-purple-600">
-                        <i class="fas fa-percentage text-xl"></i>
-                    </div>
-                    <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-600">Occupancy Rate</p>
-                        <p class="text-2xl font-bold text-gray-900">75%</p>
+                        <p class="text-sm font-medium text-gray-500">Total revenue estimate</p>
+                        <p class="text-2xl font-bold text-gray-800">7</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Filters -->
-        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Filter by Status</label>
-                    <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option>All Bookings</option>
-                        <option>Active</option>
-                        <option>Expired</option>
-                        <option>Pending</option>
+        <!-- Filter row (Fake, no action) -->
+        <form class="flex flex-row items-end gap-2 mb-6 w-full" th:object="${bookingSearchRequestDTO}"
+              th:action="@{/landlord/bookings}" method="get">
+            <div class="flex flex-col w-full" style="max-width:20%">
+                <label class="block text-xs font-medium text-gray-500 mb-1">Status</label>
+                <label>
+                    <select th:field="*{status}"
+                            class="border border-gray-300 rounded-md px-2 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-800">
+                        <option value="">All</option>
+                        <option th:each="type : ${types}"
+                                th:value="${type}"
+                                th:text="${type}">
+                        </option>
                     </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Property</label>
-                    <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option>All Properties</option>
-                        <option>Downtown Apartment</option>
-                        <option>Suburban House</option>
-                        <option>Studio Apartment</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Date Range</label>
-                    <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option>All time</option>
-                        <option>This month</option>
-                        <option>Last 3 months</option>
-                        <option>This year</option>
-                    </select>
-                </div>
-                <div class="flex items-end">
-                    <button class="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
-                        <i class="fas fa-search mr-2"></i>Filter
-                    </button>
-                </div>
+                </label>
             </div>
-        </div>
+            <div class="flex flex-col w-full" style="max-width:20%">
+                <label class="block text-xs font-medium text-gray-500 mb-1">Property Name</label>
+                <label>
+                    <input th:field="*{propertyTitle}" type="text" placeholder="Search by property..."
+                           class="border border-gray-300 rounded-md px-2 py-2 w-full bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </label>
+            </div>
+            <div class="flex flex-col w-full" style="max-width:20%">
+                <label class="block text-xs font-medium text-gray-500 mb-1">Date from</label>
+                <label>
+                    <input th:field="*{startDate}" type="date"
+                           th:value="${#temporals.format(bookingSearchRequestDTO.startDate, 'yyyy-MM-dd')}"
+                           class="border border-gray-300 rounded-md px-2 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-800">
 
-        <!-- Bookings List -->
-        <div class="space-y-6" th:if="${bookings != null and !#lists.isEmpty(bookings)}">
-            <div th:each="booking : ${bookings}" class="bg-white rounded-lg shadow-md p-6">
-                <div class="flex justify-between items-start mb-4">
-                    <div class="flex-1">
-                        <div class="flex items-center space-x-4 mb-2">
-                            <h3 class="text-lg font-semibold text-gray-900" th:text="${booking.tenantName}">Tenant Name</h3>
-                            <span th:class="|px-2 py-1 text-xs rounded-full ${
-                              booking.status == 'ACTIVE' ? 'bg-green-100 text-green-800' :
-                              booking.status == 'EXPIRED' ? 'bg-red-100 text-red-800' :
-                              'bg-yellow-100 text-yellow-800'
-                            }|"
-                                  th:text="${booking.status}">Status</span>
-                        </div>
-                        <p class="text-sm text-gray-600 mb-2">
-                            <i class="fas fa-home mr-1"></i>
-                            <span th:text="${booking.propertyName}">Property Name</span>
-                        </p>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
+                </label>
+            </div>
+            <div class="flex flex-col w-full" style="max-width:20%">
+                <label class="block text-xs font-medium text-gray-500 mb-1">Date to</label>
+                <label>
+                    <input th:field="*{endDate}" type="date"
+                           th:value="${#temporals.format(bookingSearchRequestDTO.endDate, 'yyyy-MM-dd')}"
+                           class="border border-gray-300 rounded-md px-2 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-800">
+
+                </label>
+            </div>
+            <div class="flex flex-col w-full justify-end" style="max-width:20%">
+                <button type="submit"
+                        class="bg-blue-600 text-white w-full py-2 rounded-md font-medium hover:bg-blue-700 transition-colors duration-200 shadow mt-auto">
+                    Filter
+                </button>
+            </div>
+        </form>
+
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-100">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Property
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price
+                    </th>
+                    <th class="px-6 py-3"></th>
+                </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                <tr th:each="booking, iterStat : ${bookings}">
+                    <td th:text="${iterStat.index + 1}" class="px-6 py-4 whitespace-nowrap">1</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <img th:src="${booking.propertyImage}" alt="Property"
+                                 class="w-12 h-12 rounded mr-3 object-cover">
                             <div>
-                                <i class="fas fa-calendar-alt mr-1"></i>
-                                <span class="font-medium">Start:</span> <span th:text="${booking.startDate}">2025-02-01</span>
-                            </div>
-                            <div>
-                                <i class="fas fa-calendar-check mr-1"></i>
-                                <span class="font-medium">End:</span> <span th:text="${booking.endDate}">2025-07-31</span>
-                            </div>
-                            <div>
-                                <i class="fas fa-dollar-sign mr-1"></i>
-                                <span class="font-medium">Rent:</span> <span th:text="'$' + ${#numbers.formatDecimal(booking.monthlyRent, 1, 'COMMA', 0, 'POINT')} + '/mo'">$1,800/mo</span>
+                                <div th:text="${booking.propertyName}" class="font-semibold text-gray-900">Sunshine
+                                    Apartment
+                                </div>
+                                <div th:text="${booking.propertyAddress}" class="text-xs text-gray-500">123 Main St,
+                                    District 1
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
+                    </td>
+                    <td th:text="${booking.bookingDate}" class="px-6 py-4 whitespace-nowrap">2024-06-01</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <!-- CONFIRMED -->
+                        <span th:if="${booking.bookingStatus == 'CONFIRMED'}"
+                              class="px-3 py-1 inline-flex text-xs leading-5 font-medium rounded-full bg-yellow-100 text-yellow-800 border border-current shadow-sm">
+                         <span th:text="${booking.bookingStatus}">CONFIRMED</span>
+                        </span>
 
-                <div class="flex flex-wrap gap-2">
-                    <button class="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors duration-200">
-                        <i class="fas fa-eye mr-1"></i>View Details
-                    </button>
-                    <button class="px-4 py-2 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 transition-colors duration-200">
-                        <i class="fas fa-file-contract mr-1"></i>View Lease
-                    </button>
-                    <button class="px-4 py-2 bg-yellow-600 text-white text-sm rounded-md hover:bg-yellow-700 transition-colors duration-200">
-                        <i class="fas fa-edit mr-1"></i>Renew
-                    </button>
-                    <button class="px-4 py-2 bg-gray-600 text-white text-sm rounded-md hover:bg-gray-700 transition-colors duration-200">
-                        <i class="fas fa-comment mr-1"></i>Message
-                    </button>
-                    <button class="px-4 py-2 bg-red-600 text-white text-sm rounded-md hover:bg-red-700 transition-colors duration-200">
-                        <i class="fas fa-times mr-1"></i>Terminate
-                    </button>
-                </div>
+                        <!-- ACTIVE -->
+                        <span th:if="${booking.bookingStatus == 'ACTIVE'}"
+                              class="px-3 py-1 inline-flex text-xs leading-5 font-medium rounded-full bg-blue-100 text-blue-800 border border-current shadow-sm">
+                        <span th:text="${booking.bookingStatus}">ACTIVE</span>
+                        </span>
+
+                        <!-- COMPLETED -->
+                        <span th:if="${booking.bookingStatus == 'COMPLETED'}"
+                              class="px-3 py-1 inline-flex text-xs leading-5 font-medium rounded-full bg-green-100 text-green-800 border border-current shadow-sm">
+                        <span th:text="${booking.bookingStatus}">COMPLETED</span>
+                        </span>
+
+                        <!-- CANCELED -->
+                        <span th:if="${booking.bookingStatus == 'CANCELED'}"
+                              class="px-3 py-1 inline-flex text-xs leading-5 font-medium rounded-full bg-red-100 text-red-800 border border-current shadow-sm">
+                                <span th:text="${booking.bookingStatus}">CANCELED</span>
+                        </span>
+                    </td>
+
+                    <td class="px-6 py-4 whitespace-nowrap font-medium text-blue-600"
+                        th:text="${booking.totalAmount}">
+                        5,000,000₫
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <a th:href="@{/landlord/bookings/{id}(id=${booking.bookingId})}" class="text-blue-600 hover:text-blue-900">View</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <div class="mt-4 flex justify-end space-x-2" th:if="${bookings.totalPages > 0}">
+                <!-- Previous Page -->
+                <a th:if="${bookings.hasPrevious()}"
+                   th:href="@{/landlord/bookings(
+                            page=${bookings.number - 1},
+                            size=${bookings.size},
+                            status=${bookingSearchRequestDTO.status},
+                            propertyTitle=${bookingSearchRequestDTO.propertyTitle},
+                            startDate=${#temporals.format(bookingSearchRequestDTO.startDate, 'yyyy-MM-dd')},
+                            endDate=${#temporals.format(bookingSearchRequestDTO.endDate, 'yyyy-MM-dd')}
+                       )}"
+                   class="px-3 py-1 rounded border text-gray-600 hover:bg-gray-100">
+                    &laquo; Prev
+                </a>
+
+                <!-- Page Numbers -->
+                <a th:each="i : ${#numbers.sequence(0, bookings.totalPages - 1)}"
+                   th:href="@{/landlord/bookings(
+                            page=${i},
+                            size=${bookings.size},
+                            status=${bookingSearchRequestDTO.status},
+                            propertyTitle=${bookingSearchRequestDTO.propertyTitle},
+                            startDate=${#temporals.format(bookingSearchRequestDTO.startDate, 'yyyy-MM-dd')},
+                            endDate=${#temporals.format(bookingSearchRequestDTO.endDate, 'yyyy-MM-dd')}
+                       )}"
+                   th:text="${i + 1}"
+                   th:classappend="${i == bookings.number} ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-gray-100'"
+                   class="px-3 py-1 rounded border">
+                </a>
+
+                <!-- Next Page -->
+                <a th:if="${bookings.hasNext()}"
+                   th:href="@{/landlord/bookings(
+                            page=${bookings.number + 1},
+                            size=${bookings.size},
+                            status=${bookingSearchRequestDTO.status},
+                            propertyTitle=${bookingSearchRequestDTO.propertyTitle},
+                            startDate=${#temporals.format(bookingSearchRequestDTO.startDate, 'yyyy-MM-dd')},
+                            endDate=${#temporals.format(bookingSearchRequestDTO.endDate, 'yyyy-MM-dd')}
+                       )}"
+                   class="px-3 py-1 rounded border text-gray-600 hover:bg-gray-100">
+                    Next &raquo;
+                </a>
             </div>
-        </div>
 
-        <!-- Empty state -->
-        <div th:if="${bookings == null or #lists.isEmpty(bookings)}" class="text-center py-12">
-            <i class="fas fa-calendar-check text-6xl text-gray-300 mb-4"></i>
-            <h3 class="text-lg font-medium text-gray-900 mb-2">No bookings found</h3>
-            <p class="text-gray-500">You don't have any active bookings at the moment.</p>
-        </div>
-
-        <!-- Pagination -->
-        <div class="flex justify-center mt-8" th:if="${bookings != null and !#lists.isEmpty(bookings)}">
-            <nav class="flex space-x-2">
-                <button class="px-3 py-2 text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-                <button class="px-3 py-2 text-white bg-blue-600 border border-blue-600 rounded-md">1</button>
-                <button class="px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">2</button>
-                <button class="px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">3</button>
-                <button class="px-3 py-2 text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
-                    <i class="fas fa-chevron-right"></i>
-                </button>
-            </nav>
         </div>
     </div>
-</main>
+</div>
 </body>
-</html> 
+</html>

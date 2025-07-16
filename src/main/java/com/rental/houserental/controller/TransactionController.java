@@ -48,7 +48,6 @@ public class TransactionController {
             transactions = transactionService.getTransactionHistory(transactionRequestDTO);
         }
 
-
         model.addAttribute("transactions", transactions);
         model.addAttribute("types", TransactionType.getAllTypes());
         model.addAttribute("transactionRequest", transactionRequestDTO);

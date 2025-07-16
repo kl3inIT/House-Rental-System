@@ -1,10 +1,7 @@
 package com.rental.houserental.service;
 
-import com.rental.houserental.dto.request.property.CreatePropertyRequestDTO;
-import com.rental.houserental.dto.request.property.LandlordPropertyFilterDTO;
-import com.rental.houserental.dto.request.property.UpdatePropertyRequestDTO;
+import com.rental.houserental.dto.request.property.*;
 import com.rental.houserental.dto.response.property.*;
-import com.rental.houserental.dto.request.property.SearchPropertyCriteriaDTO;
 import com.rental.houserental.entity.User;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.data.domain.Page;
@@ -31,4 +28,7 @@ public interface PropertyService {
     void updateProperty(Long id, UpdatePropertyRequestDTO dto, MultipartFile[] imageFiles);
 
     void deleteProperty(Long id);
+
+    PropertyCheckoutDTO getPropertyToCheckoutById(Long id);
+
 }
