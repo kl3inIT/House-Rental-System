@@ -7,7 +7,9 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -47,7 +49,7 @@ public class RentalProperty extends BaseEntity {
     @Column(name = "Province", nullable = false, columnDefinition = "NVARCHAR(100)")
     private String province;
 
-    @Column(name = "Description", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "Description", nullable = false, columnDefinition = "NVARCHAR(2000)")
     private String description;
 
     @Column(name = "Furnishing", length = 20)
@@ -106,5 +108,14 @@ public class RentalProperty extends BaseEntity {
 
     @OneToMany(mappedBy = "rentalProperty", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Listing> listings = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "RentalPropertyAmenities",
+            joinColumns = @JoinColumn(name = "property_id"),
+            inverseJoinColumns = @JoinColumn(name = "amenity_id")
+    )
+    private Set<Amenity> amenities = new HashSet<>();
+
 
 }

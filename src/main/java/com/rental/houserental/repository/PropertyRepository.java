@@ -1,6 +1,7 @@
 package com.rental.houserental.repository;
 
 import com.rental.houserental.entity.RentalProperty;
+import com.rental.houserental.entity.User;
 import com.rental.houserental.enums.PropertyStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.repository.query.Param;
@@ -23,6 +24,9 @@ public interface PropertyRepository extends JpaRepository<RentalProperty, Long>,
             """)
     List<RentalProperty> findFeaturedProperties(@Param("status") PropertyStatus status, Pageable pageable);
 
+    List<RentalProperty> findByLandlordIdAndPropertyStatusNot(Long landlordId, PropertyStatus propertyStatus);
+
+    List<RentalProperty> findByLandlordIdAndPropertyStatus(Long landlordId, PropertyStatus propertyStatus);
     // JPQL query trả về entity RentalProperty
     @Query("SELECT p FROM RentalProperty p " +
             "WHERE p.landlord.id = :landlordId " +
@@ -66,4 +70,12 @@ public interface PropertyRepository extends JpaRepository<RentalProperty, Long>,
             @Param("maxPrice") Integer maxPrice
     );
 
+    List<RentalProperty> findByCategoryIdAndIdNotAndPropertyStatus(
+            Long categoryId,
+            Long propertyId,
+            PropertyStatus propertyStatus,
+            Pageable pageable
+    );
+
+    List<RentalProperty> findByLandlordId(Long landlord);
 }

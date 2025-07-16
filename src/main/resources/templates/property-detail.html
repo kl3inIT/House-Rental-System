@@ -56,7 +56,7 @@
                             </div>
                         </div>
                         <div class="text-right">
-                            <div class="text-4xl font-bold text-blue-600 mb-2" th:text="'$' + ${#numbers.formatDecimal(property.monthlyRent, 0, 'COMMA', 0, 'POINT')}">$1,800</div>
+                            <div class="text-4xl font-bold text-blue-600 mb-2" th:text="${#numbers.formatDecimal(property.monthlyRent, 0, 'COMMA', 0, 'POINT') + ' VND'}"></div>
                             <div class="text-gray-500">per month</div>
                             <span class="inline-block mt-3 px-4 py-2 bg-green-100 text-green-800 text-sm rounded-full" 
                                   th:text="${property.propertyStatus == 'AVAILABLE' ? 'Available' : 'Not Available'}">Available</span>
@@ -71,28 +71,24 @@
                             <i class="fas fa-calendar-check mr-2"></i>Book Now
                         </a>
 
-                        <!-- Nếu đã booked -->
                         <button th:if="${property.getPropertyStatus() == 'BOOKED'}"
                                 class="bg-gray-300 text-gray-500 px-8 py-3 text-lg rounded-xl cursor-not-allowed font-semibold transition-colors duration-200 flex items-center gap-2">
                             <i class="fas fa-check text-xl"></i>
                             Already Booked
                         </button>
 
-                        <!-- Contact Landlord -->
                         <button sec:authorize="isAuthenticated()"
                                 class="bg-white border border-green-600 text-green-700 px-6 py-3 rounded-md hover:bg-green-50 font-medium flex items-center gap-2 transition-colors duration-200">
                             <i class="fas fa-envelope text-lg"></i>
                             Contact Landlord
                         </button>
 
-                        <!-- Save Property -->
                         <button sec:authorize="isAuthenticated()"
                                 class="bg-white border border-gray-300 text-gray-600 px-6 py-3 rounded-md hover:bg-gray-50 font-medium flex items-center gap-2 transition-colors duration-200">
                             <i class="far fa-heart text-lg"></i>
                             Save Property
                         </button>
 
-                        <!-- Nếu chưa đăng nhập -->
                         <a sec:authorize="!isAuthenticated()" th:href="@{/login}"
                            class="bg-blue-100 text-blue-600 px-6 py-3 rounded-md hover:bg-blue-200 font-medium flex items-center gap-2 transition-colors duration-200 border border-blue-200">
                             <i class="fas fa-sign-in-alt text-lg"></i>
@@ -102,21 +98,11 @@
 
                     <!-- Property Features -->
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div class="text-center p-3 bg-gray-50 rounded-lg">
-                            <i class="fas fa-wifi text-xl text-blue-600 mb-2"></i>
-                            <div class="text-sm text-gray-600">WiFi</div>
-                        </div>
-                        <div class="text-center p-3 bg-gray-50 rounded-lg">
-                            <i class="fas fa-car text-xl text-blue-600 mb-2"></i>
-                            <div class="text-sm text-gray-600">Parking</div>
-                        </div>
-                        <div class="text-center p-3 bg-gray-50 rounded-lg">
-                            <i class="fas fa-swimming-pool text-xl text-blue-600 mb-2"></i>
-                            <div class="text-sm text-gray-600">Pool</div>
-                        </div>
-                        <div class="text-center p-3 bg-gray-50 rounded-lg">
-                            <i class="fas fa-dumbbell text-xl text-blue-600 mb-2"></i>
-                            <div class="text-sm text-gray-600">Gym</div>
+                        <div th:each="amenity, i : ${property.amenities}"
+                             th:if="${i.index} < 4"
+                             class="text-center p-3 bg-gray-50 rounded-lg">
+                            <i th:class="'fas ' + ${amenity.icon} + ' text-xl text-blue-600 mb-2'"></i>
+                            <div class="text-sm text-gray-600" th:text="${amenity.name}"></div>
                         </div>
                     </div>
                 </div>
@@ -151,64 +137,27 @@
             </div>
 
             <div id="amenities-content" class="tab-content hidden">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Building Amenities</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <h4 class="font-medium text-gray-900 mb-3">Interior Features</h4>
-                        <ul class="space-y-2 text-gray-600">
-                            <li><i class="fas fa-check text-green-500 mr-2"></i>Hardwood floors</li>
-                            <li><i class="fas fa-check text-green-500 mr-2"></i>Stainless steel appliances</li>
-                            <li><i class="fas fa-check text-green-500 mr-2"></i>In-unit washer/dryer</li>
-                            <li><i class="fas fa-check text-green-500 mr-2"></i>Walk-in closets</li>
-                            <li><i class="fas fa-check text-green-500 mr-2"></i>Central air conditioning</li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h4 class="font-medium text-gray-900 mb-3">Building Features</h4>
-                        <ul class="space-y-2 text-gray-600">
-                            <li><i class="fas fa-check text-green-500 mr-2"></i>24/7 concierge</li>
-                            <li><i class="fas fa-check text-green-500 mr-2"></i>Rooftop pool & deck</li>
-                            <li><i class="fas fa-check text-green-500 mr-2"></i>Fitness center</li>
-                            <li><i class="fas fa-check text-green-500 mr-2"></i>Garage parking</li>
-                            <li><i class="fas fa-check text-green-500 mr-2"></i>Pet-friendly</li>
-                        </ul>
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Amenities</h3>
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                    <div th:each="amenity : ${property.amenities}" class="flex items-center">
+                        <i class="fas fa-check text-green-500 mr-2"></i>
+                        <span th:text="${amenity.name}"></span>
                     </div>
                 </div>
             </div>
 
             <div id="location-content" class="tab-content hidden">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Location & Neighborhood</h3>
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Location</h3>
                 <div class="bg-gray-100 h-64 rounded-lg mb-4 flex items-center justify-center">
-                    <i class="fas fa-map text-4xl text-gray-400"></i>
-                    <span class="ml-3 text-gray-500">Map will be loaded here</span>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
-                        <h4 class="font-medium text-gray-900 mb-3">Transportation</h4>
-                        <ul class="space-y-2 text-gray-600 text-sm">
-                            <li><i class="fas fa-subway mr-2"></i>Central Station (2 min walk)</li>
-                            <li><i class="fas fa-bus mr-2"></i>Bus stop (1 min walk)</li>
-                            <li><i class="fas fa-bicycle mr-2"></i>Bike share station (3 min walk)</li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h4 class="font-medium text-gray-900 mb-3">Shopping & Dining</h4>
-                        <ul class="space-y-2 text-gray-600 text-sm">
-                            <li><i class="fas fa-shopping-cart mr-2"></i>Grocery store (5 min walk)</li>
-                            <li><i class="fas fa-utensils mr-2"></i>Restaurants (2 min walk)</li>
-                            <li><i class="fas fa-coffee mr-2"></i>Coffee shops (1 min walk)</li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h4 class="font-medium text-gray-900 mb-3">Recreation</h4>
-                        <ul class="space-y-2 text-gray-600 text-sm">
-                            <li><i class="fas fa-tree mr-2"></i>Central Park (10 min walk)</li>
-                            <li><i class="fas fa-running mr-2"></i>Jogging trail (5 min walk)</li>
-                            <li><i class="fas fa-film mr-2"></i>Movie theater (8 min walk)</li>
-                        </ul>
-                    </div>
+                    <iframe
+                            th:src="'https://www.google.com/maps?q=' + ${property.latitude} + ',' + ${property.longitude} + '&hl=vi&z=16&output=embed'"
+                            width="100%" height="100%" style="border:0; border-radius: 0.75rem;"
+                            allowfullscreen=""
+                            aria-hidden="false" tabindex="0">
+                    </iframe>
                 </div>
             </div>
+
 
             <div id="reviews-content" class="tab-content hidden">
                 <h3 class="text-lg font-semibold text-gray-900 mb-4">Reviews & Ratings</h3>
@@ -235,33 +184,30 @@
         </div>
 
         <!-- Similar Properties -->
-        <div class="mb-8">
+        <div class="mb-8" th:if="${not #lists.isEmpty(similarProperties)}">
             <h2 class="text-2xl font-bold text-gray-900 mb-6">Similar Properties</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Similar property cards would go here -->
-                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
-                    <div class="h-48 bg-gray-200"></div>
-                    <div class="p-4">
-                        <h3 class="font-semibold text-gray-900 mb-2">Similar Property 1</h3>
-                        <p class="text-gray-600 text-sm mb-2">Downtown Location</p>
-                        <div class="text-lg font-bold text-blue-600">$1,750/mo</div>
-                    </div>
-                </div>
-                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
-                    <div class="h-48 bg-gray-200"></div>
-                    <div class="p-4">
-                        <h3 class="font-semibold text-gray-900 mb-2">Similar Property 2</h3>
-                        <p class="text-gray-600 text-sm mb-2">Midtown Location</p>
-                        <div class="text-lg font-bold text-blue-600">$1,900/mo</div>
-                    </div>
-                </div>
-                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
-                    <div class="h-48 bg-gray-200"></div>
-                    <div class="p-4">
-                        <h3 class="font-semibold text-gray-900 mb-2">Similar Property 3</h3>
-                        <p class="text-gray-600 text-sm mb-2">Uptown Location</p>
-                        <div class="text-lg font-bold text-blue-600">$1,650/mo</div>
-                    </div>
+                <div th:each="prop : ${similarProperties}"
+                     class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                    <a th:href="@{'/properties/' + ${prop.id}}">
+                        <div class="h-48 bg-gray-200 overflow-hidden">
+                            <img th:if="${prop.mainImageUrl != null}"
+                                 th:src="${prop.mainImageUrl}"
+                                 th:alt="${prop.title}"
+                                 class="w-full h-48 object-cover">
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-semibold text-gray-900 mb-2" th:text="${prop.title}">Property Title</h3>
+                            <p class="text-gray-600 text-sm mb-2" th:text="${prop.fullAddress}">Location</p>
+                            <div class="text-lg font-bold text-blue-600"
+                                 th:text="${#numbers.formatDecimal(prop.monthlyRent, 0, 'COMMA', 0, 'POINT') + ' VND'}"></div>
+                            <div class="flex gap-2 mt-2 text-gray-600 text-sm">
+                                <span><i class="fas fa-bed mr-1"></i><span th:text="${prop.bedrooms}"></span></span>
+                                <span><i class="fas fa-bath ml-2 mr-1"></i><span th:text="${prop.bathrooms}"></span></span>
+                                <span><i class="fas fa-ruler-combined ml-2 mr-1"></i><span th:text="${prop.area + ' m²'}"></span></span>
+                            </div>
+                        </div>
+                    </a>
                 </div>
             </div>
         </div>

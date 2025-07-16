@@ -18,11 +18,10 @@ public class PropertyDetailDTO {
     private String title;
     private String description;
 
-    // Địa chỉ chi tiết
     private String streetAddress;
     private String ward;
     private String province;
-    private String fullAddress;  // Nếu cần ghép nhanh
+    private String fullAddress;
 
     private Long categoryId;
     private String categoryName;
@@ -32,32 +31,30 @@ public class PropertyDetailDTO {
     private Integer bathrooms;
     private BigDecimal area;
 
-    // Trạng thái hiện tại của property
     private PropertyStatus propertyStatus;
 
     private String mainImageUrl;
-    private List<String> imageUrls; // Các ảnh khác nếu có
+    private List<String> imageUrls;
 
-    // Đồ nội thất
-    private FurnishingType furnishing; // FULL, BASIC, NONE
+    private FurnishingType furnishing;
 
-    // Thông tin đặt cọc
-    private Integer depositPercentage; // Phần trăm đặt cọc
+    private Integer depositPercentage;
 
-    // Tọa độ
     private Double latitude;
     private Double longitude;
 
-    // Thông tin hệ thống
-    private Integer views;       // Số lượt xem
-    private Double rating;       // Đánh giá trung bình
+    private Integer views;
+    private Double rating;
 
-    // Thời gian
+    private LocalDateTime publishAt;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    // Các trường mở rộng (tuỳ yêu cầu)
     private String landlordName;
     private Long landlordId;
-    private List<String> amenities; // Tiện ích đi kèm
+    private List<AmenityDTO> amenities;
+
+    private LocalDateTime listingStartDate;
+    private LocalDateTime listingEndDate;
+    private Long timeLeftDays;
 }

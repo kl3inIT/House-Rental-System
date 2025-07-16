@@ -4,6 +4,7 @@ import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Getter
 @Setter
@@ -70,4 +71,7 @@ public class CreatePropertyRequestDTO {
 
     @NotNull(message = "Longitude is required")
     private Double longitude;
+
+    private List<Long> amenityIds;
+
 }

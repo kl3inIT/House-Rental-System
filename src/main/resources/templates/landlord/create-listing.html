@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+     xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+     xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+     layout:decorate="~{layout/landlord}">
+     <head>
+          <title>Create New Listing - RentEase</title>
+     </head>
+     <body class="bg-gray-50">
+          <div layout:fragment="content">
+               <div class="p-6">
+                    <!-- Header -->
+                    <div class="mb-8">
+                         <h1 class="text-3xl font-bold text-gray-900">Create New
+                              Listing</h1>
+                         <p class="text-gray-600 mt-2">Fill in the details to
+                              create a new listing for your property</p>
+                    </div>
+
+                    <form th:action="@{${actionUrl}}"
+                         th:object="${listing}" method="post" class="space-y-8"
+                         id="listing-form" novalidate>
+                         <!-- CSRF Token -->
+                         <input type="hidden" th:name="${_csrf.parameterName}"
+                              th:value="${_csrf.token}" />
+
+                         <!-- Success Message -->
+                         <div th:if="${successMessage}"
+                              class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-6">
+                              <span th:text="${successMessage}"></span>
+                         </div>
+
+                         <!-- Property Selection -->
+                         <div class="bg-white rounded-lg shadow-md p-6">
+                              <h2
+                                   class="text-xl font-semibold text-gray-900 mb-6">
+                                   <i
+                                        class="fas fa-home text-blue-600 mr-2"></i>
+                                   Property Selection
+                              </h2>
+
+                              <div class="grid grid-cols-1 gap-6">
+                                   <div>
+                                        <label
+                                             class="block text-sm font-medium text-gray-700 mb-1">Select
+                                             Property *</label>
+                                        <select th:field="*{rentalPropertyId}"
+                                             required data-validate="required"
+                                             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                             <option value="">Choose a property to
+                                                  list</option>
+                                             <option
+                                                  th:each="property : ${properties}"
+                                                  th:value="${property.id}"
+                                                  th:text="${property.title + ' - ' + property.streetAddress}"></option>
+                                        </select>
+                                        <div
+                                             class="validation-error text-red-600 text-sm mt-1 hidden"></div>
+                                        <div
+                                             th:if="${#fields.hasErrors('rentalPropertyId')}"
+                                             class="text-red-600 text-sm mt-1"
+                                             th:errors="*{rentalPropertyId}"></div>
+                                   </div>
+                              </div>
+                         </div>
+
+                         <!-- Listing Details -->
+                         <div class="bg-white rounded-lg shadow-md p-6">
+                              <h2
+                                   class="text-xl font-semibold text-gray-900 mb-6">
+                                   <i
+                                        class="fas fa-calendar-alt text-green-600 mr-2"></i>
+                                   Listing Period
+                              </h2>
+
+                              <div class="grid grid-cols-1 gap-6">
+                                   <div>
+                                        <label
+                                             class="block text-sm font-medium text-gray-700 mb-1">Start
+                                             Date *</label>
+                                        <input type="date"
+                                             th:field="*{startDate}" required
+                                             data-validate="required"
+                                             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                        <div
+                                             class="validation-error text-red-600 text-sm mt-1 hidden"></div>
+                                        <div
+                                             th:if="${#fields.hasErrors('startDate')}"
+                                             class="text-red-600 text-sm mt-1"
+                                             th:errors="*{startDate}"></div>
+                                   </div>
+                              </div>
+                         </div>
+
+                         <!-- Payment Type Selection -->
+                         <div class="bg-white rounded-lg shadow-md p-6">
+                              <h2 class="text-xl font-semibold text-gray-900 mb-6">
+                                   <i class="fas fa-credit-card text-indigo-600 mr-2"></i>
+                                   Payment Type
+                              </h2>
+                              <div class="mb-6">
+                                   <label class="block text-sm font-medium text-gray-700 mb-1">Listing Duration</label>
+                                   <div class="flex items-center space-x-2">
+                                        <select th:field="*{durationType}" id="duration-type"
+                                                class="w-32 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                             <option value="WEEK">Weeks</option>
+                                             <option value="MONTH">Months</option>
+                                        </select>
+                                        <input type="number" min="1" th:field="*{duration}" id="listing-duration"
+                                               value="1"
+                                               class="w-32 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                        <div class="validation-error text-red-600 text-sm mt-1 hidden"></div>
+                                        <div th:if="${#fields.hasErrors('duration')}"
+                                                class="text-red-600 text-sm mt-1"
+                                                th:errors="*{duration}"></div>
+                                   </div>
+                                   <p class="text-xs text-gray-500 mt-1">You can choose to list for multiple weeks or months.</p>
+                              </div>
+
+                              <div
+                                   class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                   <div>
+                                        <label
+                                             class="block text-sm font-medium text-gray-700 mb-1">Listing
+                                             Type</label>
+                                        <div class="space-y-3">
+                                             <input type="radio"
+                                                    th:field="*{isHighlight}"
+                                                    value="false"
+                                                    id="normal-listing"
+                                                    th:attr="data-price-permonth=${listingPrices.normalPricePerMonth},data-price-perweek=${listingPrices.normalPricePerWeek}"
+                                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                                             <label for="normal-listing"
+                                                       class="ml-2 text-sm text-gray-700">
+                                                       Normal Listing
+                                                  </label>
+                                        </div>
+                                        <div class="flex items-center">
+                                             <input type="radio"
+                                                    th:field="*{isHighlight}"
+                                                    value="true"
+                                                    id="highlight-listing"
+                                                    th:attr="data-price-permonth=${listingPrices.highlightPricePerMonth},data-price-perweek=${listingPrices.highlightPricePerWeek}"
+                                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                                             <label for="highlight-listing"
+                                                  class="ml-2 text-sm text-gray-700">
+                                                  Highlight Listing
+                                             </label>
+                                        </div>
+                                        <p class="text-xs text-gray-500 mt-2">
+                                             Highlight listings appear at the
+                                             top of search results with priority
+                                             visibility
+                                        </p>
+                                   </div>
+
+                                   <div>
+                                        <label
+                                             class="block text-sm font-medium text-gray-700 mb-1">Payment
+                                             Summary</label>
+                                        <div class="bg-gray-50 rounded-lg p-4">
+                                             <div
+                                                  class="flex justify-between items-center mb-2">
+                                                  <span
+                                                       class="text-sm text-gray-600">Listing
+                                                       Fee:</span>
+                                                  <span
+                                                       class="text-sm font-medium text-gray-900"
+                                                       id="listing-fee">0VND</span>
+                                             </div>
+                                             <div class="border-t pt-2">
+                                                  <div
+                                                       class="flex justify-between items-center">
+                                                       <span
+                                                            class="text-sm font-medium text-gray-900">Total:</span>
+                                                       <span
+                                                            class="text-lg font-bold text-blue-600"
+                                                            id="total-fee">0VND</span>
+                                                  </div>
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div>
+                         </div>
+
+                         <!-- Description -->
+                         <div class="bg-white rounded-lg shadow-md p-6">
+                              <h2
+                                   class="text-xl font-semibold text-gray-900 mb-6">
+                                   <i
+                                        class="fas fa-align-left text-orange-600 mr-2"></i>
+                                   Listing Description
+                              </h2>
+
+                              <div class="grid grid-cols-1 gap-6">
+                                   <div>
+                                        <label
+                                             class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                                        <textarea th:field="*{description}"
+                                             rows="6" maxlength="2000"
+                                             placeholder="Describe your property listing, special features, terms, or any additional information that would help potential tenants..."
+                                             data-validate="maxLength:2000"
+                                             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"></textarea>
+                                        <div
+                                             class="flex justify-between items-center mt-1">
+                                             <div
+                                                  class="validation-error text-red-600 text-sm hidden"></div>
+                                             <div
+                                                  th:if="${#fields.hasErrors('description')}"
+                                                  class="text-red-600 text-sm"
+                                                  th:errors="*{description}"></div>
+                                             <span
+                                                  class="text-xs text-gray-500">
+                                                  <span
+                                                       id="char-count">0</span>/2000
+                                                  characters
+                                             </span>
+                                        </div>
+                                   </div>
+                              </div>
+                         </div>
+
+                         <!-- Action Buttons -->
+                         <div class="flex justify-end space-x-4 pt-6">
+                              <a href="/landlord/properties"
+                                   class="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
+                                   <i class="fas fa-times mr-2"></i>
+                                   Cancel
+                              </a>
+                              <button type="submit"
+                                   class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
+                                   <i class="fas fa-save mr-2"></i>
+                                   Create Listing
+                              </button>
+                         </div>
+                    </form>
+               </div>
+               <!-- Popup thông báo ví không đủ tiền -->
+               <div id="insufficient-balance-modal"
+                    class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 hidden">
+                    <div
+                         class="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full text-center">
+                         <h2 class="text-xl font-bold text-red-600 mb-4">Ví
+                              không đủ tiền</h2>
+                         <p class="mb-6">Ví của bạn không đủ để thanh toán. Hãy
+                              nạp tiền trước khi đăng tin.</p>
+                         <div class="flex justify-center space-x-4">
+                              <button id="cancel-modal-btn"
+                                   class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Cancel</button>
+                              <a id="deposit-btn" th:href="@{/wallet/deposit}"
+                                   class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Nạp
+                                   tiền</a>
+                         </div>
+                    </div>
+               </div>
+               <script>
+                    function updatePaymentSummary() {
+                         // Lấy radio đang chọn
+                         const selected = document.querySelector('input[name="isHighlight"]:checked');
+                         if (!selected) return;
+
+                         // Lấy giá per week và per month từ radio
+                         const pricePerMonth = Number(selected.getAttribute('data-price-permonth') || "0");
+                         const pricePerWeek = Number(selected.getAttribute('data-price-perweek') || "0");
+
+                         // Lấy loại duration (WEEK/MONTH) và số lượng
+                         const durationType = document.getElementById('duration-type').value;
+                         const duration = Number(document.getElementById('listing-duration').value) || 1;
+
+                         // Tính tiền theo lựa chọn
+                         let unitFee = durationType === "WEEK" ? pricePerWeek : pricePerMonth;
+                         let total = unitFee * duration;
+
+                         // Cập nhật UI
+                         document.getElementById('listing-fee').textContent = unitFee.toLocaleString('vi-VN') + ' VND';
+                         document.getElementById('total-fee').textContent = total.toLocaleString('vi-VN') + ' VND';
+                    }
+
+                    document.querySelectorAll('input[name="isHighlight"]').forEach(radio => {
+                         radio.addEventListener('change', updatePaymentSummary);
+                    });
+                    document.getElementById('duration-type').addEventListener('change', updatePaymentSummary);
+                    document.getElementById('listing-duration').addEventListener('input', updatePaymentSummary);
+                    updatePaymentSummary();
+
+               </script>
+          </div>
+     </body>
+</html>

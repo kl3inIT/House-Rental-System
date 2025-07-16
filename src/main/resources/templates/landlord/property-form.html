@@ -132,6 +132,20 @@
                         </div>
                     </div>
 
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1 ">Amenites</label>
+                        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px;">
+                            <div th:each="amenity : ${amenities}">
+                                <label>
+                                    <input type="checkbox"
+                                           name="amenityIds"
+                                           th:value="${amenity.id}"
+                                           th:checked="${selectedAmenityIds != null and selectedAmenityIds.contains(amenity.id)}" />
+                                    <span th:text="${amenity.name}"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -175,26 +189,23 @@
                     </div>
                 </div>
 
-                <div class="md:col-span-2">
+                <!--Map-->
+                <div class="md:col-span-2 mt-4">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Select Location on Map *</label>
                     <div id="map" style="height: 350px;" class="mb-2 rounded-lg border border-gray-300"></div>
                     <input type="hidden" id="latitude" name="latitude" th:field="*{latitude}"/>
                     <input type="hidden" id="longitude" name="longitude" th:field="*{longitude}"/>
                 </div>
-                <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBMKQc8KNgL_tzcdPYuvpTacsHtLDQrW3o"></script>
+
                 <script>
                     let marker;
                     function initMap() {
-                        // Lấy giá trị hiện tại của input (do Thymeleaf render ra)
                         let lat = parseFloat(document.getElementById("latitude").value);
                         let lng = parseFloat(document.getElementById("longitude").value);
-
-                        // Nếu chưa có thì lấy mặc định Hà Nội
                         if (isNaN(lat) || isNaN(lng)) {
                             lat = 21.0285;
                             lng = 105.8542;
                         }
-
                         const defaultPos = { lat, lng };
                         const map = new google.maps.Map(document.getElementById("map"), {
                             zoom: 15,
@@ -218,18 +229,15 @@
                             document.getElementById("longitude").value = event.latLng.lng();
                         });
 
-                        // Gán lại cho chắc chắn (để đúng value trên input khi mở form)
                         document.getElementById("latitude").value = lat;
                         document.getElementById("longitude").value = lng;
                     }
-
-                    window.onload = function() {
-                        if (document.getElementById('map')) {
-                            initMap();
-                        }
-                    };
                 </script>
 
+                <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4Uc3jH8JK7KHfSqm8BsjH7JJ-KxFvmNY&callback=initMap&loading=async"
+                        async
+                        defer>
+                </script>
             </div>
 
             <!-- Description -->
@@ -278,24 +286,6 @@
                 <div id="image-preview" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4 hidden">
                     <!-- Images will be previewed here via JavaScript with individual remove buttons -->
                 </div>
-
-                <!-- Preview old images when editing -->
-                <div id="image-preview-old" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-                    <div th:each="url, iterStat : ${oldImageUrls}"
-                         class="relative group bg-gray-100 rounded-lg shadow-sm flex flex-col items-center"
-                         th:attr="data-image-url=${url}">
-                        <img th:src="${url}" class="w-32 h-32 md:w-40 md:h-40 object-cover rounded-lg mx-auto"
-                             th:alt="'Property image ' + ${iterStat.index + 1}"/>
-                        <button type="button"
-                                class="remove-image-btn absolute -top-2 -right-2 w-7 h-7 bg-red-600 hover:bg-red-700 text-white rounded-full flex items-center justify-center transition"
-                                th:attr="data-image-url=${url}">
-                            <i class="fas fa-times text-sm font-bold"></i>
-                        </button>
-                        <div class="absolute bottom-1 left-1 bg-white text-gray-700 text-xs px-1.5 py-0.5 rounded font-medium shadow-sm">
-                            #<span th:text="${iterStat.index + 1}"></span>
-                        </div>
-                    </div>
-                </div>
                 <input type="hidden" name="oldImageUrls" id="oldImageUrls" th:value="${#strings.arrayJoin(oldImageUrls, ',')}">
 
                 <!-- Template for image preview item (hidden, used by JavaScript) -->
@@ -304,7 +294,7 @@
                         <img class="w-32 h-32 md:w-40 md:h-40 object-cover rounded-lg mx-auto" alt="Preview">
                         <!-- Beautiful modern remove button -->
                         <button type="button" 
-                                class="remove-image-btn absolute -top-2 -right-2 w-7 h-7 bg-red-600 hover:bg-red-700 focus:bg-red-700 text-white rounded-full flex items-center justify-center transition-all duration-300 ease-out shadow-lg hover:shadow-xl border-2 border-white opacity-100 group-hover:scale-110 z-50 focus:outline-none focus:ring-3 focus:ring-red-400 hover:rotate-90 transform-gpu"
+                                class="z-50 remove-image-btn absolute -top-2 -right-2 w-7 h-7 bg-red-600 hover:bg-red-700 focus:bg-red-700 text-white rounded-full flex items-center justify-center transition-all duration-300 ease-out shadow-lg hover:shadow-xl border-2 border-white group-hover:scale-110 z-50 focus:outline-none focus:ring-3 focus:ring-red-400 hover:rotate-90 transform-gpu"
                                 title="Remove image"
                                 aria-label="Remove image">
                             <i class="fas fa-times text-sm font-bold drop-shadow-sm" aria-hidden="true"></i>

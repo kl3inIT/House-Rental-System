@@ -67,10 +67,38 @@
 
                 </div>
 
+                <!-- Listings -->
+                <div class="space-y-1">
+                    <!-- Parent link (dropdown toggle) -->
+                    <button type="button"
+                            class="group flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                            onclick="toggleDropdown('listing-submenu')">
+                        <span class="flex items-center">
+                            <i class="fas fa-list mr-3 text-lg"></i>
+                            My Listings
+                        </span>
+                        <i class="fas fa-chevron-down transition-transform duration-200" id="listing-chevron"></i>
+                    </button>
+
+                    <!-- Dropdown submenu -->
+                    <div id="listing-submenu" class="ml-6 space-y-1 hidden">
+                        <a th:href="@{/landlord/listings}"
+                           th:class="'block px-3 py-2 text-sm rounded-md font-medium transition ' + (${currentUri == '/landlord/listings'} ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900')">
+                            View All Listings
+                        </a>
+                        <a th:href="@{/landlord/listings/create}"
+                           th:class="'block px-3 py-2 text-sm rounded-md font-medium transition ' + (${currentUri == '/landlord/listings/create'} ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900')">
+                            Create New Listing
+                        </a>
+                    </div>
+                </div>
+
                 <script>
                     function toggleDropdown(id) {
                         const submenu = document.getElementById(id);
+                        const chevron = document.getElementById(id.replace('-submenu', '-chevron'));
                         submenu.classList.toggle("hidden");
+                        chevron.classList.toggle("rotate-180");
                     }
                 </script>
                 <!-- Requests -->
