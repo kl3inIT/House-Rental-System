@@ -11,10 +11,6 @@ public interface SystemConfigService {
 
     BigDecimal getConfigValueAsDecimal(String key, BigDecimal defaultValue);
 
-    void updateConfig(String key, String value);
-    
-    void updateConfig(String key, BigDecimal value);
-
     BigDecimal getNormalListingPricePerMonth();
     
     BigDecimal getHighlightListingPricePerMonth();
@@ -22,8 +18,4 @@ public interface SystemConfigService {
     BigDecimal getNormalListingPricePerWeek();
 
     BigDecimal getHighlightListingPricePerWeek();
-    
-    void setNormalListingPrice(BigDecimal price);
-    
-    void setHighlightListingPrice(BigDecimal price);
 } 

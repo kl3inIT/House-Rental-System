@@ -27,7 +27,7 @@ public interface PropertyRepository extends JpaRepository<RentalProperty, Long>,
     List<RentalProperty> findByLandlordIdAndPropertyStatusNot(Long landlordId, PropertyStatus propertyStatus);
 
     List<RentalProperty> findByLandlordIdAndPropertyStatus(Long landlordId, PropertyStatus propertyStatus);
-    // JPQL query trả về entity RentalProperty
+
     @Query("SELECT p FROM RentalProperty p " +
             "WHERE p.landlord.id = :landlordId " +
             "AND (:status IS NULL OR p.propertyStatus = :status) " +
@@ -43,9 +43,8 @@ public interface PropertyRepository extends JpaRepository<RentalProperty, Long>,
             Pageable pageable
     );
 
-    // JPQL query cho thống kê stats
     @Query("SELECT " +
-            "COUNT(p), " + // 0
+            "COUNT(p), " + // 0: Tổng số bất động sản
             "SUM(CASE WHEN p.propertyStatus = 'AVAILABLE' THEN 1 ELSE 0 END), " + // 1
             "SUM(CASE WHEN p.propertyStatus = 'RENTED' THEN 1 ELSE 0 END), " + // 2
             "SUM(CASE WHEN p.propertyStatus = 'BOOKED' THEN 1 ELSE 0 END), " + // 3
@@ -55,7 +54,7 @@ public interface PropertyRepository extends JpaRepository<RentalProperty, Long>,
             "SUM(CASE WHEN p.propertyStatus = 'ADMIN_HIDDEN' THEN 1 ELSE 0 END), " + // 7
             "SUM(CASE WHEN p.propertyStatus = 'ADMIN_BANNED' THEN 1 ELSE 0 END), " + // 8
             "COALESCE(SUM(p.views), 0), " + // 9
-            "COALESCE(SUM(p.monthlyRent), 0) " + // 10
+            "COALESCE(SUM(CASE WHEN p.propertyStatus IN ('RENTED') THEN p.monthlyRent ELSE 0 END), 0) " + // 10
             "FROM RentalProperty p " +
             "WHERE p.landlord.id = :landlordId " +
             "AND (:status IS NULL OR p.propertyStatus = :status) " +
@@ -69,6 +68,7 @@ public interface PropertyRepository extends JpaRepository<RentalProperty, Long>,
             @Param("minPrice") Integer minPrice,
             @Param("maxPrice") Integer maxPrice
     );
+
 
     List<RentalProperty> findByCategoryIdAndIdNotAndPropertyStatus(
             Long categoryId,

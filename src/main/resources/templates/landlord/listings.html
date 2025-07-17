@@ -5,6 +5,8 @@
       layout:decorate="~{layout/landlord}">
 <head>
      <title>My Listings - RentEase</title>
+     <meta name="_csrf" th:content="${_csrf.token}" />
+     <meta name="_csrf_header" th:content="${_csrf.headerName}" />
 </head>
 <body>
 <div layout:fragment="content">
@@ -80,15 +82,15 @@
                <div class="flex flex-col md:flex-row items-center gap-4 mb-8 w-full">
                     <div class="relative flex-1 w-full max-w-lg">
                          <input id="searchInput" name="searchTerm" type="text" placeholder="Search by property title..."
-                                class="w-full flex-1 pl-10 pr-4 py-2 border border-gray-300 rounded-xl bg-white shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                                th:value="${filter.searchTerm}" />
+                                                                 class="w-full flex-1 pl-10 pr-4 py-2 border border-gray-300 rounded-xl bg-white shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                                                 th:value="${filter.searchTerm}" />
                          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
                               <i class="fas fa-search"></i>
                          </span>
                     </div>
                     <!-- Status filter -->
                     <select id="statusFilter" name="status"
-                            class="border border-gray-300 rounded-xl py-2 px-6 focus:ring-blue-500 bg-white shadow-sm">
+                                                              class="border border-gray-300 rounded-xl py-2 px-6 focus:ring-blue-500 bg-white shadow-sm">
                          <option value="" th:selected="${filter.status == null or filter.status == ''}">All Status</option>
                          <option value="ACTIVE" th:selected="${filter.status == 'ACTIVE'}">Active</option>
                          <option value="EXPIRED" th:selected="${filter.status == 'EXPIRED'}">Expired</option>
@@ -97,7 +99,7 @@
 
                     <!-- Highlight filter -->
                     <select id="highlightFilter" name="highlight"
-                            class="border border-gray-300 rounded-xl py-2 px-8 focus:ring-blue-500 bg-white shadow-sm">
+                                                                 class="border border-gray-300 rounded-xl py-2 px-8 focus:ring-blue-500 bg-white shadow-sm">
                          <option value="" th:selected="${filter.highlight == null or filter.highlight == ''}">All Types</option>
                          <option value="highlighted" th:selected="${filter.highlight == 'highlighted'}">Highlighted</option>
                          <option value="regular" th:selected="${filter.highlight == 'regular'}">Regular</option>
@@ -118,7 +120,7 @@
                  data-status=${listing.status},
                  data-highlighted=${listing.isHighlight}">
 
-                    <div class="relative w-full aspect-[4/3] overflow-hidden bg-gray-100">
+                    <div class="relative w-full overflow-hidden bg-gray-100" style="aspect-ratio: 16/9;">
                          <img th:src="${listing.propertyMainImageUrl != null ? listing.propertyMainImageUrl : '/images/placeholder-property.jpg'}"
                               alt="Property"
                               class="w-full h-full object-cover" />
@@ -138,11 +140,26 @@
                                class="absolute top-3 right-3 px-2 py-1 bg-gray-200 text-gray-600 text-xs rounded-full font-semibold shadow-md">
                              EXPIRED
                          </span>
+                         <span th:if="${listing.status eq 'HIDDEN'}"
+                               class="absolute top-3 right-3 px-2 py-1 bg-gray-200 text-gray-600 text-xs rounded-full font-semibold shadow-md">
+                             HIDDEN
+                         </span>
                     </div>
 
                     <!-- Listing -->
                     <div class="p-6 flex-1 flex flex-col">
-                         <h3 class="font-bold text-lg text-gray-900 mb-1" th:text="${listing.propertyTitle}">Property Name</h3>
+                         <div class="flex items-center gap-2 mb-1">
+                              <h3 class="font-bold text-3xl text-gray-900" th:text="${listing.propertyTitle}">Property Name</h3>
+                              <span th:if="${listing.status eq 'UPCOMING' and listing.daysLeft != null and listing.daysLeft > 0}"
+                                    th:text="${listing.daysLeft} + ' days to start'"
+                                    class="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded font-semibold"></span>
+                              <span th:if="${listing.status eq 'ACTIVE' and listing.daysLeft != null and listing.daysLeft > 0}"
+                                    th:text="${listing.daysLeft} + ' days left'"
+                                    class="px-2 py-0.5 bg-yellow-100 text-yellow-800 text-xs rounded font-semibold"></span>
+                              <span th:if="${listing.daysLeft != null and listing.daysLeft <= 0}"
+                                    th:text="'Expired'"
+                                    class="px-2 py-0.5 bg-gray-200 text-gray-800 text-xs rounded font-semibold"></span>
+                         </div>
                          <div class="text-gray-500 mb-2 text-sm" th:text="${listing.propertyAddress}">Address</div>
                          <div class="text-blue-600 font-bold text-xl mb-1" th:text="${#numbers.formatDecimal(listing.amount, 0, 0)} + ' VND'">0 VND</div>
                          <div class="flex items-center text-gray-400 text-sm mb-2">
@@ -154,9 +171,26 @@
                               <span><i class="fas fa-eye mr-1"></i> <span th:text="${listing.viewCount}">0</span> views</span>
                               <span><i class="fas fa-envelope mr-1"></i> <span th:text="${listing.inquiryCount}">0</span> inquiries</span>
                          </div>
-                         <div class="flex gap-2 mt-auto">
-                              <a th:href="@{'/landlord/listings/edit/' + ${listing.id}}" class="flex-1 bg-blue-600 text-white rounded-xl py-2 text-center font-semibold hover:bg-blue-700"><i class="fas fa-edit mr-1"></i>Edit</a>
-                              <button th:onclick="'deleteListing(' + ${listing.id} + ')'" class="flex-0 bg-red-100 text-red-700 rounded-xl py-2 px-4 hover:bg-red-200"><i class="fas fa-trash"></i></button>
+                         <div class="flex gap-2 mt-4">
+                              <form th:action="@{|/landlord/listings/hide/${listing.id}|}" method="post" th:if="${listing.status != 'HIDDEN'}" class="flex-1">
+                                   <button type="submit"
+                                           class="w-full px-6 py-2 bg-yellow-400 text-white rounded-md hover:bg-yellow-500 focus:outline-none flex items-center justify-center">
+                                        <i class="fas fa-eye-slash mr-2"></i> Hide Listing
+                                   </button>
+                              </form>
+                              <form th:action="@{|/landlord/listings/unhide/${listing.id}|}" method="post" th:if="${listing.status == 'HIDDEN'}" class="flex-1">
+                                   <button type="submit"
+                                           class="w-full px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none flex items-center justify-center">
+                                        <i class="fas fa-eye mr-2"></i> Unhide Listing
+                                   </button>
+                              </form>
+                              <form th:action="@{|/landlord/listings/delete/${listing.id}|}" method="post" class="flex-1">
+                                   <button type="submit"
+                                           class="w-full px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 text-sm flex items-center justify-center"
+                                           onclick="return confirm('Are you sure you want to delete this listing?');">
+                                        <i class="fas fa-trash mr-1"></i> Delete
+                                   </button>
+                              </form>
                          </div>
                     </div>
                </div>
@@ -217,94 +251,8 @@
                     Next &raquo;
                </a>
           </nav>
-
-
      </div>
+     <script src="/js/landlord/listing-action.js"></script>
 </div>
-
-<!-- Delete Confirmation Modal -->
-<div id="deleteModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
-     <div class="flex items-center justify-center min-h-screen p-4">
-          <div class="bg-white rounded-lg shadow-xl max-w-md w-full">
-               <div class="p-6">
-                    <div class="flex items-center mb-4">
-                         <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
-                              <i class="fas fa-exclamation-triangle text-red-600"></i>
-                         </div>
-                    </div>
-                    <div class="text-center">
-                         <h3 class="text-lg font-medium text-gray-900 mb-2">Delete Listing</h3>
-                         <p class="text-sm text-gray-500 mb-6">Are you sure you want to delete this listing? This action cannot be undone.</p>
-                         <div class="flex space-x-3">
-                              <button id="cancelDelete"
-                                      class="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
-                                   Cancel
-                              </button>
-                              <button id="confirmDelete"
-                                      class="flex-1 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">
-                                   Delete
-                              </button>
-                         </div>
-                    </div>
-               </div>
-          </div>
-     </div>
-</div>
-
-<script th:inline="javascript">
-     document.addEventListener('DOMContentLoaded', function () {
-          // === Xóa Listing với Modal xác nhận ===
-          let currentListingId = null;
-          const deleteModal = document.getElementById('deleteModal');
-          const cancelDelete = document.getElementById('cancelDelete');
-          const confirmDelete = document.getElementById('confirmDelete');
-
-          // Gọi từ nút xóa từng listing (th:onclick="'deleteListing(' + ${listing.id} + ')'").
-          window.deleteListing = function (listingId) {
-               currentListingId = listingId;
-               if (deleteModal) deleteModal.classList.remove('hidden');
-          };
-
-          if (cancelDelete) {
-               cancelDelete.addEventListener('click', function () {
-                    deleteModal.classList.add('hidden');
-               });
-          }
-
-          if (confirmDelete) {
-               confirmDelete.addEventListener('click', function () {
-                    if (currentListingId) {
-                         fetch(`/landlord/listings/delete/${currentListingId}`, {
-                              method: 'DELETE',
-                              headers: { 'Content-Type': 'application/json' }
-                         }).then(response => {
-                              if (response.ok) {
-                                   const listingCard = document.querySelector(`[data-listing-id="${currentListingId}"]`);
-                                   if (listingCard) listingCard.remove();
-                                   deleteModal.classList.add('hidden');
-                                   showNotification('Listing deleted successfully', 'success');
-                                   // Reload page để cập nhật lại pagination/filter (nếu muốn)
-                                   setTimeout(() => window.location.reload(), 1200);
-                              } else {
-                                   showNotification('Failed to delete listing', 'error');
-                              }
-                         }).catch(() => {
-                              showNotification('An error occurred while deleting the listing', 'error');
-                         });
-                    }
-               });
-          }
-     });
-
-     // Hàm notification nhỏ gọn
-     function showNotification(message, type) {
-          const notification = document.createElement('div');
-          notification.className = `fixed top-4 right-4 px-6 py-3 rounded-md text-white z-50 ${type === 'success' ? 'bg-green-600' : 'bg-red-600'}`;
-          notification.textContent = message;
-          document.body.appendChild(notification);
-          setTimeout(() => notification.remove(), 2000);
-     }
-</script>
-
 </body>
 </html>

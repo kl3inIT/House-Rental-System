@@ -13,12 +13,12 @@ public class ListingListItemDTO {
     private Long id;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
+    private Integer daysLeft;
     private Double amount;
     private String description;
     private Boolean isHighlight;
     private String status;
     
-    // Property information
     private Long propertyId;
     private String propertyTitle;
     private String propertyAddress;

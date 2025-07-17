@@ -39,5 +39,5 @@ public interface PropertyService {
 
     List<RentalProperty> getPropertiesByLandlordStatusNotAvailable(Long landlordId);
 
-    List<RentalProperty> getPropertiesByLandlordStatusAvailable(Long landlordId);
+
 }

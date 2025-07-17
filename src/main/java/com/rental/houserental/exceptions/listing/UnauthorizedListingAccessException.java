@@ -1,4 +1,4 @@
-package com.rental.houserental.exception.listing;
+package com.rental.houserental.exceptions.listing;
 
 public class UnauthorizedListingAccessException extends RuntimeException {
     

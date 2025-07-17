@@ -24,7 +24,6 @@ public class PropertyDetailDTO {
     private String fullAddress;
 
     private Long categoryId;
-    private String categoryName;
 
     private BigDecimal monthlyRent;
     private Integer bedrooms;
