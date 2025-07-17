@@ -1,7 +1,159 @@
 // Simple page functionality
 document.addEventListener('DOMContentLoaded', function() {
     initializeHomeSearch();
+    initializeWishlistToggles();
+    createToastContainer();
 });
+
+// Toast Notification System
+function createToastContainer() {
+    if (document.getElementById('toast-container')) return;
+    
+    const container = document.createElement('div');
+    container.id = 'toast-container';
+    container.className = 'fixed top-4 right-4 z-50 space-y-2';
+    document.body.appendChild(container);
+}
+
+function showToast(message, type = 'success') {
+    const container = document.getElementById('toast-container');
+    
+    const toast = document.createElement('div');
+    toast.className = `transform transition-all duration-300 ease-in-out translate-x-full opacity-0 max-w-sm w-full bg-white shadow-lg rounded-lg pointer-events-auto flex ring-1 ring-black ring-opacity-5`;
+    
+    const iconColor = type === 'success' ? 'text-green-400' : 'text-red-400';
+    const icon = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+    
+    toast.innerHTML = `
+        <div class="flex-1 w-0 p-4">
+            <div class="flex items-start">
+                <div class="flex-shrink-0">
+                    <i class="${icon} ${iconColor} text-xl"></i>
+                </div>
+                <div class="ml-3 flex-1">
+                    <p class="text-sm font-medium text-gray-900">${message}</p>
+                </div>
+            </div>
+        </div>
+        <div class="flex border-l border-gray-200">
+            <button onclick="this.parentElement.parentElement.remove()" 
+                    class="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center text-sm font-medium text-gray-600 hover:text-gray-500 focus:outline-none">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `;
+    
+    container.appendChild(toast);
+    
+    // Animate in
+    setTimeout(() => {
+        toast.classList.remove('translate-x-full', 'opacity-0');
+    }, 100);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        toast.classList.add('translate-x-full', 'opacity-0');
+        setTimeout(() => {
+            if (toast.parentElement) {
+                toast.remove();
+            }
+        }, 300);
+    }, 5000);
+}
+
+// Wishlist AJAX functionality
+function initializeWishlistToggles() {
+    const wishlistForms = document.querySelectorAll('form[action*="/wishlist/toggle/"]');
+    
+    wishlistForms.forEach(form => {
+        const button = form.querySelector('button[type="submit"]');
+        const heartIcon = button.querySelector('i');
+        
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(form);
+            const propertyId = form.action.split('/').pop();
+            
+            // Add loading state
+            button.disabled = true;
+            heartIcon.classList.add('fa-spinner', 'fa-spin');
+            heartIcon.classList.remove('fa-heart');
+            
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    
+                    // Update heart icon
+                    heartIcon.classList.remove('fa-spinner', 'fa-spin');
+                    heartIcon.classList.add('fa-heart');
+                    
+                    if (result.added) {
+                        heartIcon.classList.remove('far', 'text-gray-600');
+                        heartIcon.classList.add('fas', 'text-red-500');
+                        button.title = 'Remove from wishlist';
+                        showToast('❤️ Added to wishlist!', 'success');
+                    } else {
+                        heartIcon.classList.remove('fas', 'text-red-500');
+                        heartIcon.classList.add('far', 'text-gray-600');
+                        button.title = 'Add to wishlist';
+                        showToast('💔 Removed from wishlist', 'success');
+                    }
+                    
+                    // Update wishlist count in header if exists
+                    updateWishlistCount(result.wishlistCount);
+                    
+                } else {
+                    throw new Error('Failed to update wishlist');
+                }
+                
+            } catch (error) {
+                console.error('Wishlist error:', error);
+                showToast('Failed to update wishlist. Please try again.', 'error');
+                
+                // Reset icon
+                heartIcon.classList.remove('fa-spinner', 'fa-spin');
+                heartIcon.classList.add('fa-heart');
+            } finally {
+                button.disabled = false;
+            }
+        });
+    });
+}
+
+function updateWishlistCount(count) {
+    const wishlistBadge = document.querySelector('[data-wishlist-count]');
+    if (wishlistBadge) {
+        wishlistBadge.textContent = count;
+        // Show badge if count > 0, hide if count = 0
+        if (count > 0) {
+            wishlistBadge.style.display = 'flex';
+        } else {
+            wishlistBadge.style.display = 'none';
+        }
+    }
+    
+    // Also update mobile menu badge if exists
+    const mobileBadges = document.querySelectorAll('a[href="/wishlist"] span');
+    mobileBadges.forEach(badge => {
+        if (badge && badge.classList.contains('bg-red-500')) {
+            badge.textContent = count;
+            if (count > 0) {
+                badge.style.display = 'flex';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+    });
+}
 
 // Home search functionality
 function initializeHomeSearch() {

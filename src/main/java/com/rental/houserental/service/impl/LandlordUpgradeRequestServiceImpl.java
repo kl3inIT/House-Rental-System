@@ -31,6 +31,7 @@ public class LandlordUpgradeRequestServiceImpl implements LandlordUpgradeRequest
 
     @Autowired
     private NotificationService notificationService;
+
     @Autowired
     private NotificationWebSocketService notificationWebSocketService;
 

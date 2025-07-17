@@ -87,11 +87,6 @@
 
                         <!-- Property Image -->
                         <div class="relative h-48 bg-gray-200 overflow-hidden group">
-                            <!-- Property Category Badge -->
-                            <div class="absolute top-3 left-3 bg-blue-600 text-white px-2 py-1 rounded text-xs font-medium z-30 shadow-sm">
-                                <span th:text="${property.categoryName}">Category</span>
-                            </div>
-
                             <!-- Heart Icon with Dynamic State -->
                             <div sec:authorize="isAuthenticated()" class="absolute top-3 right-3 z-30">
                                 <form th:action="@{/wishlist/toggle/{propertyId}(propertyId=${property.id})}" method="post" style="display: inline;">
@@ -113,34 +108,34 @@
                             </div>
 
                             <!-- Single Image or Placeholder -->
-                            <div th:if="${#lists.isEmpty(property.imageUrls)}"
+                            <div th:if="${!property.hasImage()}"
                                 class="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
                                 <i class="fas fa-home text-4xl text-gray-400"></i>
                             </div>
 
-                            <img th:if="${!#lists.isEmpty(property.imageUrls)}" th:src="${property.imageUrls[0]}"
+                            <img th:if="${property.hasImage()}" th:src="${property.mainImageUrl}"
                                 th:alt="${property.title}"
                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                 loading="lazy">
-
-                            <!-- Image Count Indicator -->
-                            <div th:if="${property.imageCount > 1}"
-                                class="absolute bottom-3 right-3 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs font-medium">
-                                <i class="fas fa-images mr-1"></i>
-                                <span th:text="${property.imageCount}">5</span>
-                            </div>
                         </div>
 
                         <!-- Property Info -->
                         <div class="p-4 space-y-3">
-                            <!-- Title & Views -->
-                            <div class="flex items-start justify-between">
-                                <h3 class="font-semibold text-gray-900 text-base leading-tight line-clamp-2 flex-1"
-                                    th:text="${property.title}">Property Title</h3>
-                                <div class="flex items-center text-xs text-gray-500 ml-2">
+                            <!-- Category Badge (moved here to avoid conflicts) -->
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="inline-block bg-blue-600 text-white px-2 py-1 rounded text-xs font-medium">
+                                    <span th:text="${property.categoryName}">Category</span>
+                                </span>
+                                <div class="flex items-center text-xs text-gray-500">
                                     <i class="fas fa-eye mr-1"></i>
                                     <span th:text="${property.views}">0</span>
                                 </div>
+                            </div>
+
+                            <!-- Title -->
+                            <div>
+                                <h3 class="font-semibold text-gray-900 text-base leading-tight line-clamp-2"
+                                    th:text="${property.title}">Property Title</h3>
                             </div>
 
                             <!-- Location -->

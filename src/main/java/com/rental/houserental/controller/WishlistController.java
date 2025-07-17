@@ -6,6 +6,7 @@ import com.rental.houserental.service.UserService;
 import com.rental.houserental.service.WishlistService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,7 +14,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/wishlist")
@@ -100,43 +103,63 @@ public class WishlistController {
     }
 
     /**
-     * Toggle wishlist status (for quick actions)
+     * Toggle wishlist status (for quick actions) - Form-based
      */
     @PostMapping("/toggle/{propertyId}")
-    public String toggleWishlist(
+    public ResponseEntity<?> toggleWishlist(
             @PathVariable Long propertyId, 
             Principal principal,
             RedirectAttributes redirectAttributes,
-            @RequestParam(defaultValue = "/") String returnUrl) {
+            @RequestParam(defaultValue = "/") String returnUrl,
+            @RequestHeader(value = "X-Requested-With", required = false) String requestedWith) {
         
         try {
             User currentUser = userService.findByEmail(principal.getName());
             boolean isInWishlist = wishlistService.isInWishlist(currentUser.getId(), propertyId);
             
+            boolean added = false;
             if (isInWishlist) {
                 // Remove from wishlist
-                boolean removed = wishlistService.removeFromWishlist(currentUser.getId(), propertyId);
-                if (removed) {
-                    redirectAttributes.addFlashAttribute("successMessage", "Property removed from your wishlist");
-                } else {
-                    redirectAttributes.addFlashAttribute("errorMessage", "Failed to remove property from wishlist");
-                }
+                wishlistService.removeFromWishlist(currentUser.getId(), propertyId);
+                log.info("User {} removed property {} from wishlist", currentUser.getId(), propertyId);
             } else {
                 // Add to wishlist
-                boolean added = wishlistService.addToWishlist(currentUser.getId(), propertyId);
+                wishlistService.addToWishlist(currentUser.getId(), propertyId);
+                added = true;
+                log.info("User {} added property {} to wishlist", currentUser.getId(), propertyId);
+            }
+            
+            // Check if this is an AJAX request
+            if ("XMLHttpRequest".equals(requestedWith)) {
+                Map<String, Object> response = new HashMap<>();
+                response.put("success", true);
+                response.put("added", added);
+                response.put("wishlistCount", wishlistService.getWishlistCount(currentUser.getId()));
+                response.put("message", added ? "Added to wishlist" : "Removed from wishlist");
+                return ResponseEntity.ok(response);
+            } else {
+                // Traditional form submission - redirect with flash message
                 if (added) {
                     redirectAttributes.addFlashAttribute("successMessage", "Property added to your wishlist");
                 } else {
-                    redirectAttributes.addFlashAttribute("errorMessage", "Failed to add property to wishlist");
+                    redirectAttributes.addFlashAttribute("successMessage", "Property removed from your wishlist");
                 }
+                return ResponseEntity.status(302).header("Location", returnUrl).build();
             }
             
         } catch (Exception e) {
             log.error("Error toggling wishlist for property {}", propertyId, e);
-            redirectAttributes.addFlashAttribute("errorMessage", "Failed to update wishlist");
+            
+            if ("XMLHttpRequest".equals(requestedWith)) {
+                Map<String, Object> response = new HashMap<>();
+                response.put("success", false);
+                response.put("message", "Failed to update wishlist");
+                return ResponseEntity.badRequest().body(response);
+            } else {
+                redirectAttributes.addFlashAttribute("errorMessage", "Failed to update wishlist");
+                return ResponseEntity.status(302).header("Location", returnUrl).build();
+            }
         }
-        
-        return "redirect:" + returnUrl;
     }
 
     /**

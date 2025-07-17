@@ -59,6 +59,16 @@
                             <i class="fas fa-wallet text-lg text-blue-600"></i>
                             <span th:text="${currentUser.balance} + '₫'"></span>
                         </a>
+                        
+                        <!-- Wishlist -->
+                        <a th:href="@{/wishlist}" class="relative text-gray-400 hover:text-gray-600 transition-colors duration-200">
+                            <i class="fas fa-heart text-lg"></i>
+                            <span th:if="${wishlistCount > 0}" 
+                                  data-wishlist-count
+                                  th:text="${wishlistCount}"
+                                  class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">0</span>
+                        </a>
+                        
                         <!-- Notifications -->
                         <button class="relative text-gray-400 hover:text-gray-600 transition-colors duration-200">
                             <i class="fas fa-bell text-lg"></i>
@@ -166,8 +176,18 @@
                    class="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">
                     <i class="fas fa-calendar-check mr-2"></i>My Bookings
                 </a>
+                
+                <!-- Wishlist Mobile Menu -->
+                <a sec:authorize="isAuthenticated()" th:href="@{/wishlist}"
+                   class="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium relative">
+                    <i class="fas fa-heart mr-2"></i>Wishlist
+                    <span th:if="${wishlistCount > 0}" 
+                          th:text="${wishlistCount}"
+                          class="inline-block bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center ml-2">0</span>
+                </a>
+                
                 <!-- Wallet Mobile Menu -->
-                <a sec:authorize="isAuthenticated()" th:href="@{/user/wallet}"
+                <a sec:authorize="isAuthenticated()" th:href="@{/wallet/transactions}"
                    class="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">
                     <i class="fas fa-wallet mr-2"></i>Wallet
                 </a>

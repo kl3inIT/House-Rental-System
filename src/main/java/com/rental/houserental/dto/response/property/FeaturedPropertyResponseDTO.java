@@ -26,8 +26,6 @@ public class FeaturedPropertyResponseDTO {
     private Integer depositPercentage;
     private Integer views;
     private String mainImageUrl;
-    private List<String> imageUrls;
-    private Integer imageCount;
     private List<String> topAmenities; // Top 3-4 amenities for display
     private Double rating; // Average rating if available
     private Integer reviewCount;
@@ -64,5 +62,10 @@ public class FeaturedPropertyResponseDTO {
             case BASIC -> "Basic Furniture";
             case NONE -> "Unfurnished";
         };
+    }
+    
+    // Helper method to check if has image
+    public boolean hasImage() {
+        return mainImageUrl != null && !mainImageUrl.trim().isEmpty();
     }
 } 

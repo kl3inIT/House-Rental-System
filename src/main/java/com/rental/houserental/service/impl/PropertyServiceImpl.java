@@ -438,9 +438,12 @@ public class PropertyServiceImpl implements PropertyService {
 
     private FeaturedPropertyResponseDTO convertToFeaturedDTO(RentalProperty property) {
         try {
-            List<String> imageUrls = property.getImages().stream()
-                    .map(PropertyImage::getImageUrl)
-                    .toList();
+            log.debug("Converting property {} to featured DTO", property.getId());
+            log.debug("Property title: {}", property.getTitle());
+            log.debug("Property images count: {}", property.getImages() != null ? property.getImages().size() : 0);
+            
+            String mainImageUrl = property.getMainImageUrl();
+            log.debug("Main image URL: {}", mainImageUrl);
             
             // Get top 3-4 amenities for display
             List<String> topAmenities = property.getAmenities().stream()
@@ -461,12 +464,10 @@ public class PropertyServiceImpl implements PropertyService {
                     .furnishing(property.getFurnishing())
                     .depositPercentage(property.getDepositPercentage())
                     .views(property.getViews())
-                    .mainImageUrl(property.getMainImageUrl())
-                    .imageUrls(imageUrls)
-                    .imageCount(imageUrls.size())
+                    .mainImageUrl(mainImageUrl)
                     .topAmenities(topAmenities)
-                    .rating(4.5) // TODO: Calculate from reviews
-                    .reviewCount(12) // TODO: Count from reviews
+                    .rating(4.5)
+                    .reviewCount(12)
                     .build();
                     
         } catch (Exception e) {
