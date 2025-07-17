@@ -7,7 +7,6 @@ import com.rental.houserental.dto.response.property.AmenityDTO;
 import com.rental.houserental.dto.response.property.PropertyDetailDTO;
 import com.rental.houserental.dto.response.property.PropertyListItemDTO;
 import com.rental.houserental.dto.response.property.PropertyStatsDTO;
-import com.rental.houserental.entity.Amenity;
 import com.rental.houserental.entity.User;
 import com.rental.houserental.enums.FurnishingType;
 import com.rental.houserental.service.AmenityService;

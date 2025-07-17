@@ -34,24 +34,11 @@ public class SystemConfig extends BaseEntity {
     @Column(name = "IsActive")
     private Boolean isActive = true;
     
-    // Helper methods for common config types
     public BigDecimal getDecimalValue() {
         try {
             return new BigDecimal(configValue);
         } catch (NumberFormatException e) {
             return BigDecimal.ZERO;
         }
-    }
-    
-    public Integer getIntegerValue() {
-        try {
-            return Integer.parseInt(configValue);
-        } catch (NumberFormatException e) {
-            return 0;
-        }
-    }
-    
-    public Boolean getBooleanValue() {
-        return Boolean.parseBoolean(configValue);
     }
 } 

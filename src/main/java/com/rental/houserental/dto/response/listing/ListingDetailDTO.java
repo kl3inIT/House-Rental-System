@@ -18,9 +18,8 @@ public class ListingDetailDTO {
     private Double amount;
     private String description;
     private Boolean isHighlight;
-    private String status; // active, expired, upcoming
+    private String status; 
     
-    // Property information
     private Long propertyId;
     private String propertyTitle;
     private String propertyAddress;
