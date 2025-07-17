@@ -20,5 +20,7 @@ public interface CategoryService {
     List<CategorySummaryResponseDTO> getCategorySummaries();
 
     void updateCategory(Long id, CategoryUpdateRequestDTO dto);
+
     void deleteCategory(Long id);
+
 } 

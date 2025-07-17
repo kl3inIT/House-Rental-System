@@ -1,5 +1,6 @@
 package com.rental.houserental.entity;
 
+import com.rental.houserental.enums.ListingStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,7 +24,7 @@ public class Listing extends BaseEntity {
     @Column(name = "Amount", nullable = false)
     private double amount;
 
-    @Column(name = "Description", columnDefinition = "TEXT")
+    @Column(name = "Description", columnDefinition = "NVARCHAR(2000)")
     private String description;
 
     @Column(name = "IsHighlight", nullable = false)
@@ -36,4 +37,8 @@ public class Listing extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "LandlordId", nullable = false)
     private User landlord;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "Status", nullable = false)
+    private ListingStatus status;
 }

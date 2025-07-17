@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Request Landlord Upgrade</title>
+    <link rel="stylesheet" th:href="@{/css/input.css}" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f8fafc;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 60px auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px #0002;
+            padding: 36px 32px;
+        }
+
+        h1 {
+            font-size: 1.7rem;
+            margin-bottom: 18px;
+            color: #1e293b;
+            text-align: center;
+        }
+
+        .desc {
+            color: #64748b;
+            margin-bottom: 28px;
+            text-align: center;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        label {
+            font-weight: 500;
+            color: #334155;
+            margin-bottom: 4px;
+        }
+
+        input,
+        textarea {
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .btn-submit {
+            background: #2563eb;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-submit:hover {
+            background: #1d4ed8;
+        }
+
+        .status-box {
+            margin-top: 24px;
+            padding: 18px;
+            border-radius: 8px;
+            background: #f1f5f9;
+            text-align: center;
+        }
+
+        .status-pending {
+            color: #f59e42;
+            font-weight: bold;
+        }
+
+        .status-approved {
+            color: #22c55e;
+            font-weight: bold;
+        }
+
+        .status-rejected {
+            color: #ef4444;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Request Landlord Upgrade</h1>
+        <div class="desc">
+            Gửi yêu cầu để được Admin xét duyệt nâng cấp tài khoản thành Landlord và có thể đăng tin cho thuê nhà.
+        </div>
+
+        <!-- Nếu user chưa gửi request -->
+        <form th:if="${request == null}" th:action="@{/landlord-upgrade-requests}" method="post">
+            <label for="reason">Lý do bạn muốn trở thành Landlord:</label>
+            <textarea id="reason" name="reason" required placeholder="Nhập lý do hoặc mô tả ngắn..."
+                maxlength="300"></textarea>
+            <button type="submit" class="btn-submit">Gửi yêu cầu</button>
+        </form>
+
+        <!-- Nếu user đã gửi request -->
+        <div th:if="${request != null}" class="status-box">
+            <div><b>Trạng thái yêu cầu:</b>
+                <span th:classappend="'status-' + ${request.status.toLowerCase()}" th:text="${request.status}"></span>
+            </div>
+            <div style="margin-top:10px;">
+                <b>Ngày gửi:</b> <span th:text="${#dates.format(request.requestDate, 'dd/MM/yyyy HH:mm')}"></span>
+            </div>
+            <div style="margin-top:10px;">
+                <b>Lý do:</b> <span th:text="${request.reason}"></span>
+            </div>
+            <div th:if="${request.status == 'REJECTED'}" style="margin-top:14px; color:#ef4444;">
+                <b>Lý do từ chối:</b> <span th:text="${request.rejectReason}"></span>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

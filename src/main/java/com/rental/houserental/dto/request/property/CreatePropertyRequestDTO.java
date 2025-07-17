@@ -4,6 +4,7 @@ import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Getter
 @Setter
@@ -11,6 +12,8 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreatePropertyRequestDTO {
+
+    private Long Id;
 
     @NotBlank(message = "Property title is required")
     @Size(max = 255, message = "Title must be less than 255 characters")
@@ -55,4 +58,20 @@ public class CreatePropertyRequestDTO {
     @NotBlank(message = "Property description is required")
     @Size(max = 2000, message = "Description must be less than 2000 characters")
     private String description;
+
+    @NotBlank(message = "Furnishing is required")
+    private String furnishing; // FULL, BASIC, NONE
+
+    @Min(value = 10, message = "Deposit percentage must be at least 10")
+    @Max(value = 50, message = "Deposit percentage must be at most 50")
+    private Integer depositPercentage;
+
+    @NotNull(message = "Latitude is required")
+    private Double latitude;
+
+    @NotNull(message = "Longitude is required")
+    private Double longitude;
+
+    private List<Long> amenityIds;
+
 }
