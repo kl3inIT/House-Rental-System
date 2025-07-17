@@ -1,6 +1,7 @@
 package com.rental.houserental.repository;
 
 import com.rental.houserental.entity.Booking;
+import com.rental.houserental.entity.RentalProperty;
 import com.rental.houserental.entity.Transaction;
 import com.rental.houserental.enums.BookingStatus;
 import org.springframework.data.domain.Page;
@@ -30,4 +31,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             @Param("propertyTitle") String propertyTitle,
             @Param("landlordId") Long landlordId,
             Pageable pageable);
+
+    List<Booking> findByRentalProperty_Landlord_Id(Long id);
 }

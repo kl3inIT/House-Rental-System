@@ -130,6 +130,7 @@ public class LandlordDashboardController {
 
         model.addAttribute("bookings", bookings);
         model.addAttribute("types", BookingStatus.getAllTypes());
+        model.addAttribute("bookingStats", bookingService.getBookingStatsByLandLord());
         model.addAttribute("bookingSearchRequestDTO", bookingSearchRequestDTO);
         model.addAttribute("currentUri", request.getRequestURI());
         return "landlord/bookings";
@@ -144,6 +145,8 @@ public class LandlordDashboardController {
         model.addAttribute("currentUri", request.getRequestURI());
         return "landlord/booking-detail";
     }
+
+
 
 
 }
