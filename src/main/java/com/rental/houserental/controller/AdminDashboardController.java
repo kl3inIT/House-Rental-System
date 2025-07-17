@@ -1,12 +1,14 @@
 package com.rental.houserental.controller;
 
+import com.rental.houserental.entity.LandlordUpgrade;
+import com.rental.houserental.service.LandlordUpgradeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -19,6 +21,8 @@ import java.util.Map;
 @PreAuthorize("hasRole('ADMIN')")
 @RequiredArgsConstructor
 public class AdminDashboardController {
+
+    private final LandlordUpgradeService landlordUpgradeService;
 
     @GetMapping("/dashboard")
     public String dashboard(Model model, HttpServletRequest request) {
@@ -321,54 +325,44 @@ public class AdminDashboardController {
         model.addAttribute("title", "Landlord Requests - Admin Dashboard");
         
         // Mock landlord request data
-        List<Map<String, Object>> requests = new ArrayList<>();
-        
-        Map<String, Object> request1 = new HashMap<>();
-        request1.put("id", 1L);
-        request1.put("userName", "Michael Chen");
-        request1.put("userEmail", "michael.chen@email.com");
-        request1.put("requestDate", "Jan 15, 2024");
-        request1.put("reason", "I own several properties and want to list them for rent");
-        request1.put("status", "Pending");
-        request1.put("documents", "Property ownership certificates, ID verification");
-        requests.add(request1);
-
-        Map<String, Object> request2 = new HashMap<>();
-        request2.put("id", 2L);
-        request2.put("userName", "Lisa Wang");
-        request2.put("userEmail", "lisa.wang@email.com");
-        request2.put("requestDate", "Jan 14, 2024");
-        request2.put("reason", "Inherited properties from family and need to manage them");
-        request2.put("status", "Pending");
-        request2.put("documents", "Inheritance documents, property deeds");
-        requests.add(request2);
-
-        Map<String, Object> request3 = new HashMap<>();
-        request3.put("id", 3L);
-        request3.put("userName", "David Kim");
-        request3.put("userEmail", "david.kim@email.com");
-        request3.put("requestDate", "Jan 13, 2024");
-        request3.put("reason", "Recently purchased investment properties");
-        request3.put("status", "Approved");
-        request3.put("documents", "Purchase agreements, property titles");
-        requests.add(request3);
-
+        List<LandlordUpgrade> requests = landlordUpgradeService.getAllRequests();
+        model.addAttribute("requests", requests);
         // Calculate counts
         long pendingCount = requests.stream()
-                .filter(r -> "Pending".equals(r.get("status")))
-                .count();
+                .filter(r -> r.getStatus().name().equals("Pending")).count();
         long approvedCount = requests.stream()
-                .filter(r -> "Approved".equals(r.get("status")))
-                .count();
+                .filter(r -> r.getStatus().name().equals("Approve")).count();
         long rejectedCount = requests.stream()
-                .filter(r -> "Rejected".equals(r.get("status")))
-                .count();
+                .filter(r -> r.getStatus().name().equals("Reject")).count();
 
         model.addAttribute("requests", requests);
         model.addAttribute("pendingCount", pendingCount);
         model.addAttribute("approvedCount", approvedCount);
         model.addAttribute("rejectedCount", rejectedCount);
         return "admin/landlord-requests";
+    }
+
+    @PostMapping("/landlord-upgrade-requests/{id}/approve")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String approveRequest(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        landlordUpgradeService.approveRequest(id);
+        redirectAttributes.addFlashAttribute("success", "Landlord request approved successfully!");
+        return "redirect:/admin/landlord-requests";
+    }
+
+    @GetMapping("/landlord-upgrade-requests/{id}/reject-form")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String showRejectForm(@PathVariable Long id, Model model) {
+        model.addAttribute("requestId", id);
+        return "admin/reject-landlord-request";
+    }
+
+    @PostMapping("/landlord-upgrade-requests/{id}/reject")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String rejectRequest(@PathVariable Long id, @RequestParam String reason, RedirectAttributes redirectAttributes) {
+        landlordUpgradeService.rejectRequest(id, reason);
+        redirectAttributes.addFlashAttribute("success", "Landlord request rejected successfully!");
+        return "redirect:/admin/landlord-requests";
     }
 
     @GetMapping("/reports")
