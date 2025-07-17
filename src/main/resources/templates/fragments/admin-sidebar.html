@@ -25,19 +25,15 @@
 
                 <!-- User Management -->
                 <div class="space-y-1">
-                    <a th:href="@{/admin/users}" 
-                       th:class="|group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
-                         #strings.startsWith(currentUri, '/admin/users') ? 'bg-red-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white'
-                       }|">
+                    <a th:href="@{/admin/landlords}"
+                       th:class="|group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${currentUri == '/admin/landlords' ? 'bg-red-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white'}|">
                         <i class="fas fa-users mr-3 text-lg"></i>
                         Users
                     </a>
                     
                     <!-- Nút Landlord mới thêm -->
                     <a th:href="@{/admin/landlords}"
-                       th:class="|group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ml-6 ${
-                         currentUri == '/admin/landlords' ? 'bg-red-600 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white'
-                       }|">
+                       th:class="|group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ml-6 ${currentUri == '/admin/landlords' ? 'bg-red-600 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white'}|">
                         <i class="fas fa-user-tie mr-3 text-sm"></i>
                         Landlord
                     </a>
@@ -62,18 +58,14 @@
 
                 <!-- Property Management -->
                 <div class="space-y-1">
-                    <a th:href="@{/admin/properties}" 
-                       th:class="|group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
-                         #strings.startsWith(currentUri, '/admin/properties') ? 'bg-red-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white'
-                       }|">
+                    <a th:href="@{/admin/categories}"
+                       th:class="|group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${currentUri == '/admin/categories' ? 'bg-red-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white'}|">
                         <i class="fas fa-home mr-3 text-lg"></i>
                         Properties
                     </a>
                     
-                    <a th:href="@{/admin/categories}" 
-                       th:class="|group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ml-6 ${
-                         currentUri == '/admin/categories' ? 'bg-red-600 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white'
-                       }|">
+                    <a th:href="@{/admin/categories}"
+                       th:class="|group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ml-6 ${currentUri == '/admin/categories' ? 'bg-red-600 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white'}|">
                         <i class="fas fa-tags mr-3 text-sm"></i>
                         Categories
                     </a>

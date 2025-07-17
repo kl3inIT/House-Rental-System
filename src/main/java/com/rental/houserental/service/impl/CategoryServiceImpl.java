@@ -9,6 +9,9 @@ import com.rental.houserental.dto.request.category.CategoryUpdateRequestDTO;
 import com.rental.houserental.dto.response.category.CategorySummaryResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -75,5 +78,19 @@ public class CategoryServiceImpl implements CategoryService {
             summaries.add(dto);
         }
         return summaries;
+    }
+
+    @Override
+    public Page<CategorySummaryResponseDTO> getCategorySummaries(Pageable pageable) {
+        List<CategorySummaryResponseDTO> all = getCategorySummaries();
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), all.size());
+        List<CategorySummaryResponseDTO> pageContent = all.subList(start, end);
+        return new PageImpl<>(pageContent, pageable, all.size());
+    }
+
+    @Override
+    public List<CategorySummaryResponseDTO> getCategorySummariesAll() {
+        return getCategorySummaries();
     }
 }

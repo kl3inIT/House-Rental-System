@@ -15,9 +15,14 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import static com.rental.houserental.constant.ViewNamesConstant.*;
 import com.rental.houserental.entity.Category;
+import com.rental.houserental.dto.response.category.CategorySummaryResponseDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @Controller
 @RequestMapping("/admin/categories")
@@ -86,5 +91,25 @@ public class CategoryController {
             redirectAttributes.addFlashAttribute("errorMessage", "Delete failed: " + e.getMessage());
         }
         return REDIRECT_CATEGORY;
+    }
+
+    @GetMapping("")
+    public String listCategories(Model model, HttpServletRequest request,
+                                 @RequestParam(value = "page", defaultValue = "0") int page,
+                                 @RequestParam(value = "size", defaultValue = "5") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<CategorySummaryResponseDTO> categories = categoryService.getCategorySummaries(pageable);
+
+        // Lấy toàn bộ category để tính tổng property
+        long totalProperties = categoryService.getCategorySummariesAll()
+            .stream().mapToInt(CategorySummaryResponseDTO::getTotalProperties).sum();
+
+        model.addAttribute("categories", categories);
+        model.addAttribute("currentUri", request.getRequestURI());
+        model.addAttribute("title", "Manage Categories - Admin Dashboard");
+        model.addAttribute("totalCategories", categories.getTotalElements());
+        model.addAttribute("totalProperties", totalProperties);
+        model.addAttribute("newThisMonth", 0); // Tùy chỉnh nếu cần
+        return "admin/categories";
     }
 } 

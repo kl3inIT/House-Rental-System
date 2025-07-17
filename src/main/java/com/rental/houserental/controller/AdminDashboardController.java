@@ -242,24 +242,6 @@ public class AdminDashboardController {
         return "admin/bookings";
     }
 
-    @GetMapping("/categories")
-    public String categories(Model model, HttpServletRequest request) {
-        model.addAttribute("currentUri", request.getRequestURI());
-        model.addAttribute("title", "Manage Categories - Admin Dashboard");
-
-        List<CategorySummaryResponseDTO> categories = categoryService.getCategorySummaries();
-        int totalCategories = categories.size();
-        int totalProperties = categories.stream().mapToInt(CategorySummaryResponseDTO::getTotalProperties).sum();
-        int newThisMonth = (int) categories.stream().filter(c -> c.getCreatedAt() != null && c.getCreatedAt().getMonthValue() == java.time.LocalDate.now().getMonthValue() && c.getCreatedAt().getYear() == java.time.LocalDate.now().getYear()).count();
-
-        model.addAttribute("categories", categories);
-        model.addAttribute("totalCategories", totalCategories);
-        model.addAttribute("totalProperties", totalProperties);
-        model.addAttribute("newThisMonth", newThisMonth);
-        return "admin/categories";
-    }
-
-
     @GetMapping("/reviews")
     public String reviews(Model model, HttpServletRequest request) {
         model.addAttribute("currentUri", request.getRequestURI());
