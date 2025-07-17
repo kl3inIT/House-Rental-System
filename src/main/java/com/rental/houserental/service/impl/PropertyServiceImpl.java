@@ -442,6 +442,12 @@ public class PropertyServiceImpl implements PropertyService {
                     .map(PropertyImage::getImageUrl)
                     .toList();
             
+            // Get top 3-4 amenities for display
+            List<String> topAmenities = property.getAmenities().stream()
+                    .limit(4)
+                    .map(amenity -> amenity.getName())
+                    .toList();
+            
             return FeaturedPropertyResponseDTO.builder()
                     .id(property.getId())
                     .title(property.getTitle())
@@ -450,9 +456,17 @@ public class PropertyServiceImpl implements PropertyService {
                     .bathrooms(property.getBathrooms())
                     .area(property.getArea())
                     .location(property.getWard() + ", " + property.getProvince())
+                    .fullAddress(property.getFullAddress())
+                    .categoryName(property.getCategory() != null ? property.getCategory().getName() : null)
+                    .furnishing(property.getFurnishing())
+                    .depositPercentage(property.getDepositPercentage())
+                    .views(property.getViews())
                     .mainImageUrl(property.getMainImageUrl())
                     .imageUrls(imageUrls)
                     .imageCount(imageUrls.size())
+                    .topAmenities(topAmenities)
+                    .rating(4.5) // TODO: Calculate from reviews
+                    .reviewCount(12) // TODO: Count from reviews
                     .build();
                     
         } catch (Exception e) {

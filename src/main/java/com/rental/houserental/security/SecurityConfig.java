@@ -83,10 +83,12 @@ public class SecurityConfig {
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/landlord/**").hasRole("LANDLORD")
                         .requestMatchers("/user/**").hasAnyRole("USER", "LANDLORD", "ADMIN")
+                        .requestMatchers("/wishlist/**").hasAnyRole("USER", "LANDLORD", "ADMIN")
                         .requestMatchers("/landlord-upgrade-requests", "/landlord-upgrade-requests/**").hasRole("USER")
                         .requestMatchers("/", "/login", "/perform-login", "/register", "/verify-email/**",
                                 "/forgot-password", "/reset-password/**", "/verify-otp/**", "/resend-otp",
-                                "/css/**", "/js/**", "/images/**", "/output.css", "/wallet/deposit/webhook")
+                                "/css/**", "/js/**", "/images/**", "/output.css", "/wallet/deposit/webhook",
+                                "/properties/search", "/properties/{id}")
                         .permitAll()
                         .anyRequest().authenticated())
                 .formLogin(form -> form
