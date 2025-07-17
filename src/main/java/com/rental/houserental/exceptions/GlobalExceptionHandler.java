@@ -5,6 +5,7 @@ import com.rental.houserental.exceptions.booking.InvalidBookingStatusException;
 import com.rental.houserental.exceptions.category.CategoryNotFoundException;
 import com.rental.houserental.exceptions.common.BadRequestException;
 import com.rental.houserental.exceptions.common.ResourceNotFoundException;
+import com.rental.houserental.exceptions.listing.InsufficientBalanceException;
 import com.rental.houserental.exceptions.property.*;
 import com.rental.houserental.exceptions.transaction.InvalidTransactionTypeException;
 import com.rental.houserental.exceptions.user.*;
@@ -227,5 +228,12 @@ public class GlobalExceptionHandler {
         log.warn("Bad request: {}", ex.getMessage());
         model.addAttribute(MESSAGE, "The request was invalid. Please check your input and try again.");
         return GENERIC_ERROR;
+    }
+
+    @ExceptionHandler(InsufficientBalanceException.class)
+    public String handleInsufficientBalanceException(InsufficientBalanceException ex, RedirectAttributes redirectAttributes) {
+        log.warn("Insufficient balance: {}", ex.getMessage());
+        redirectAttributes.addFlashAttribute(ERROR, "Your balance is insufficient to complete this transaction. Please top up your account.");
+        return REDIRECT_LANDLORD_LISTINGS;
     }
 }

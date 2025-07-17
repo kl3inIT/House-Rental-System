@@ -240,7 +240,6 @@ public class PropertyServiceImpl implements PropertyService {
         property.setLatitude(dto.getLatitude());
         property.setLongitude(dto.getLongitude());
 
-        // ======= Sửa chỗ này để loại bỏ phần tử "" trong danh sách ảnh giữ lại =======
         List<String> imageUrlsToKeep = dto.getImageUrls() != null
                 ? dto.getImageUrls().stream().filter(s -> s != null && !s.trim().isEmpty()).toList()
                 : new ArrayList<>();
@@ -340,7 +339,7 @@ public class PropertyServiceImpl implements PropertyService {
                         .id(property.getId())
                         .title(property.getTitle())
                         .categoryId(property.getCategory() != null ? property.getCategory().getId() : null)
-                        .categoryName(property.getCategory() != null ? property.getCategory().getName() : null)
+//                        .categoryName(property.getCategory() != null ? property.getCategory().getName() : null)
                         .monthlyRent(property.getMonthlyRent())
                         .bedrooms(property.getBedrooms())
                         .bathrooms(property.getBathrooms())
@@ -411,6 +410,9 @@ public class PropertyServiceImpl implements PropertyService {
                 .bathrooms(p.getBathrooms())
                 .area(p.getArea())
                 .mainImageUrl(p.getMainImageUrl() != null ? p.getMainImageUrl() : "")
+                .bookingCount(p.getBookings().size())
+                .listingCount(p.getListings().size())
+                .updateAt(p.getUpdatedAt())
                 .build();
     }
 
@@ -510,7 +512,7 @@ public class PropertyServiceImpl implements PropertyService {
     @Transactional
     public void increaseView(Long propertyId) {
         RentalProperty property = propertyRepository.findById(propertyId)
-                .orElseThrow(() -> new PropertyNotFoundException("Property not found with id: " + propertyId));
+                .orElseThrow(() -> new ResourceNotFoundException("Property not found with id " + propertyId));
         property.setViews(property.getViews() + 1);
         propertyRepository.save(property);
     }
@@ -518,11 +520,6 @@ public class PropertyServiceImpl implements PropertyService {
     @Override
     public List<RentalProperty> getPropertiesByLandlordStatusNotAvailable(Long landlordId) {
         return propertyRepository.findByLandlordIdAndPropertyStatusNot(landlordId, PropertyStatus.AVAILABLE);
-    }
-
-    @Override
-    public List<RentalProperty> getPropertiesByLandlordStatusAvailable(Long landlordId) {
-        return propertyRepository.findByLandlordIdAndPropertyStatus(landlordId, PropertyStatus.AVAILABLE);
     }
 
 }

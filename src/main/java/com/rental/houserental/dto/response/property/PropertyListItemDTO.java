@@ -24,6 +24,9 @@ public class PropertyListItemDTO {
     private Integer bathrooms;
     private Integer views;
     private LocalDateTime createAt;
+    private Integer bookingCount;
+    private Integer listingCount;
+    private LocalDateTime updateAt;
 
     public String getFormattedRevenue() {
         if (monthlyRent == null) return "0";
