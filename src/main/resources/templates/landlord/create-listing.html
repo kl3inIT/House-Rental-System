@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org"
-     xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
      layout:decorate="~{layout/landlord}">
      <head>
@@ -255,7 +254,6 @@
                </div>
                <script>
                     function updatePaymentSummary() {
-                         // Lấy radio đang chọn
                          const selected = document.querySelector('input[name="isHighlight"]:checked');
                          if (!selected) return;
 
