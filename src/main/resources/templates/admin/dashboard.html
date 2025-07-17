@@ -1,206 +1,157 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/admin}">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - RentEase</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title th:text="${title}">Admin Dashboard - RentEase</title>
 </head>
-<body class="bg-gray-50">
-<!-- Navigation -->
-<nav class="bg-gray-900 text-white shadow-lg sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-            <div class="flex items-center">
-                <a href="../index.html" class="text-2xl font-bold text-blue-400">RentEase</a>
-                <span class="ml-4 px-3 py-1 bg-red-600 text-white text-sm rounded-full">Admin</span>
+<body>
+    <div layout:fragment="content">
+        <div class="p-6">
+            <!-- Welcome Section -->
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-white mb-2">Admin Dashboard</h1>
+                <p class="text-gray-300">System overview and management tools</p>
             </div>
-            <div class="hidden md:flex items-center space-x-8">
-                <a href="#" class="text-blue-400 px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
-                <a href="users.html" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Users</a>
-                <a href="properties.html" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Properties</a>
-                <a href="bookings.html" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Bookings</a>
-                <a href="reports.html" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Reports</a>
-                <div class="relative">
-                    <button class="flex items-center text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
-                        <div class="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center text-white text-sm font-semibold mr-2">
-                            A
+
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-gray-800 rounded-lg shadow-md p-6 border border-gray-700">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-blue-900 text-blue-300">
+                            <i class="fas fa-users text-xl"></i>
                         </div>
-                        Admin
-                        <i class="fas fa-chevron-down ml-1"></i>
-                    </button>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-300">Total Users</p>
+                            <p class="text-2xl font-bold text-white" th:text="${dashboardStats.totalUsers}">2,847</p>
+                            <p class="text-xs text-green-400">+12% from last month</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-800 rounded-lg shadow-md p-6 border border-gray-700">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-green-900 text-green-300">
+                            <i class="fas fa-home text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-300">Total Properties</p>
+                            <p class="text-2xl font-bold text-white" th:text="${dashboardStats.totalProperties}">1,234</p>
+                            <p class="text-xs text-green-400">+8% from last month</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-800 rounded-lg shadow-md p-6 border border-gray-700">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-yellow-900 text-yellow-300">
+                            <i class="fas fa-handshake text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-300">Active Bookings</p>
+                            <p class="text-2xl font-bold text-white" th:text="${dashboardStats.activeBookings}">567</p>
+                            <p class="text-xs text-green-400">+15% from last month</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-800 rounded-lg shadow-md p-6 border border-gray-700">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-purple-900 text-purple-300">
+                            <i class="fas fa-dollar-sign text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-300">Monthly Revenue</p>
+                            <p class="text-2xl font-bold text-white" th:text="'$' + ${#numbers.formatDecimal(dashboardStats.monthlyRevenue, 1, 'COMMA', 0, 'POINT')}">$124,500</p>
+                            <p class="text-xs text-green-400">+22% from last month</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                                <!-- Recent Activity -->
+                <div class="bg-gray-800 rounded-lg shadow-md p-6 border border-gray-700">
+                    <h2 class="text-xl font-bold text-white mb-6">Recent Activity</h2>
+                    <div class="space-y-4">
+                        <div th:each="activity : ${recentActivity}" class="flex items-start space-x-3">
+                            <div th:class="|w-2 h-2 rounded-full mt-2 ${
+                              activity.color == 'green' ? 'bg-green-500' :
+                              activity.color == 'blue' ? 'bg-blue-500' :
+                              activity.color == 'yellow' ? 'bg-yellow-500' :
+                              activity.color == 'purple' ? 'bg-purple-500' :
+                              activity.color == 'red' ? 'bg-red-500' :
+                              'bg-gray-500'
+                            }|"></div>
+                            <div>
+                                <p class="text-sm text-gray-200" th:text="${activity.message}">Activity message</p>
+                                <p class="text-xs text-gray-400" th:text="${activity.time}">Time ago</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Status -->
+                <div class="bg-gray-800 rounded-lg shadow-md p-6 border border-gray-700">
+                    <h2 class="text-xl font-bold text-white mb-6">System Status</h2>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-300">Server Status</span>
+                            <span class="px-2 py-1 bg-green-900 text-green-300 text-xs rounded-full" th:text="${systemStatus.serverStatus}">Online</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-300">Database</span>
+                            <span class="px-2 py-1 bg-green-900 text-green-300 text-xs rounded-full" th:text="${systemStatus.databaseStatus}">Healthy</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-300">Payment Gateway</span>
+                            <span class="px-2 py-1 bg-green-900 text-green-300 text-xs rounded-full" th:text="${systemStatus.paymentGatewayStatus}">Active</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-300">Email Service</span>
+                            <span class="px-2 py-1 bg-yellow-900 text-yellow-300 text-xs rounded-full" th:text="${systemStatus.emailServiceStatus}">Warning</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-300">Storage Usage</span>
+                            <span class="text-sm text-gray-400" th:text="${systemStatus.storageUsage} + '% (' + ${systemStatus.storageUsed} + ' / ' + ${systemStatus.storageTotal} + ')'">78% (234 GB / 300 GB)</span>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-2">
+                            <div class="bg-blue-600 h-2 rounded-full" th:style="'width: ' + ${systemStatus.storageUsage} + '%'"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Management Tools -->
+            <div class="bg-gray-800 rounded-lg shadow-md p-6 border border-gray-700">
+                <h2 class="text-xl font-bold text-white mb-6">Management Tools</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <a th:href="@{/admin/users}" class="flex flex-col items-center p-6 border border-gray-600 rounded-lg hover:bg-gray-700 transition-colors">
+                        <i class="fas fa-users text-3xl text-blue-400 mb-3"></i>
+                        <h3 class="font-semibold text-white mb-1">Manage Users</h3>
+                        <p class="text-sm text-gray-300 text-center">View and manage user accounts</p>
+                    </a>
+
+                    <a th:href="@{/admin/properties}" class="flex flex-col items-center p-6 border border-gray-600 rounded-lg hover:bg-gray-700 transition-colors">
+                        <i class="fas fa-home text-3xl text-green-400 mb-3"></i>
+                        <h3 class="font-semibold text-white mb-1">Properties</h3>
+                        <p class="text-sm text-gray-300 text-center">Oversee property listings</p>
+                    </a>
+
+                    <a th:href="@{/admin/bookings}" class="flex flex-col items-center p-6 border border-gray-600 rounded-lg hover:bg-gray-700 transition-colors">
+                        <i class="fas fa-handshake text-3xl text-yellow-400 mb-3"></i>
+                        <h3 class="font-semibold text-white mb-1">Bookings</h3>
+                        <p class="text-sm text-gray-300 text-center">Monitor rental transactions</p>
+                    </a>
+
+                    <a th:href="@{/admin/reports}" class="flex flex-col items-center p-6 border border-gray-600 rounded-lg hover:bg-gray-700 transition-colors">
+                        <i class="fas fa-chart-bar text-3xl text-purple-400 mb-3"></i>
+                        <h3 class="font-semibold text-white mb-1">Reports</h3>
+                        <p class="text-sm text-gray-300 text-center">View analytics and reports</p>
+                    </a>
                 </div>
             </div>
         </div>
     </div>
-</nav>
-
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <!-- Welcome Section -->
-    <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">Admin Dashboard</h1>
-        <p class="text-gray-600">System overview and management tools</p>
-    </div>
-
-    <!-- Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <div class="flex items-center">
-                <div class="p-3 rounded-full bg-blue-100 text-blue-600">
-                    <i class="fas fa-users text-xl"></i>
-                </div>
-                <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600">Total Users</p>
-                    <p class="text-2xl font-bold text-gray-900">2,847</p>
-                    <p class="text-xs text-green-600">+12% from last month</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <div class="flex items-center">
-                <div class="p-3 rounded-full bg-green-100 text-green-600">
-                    <i class="fas fa-home text-xl"></i>
-                </div>
-                <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600">Total Properties</p>
-                    <p class="text-2xl font-bold text-gray-900">1,234</p>
-                    <p class="text-xs text-green-600">+8% from last month</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <div class="flex items-center">
-                <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
-                    <i class="fas fa-handshake text-xl"></i>
-                </div>
-                <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600">Active Bookings</p>
-                    <p class="text-2xl font-bold text-gray-900">567</p>
-                    <p class="text-xs text-green-600">+15% from last month</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <div class="flex items-center">
-                <div class="p-3 rounded-full bg-purple-100 text-purple-600">
-                    <i class="fas fa-dollar-sign text-xl"></i>
-                </div>
-                <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600">Monthly Revenue</p>
-                    <p class="text-2xl font-bold text-gray-900">$124,500</p>
-                    <p class="text-xs text-green-600">+22% from last month</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-        <!-- Recent Activity -->
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <h2 class="text-xl font-bold text-gray-900 mb-6">Recent Activity</h2>
-            <div class="space-y-4">
-                <div class="flex items-start space-x-3">
-                    <div class="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
-                    <div>
-                        <p class="text-sm text-gray-900">New user registration: <strong>John Doe</strong></p>
-                        <p class="text-xs text-gray-500">2 minutes ago</p>
-                    </div>
-                </div>
-                <div class="flex items-start space-x-3">
-                    <div class="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
-                    <div>
-                        <p class="text-sm text-gray-900">Property listed: <strong>Modern Apartment Downtown</strong></p>
-                        <p class="text-xs text-gray-500">15 minutes ago</p>
-                    </div>
-                </div>
-                <div class="flex items-start space-x-3">
-                    <div class="w-2 h-2 bg-yellow-500 rounded-full mt-2"></div>
-                    <div>
-                        <p class="text-sm text-gray-900">Booking request submitted for <strong>Suburban House</strong></p>
-                        <p class="text-xs text-gray-500">1 hour ago</p>
-                    </div>
-                </div>
-                <div class="flex items-start space-x-3">
-                    <div class="w-2 h-2 bg-purple-500 rounded-full mt-2"></div>
-                    <div>
-                        <p class="text-sm text-gray-900">Payment processed: <strong>$1,800</strong></p>
-                        <p class="text-xs text-gray-500">2 hours ago</p>
-                    </div>
-                </div>
-                <div class="flex items-start space-x-3">
-                    <div class="w-2 h-2 bg-red-500 rounded-full mt-2"></div>
-                    <div>
-                        <p class="text-sm text-gray-900">Property reported: <strong>Studio Apartment</strong></p>
-                        <p class="text-xs text-gray-500">3 hours ago</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- System Status -->
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <h2 class="text-xl font-bold text-gray-900 mb-6">System Status</h2>
-            <div class="space-y-4">
-                <div class="flex justify-between items-center">
-                    <span class="text-sm text-gray-700">Server Status</span>
-                    <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Online</span>
-                </div>
-                <div class="flex justify-between items-center">
-                    <span class="text-sm text-gray-700">Database</span>
-                    <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Healthy</span>
-                </div>
-                <div class="flex justify-between items-center">
-                    <span class="text-sm text-gray-700">Payment Gateway</span>
-                    <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Active</span>
-                </div>
-                <div class="flex justify-between items-center">
-                    <span class="text-sm text-gray-700">Email Service</span>
-                    <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">Warning</span>
-                </div>
-                <div class="flex justify-between items-center">
-                    <span class="text-sm text-gray-700">Storage Usage</span>
-                    <span class="text-sm text-gray-600">78% (234 GB / 300 GB)</span>
-                </div>
-                <div class="w-full bg-gray-200 rounded-full h-2">
-                    <div class="bg-blue-600 h-2 rounded-full" style="width: 78%"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Management Tools -->
-    <div class="bg-white rounded-lg shadow-md p-6">
-        <h2 class="text-xl font-bold text-gray-900 mb-6">Management Tools</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <a href="users.html" class="flex flex-col items-center p-6 border border-gray-200 rounded-lg hover:shadow-md transition-shadow">
-                <i class="fas fa-users text-3xl text-blue-600 mb-3"></i>
-                <h3 class="font-semibold text-gray-900 mb-1">Manage Users</h3>
-                <p class="text-sm text-gray-600 text-center">View and manage user accounts</p>
-            </a>
-
-            <a href="properties.html" class="flex flex-col items-center p-6 border border-gray-200 rounded-lg hover:shadow-md transition-shadow">
-                <i class="fas fa-home text-3xl text-green-600 mb-3"></i>
-                <h3 class="font-semibold text-gray-900 mb-1">Properties</h3>
-                <p class="text-sm text-gray-600 text-center">Oversee property listings</p>
-            </a>
-
-            <a href="bookings.html" class="flex flex-col items-center p-6 border border-gray-200 rounded-lg hover:shadow-md transition-shadow">
-                <i class="fas fa-handshake text-3xl text-yellow-600 mb-3"></i>
-                <h3 class="font-semibold text-gray-900 mb-1">Bookings</h3>
-                <p class="text-sm text-gray-600 text-center">Monitor rental transactions</p>
-            </a>
-
-            <a href="reports.html" class="flex flex-col items-center p-6 border border-gray-200 rounded-lg hover:shadow-md transition-shadow">
-                <i class="fas fa-chart-bar text-3xl text-purple-600 mb-3"></i>
-                <h3 class="font-semibold text-gray-900 mb-1">Reports</h3>
-                <p class="text-sm text-gray-600 text-center">View analytics and reports</p>
-            </a>
-        </div>
-    </div>
-</div>
 </body>
 </html>

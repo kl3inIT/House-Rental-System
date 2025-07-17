@@ -2,6 +2,7 @@ package com.rental.houserental.service.impl;
 
 import com.rental.houserental.dto.request.transaction.TransactionRequestDTO;
 import com.rental.houserental.dto.response.transaction.TransactionResponseDTO;
+import com.rental.houserental.dto.response.transaction.TransactionStatsDTO;
 import com.rental.houserental.entity.Transaction;
 import com.rental.houserental.entity.User;
 import com.rental.houserental.enums.TransactionType;
@@ -91,6 +92,37 @@ public class TransactionServiceImpl implements TransactionService {
         return transactions.map(this::transactionResponseDTO);
     }
 
+    @Override
+    public Page<TransactionResponseDTO> getTransactionHistoryForAdmin(TransactionRequestDTO transactionRequestDTO) {
+        LocalDateTime dateFrom = transactionRequestDTO.getDateFrom() != null
+                ? transactionRequestDTO.getDateFrom().atStartOfDay()
+                : null;
+
+        LocalDateTime dateTo = transactionRequestDTO.getDateTo() != null
+                ? transactionRequestDTO.getDateTo().atTime(23, 59, 59)
+                : null;
+
+        Pageable pageable = PageRequest.of(transactionRequestDTO.getPage(), transactionRequestDTO.getSize());
+        Page<Transaction> transactions = transactionRepository.findAllBySearchRequestForAdmin(
+                TransactionType.fromString(transactionRequestDTO.getType()),
+                dateFrom,
+                dateTo,
+                transactionRequestDTO.getAmountFrom(),
+                transactionRequestDTO.getAmountTo(),
+                transactionRequestDTO.getUserEmail(),
+                pageable
+        );
+        return transactions.map(this::transactionResponseDTO);
+    }
+
+    @Override
+    public TransactionStatsDTO getTransactionStats() {
+        return transactionRepository.getDepositStats();
+    }
+
+
+
+
     public User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
@@ -108,6 +140,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .description(transaction.getDescription())
                 .type(transaction.getType().toString())
                 .date(transaction.getCreatedAt().format(formatter))
+                .userEmail(transaction.getUser().getEmail())
                 .build();
     }
 }

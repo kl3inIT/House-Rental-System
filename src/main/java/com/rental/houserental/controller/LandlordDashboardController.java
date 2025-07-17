@@ -1,23 +1,25 @@
 package com.rental.houserental.controller;
 
-import com.rental.houserental.dto.request.property.CreatePropertyRequestDTO;
-import com.rental.houserental.entity.User;
-import com.rental.houserental.enums.FurnishingType;
-import com.rental.houserental.service.CategoryService;
-import com.rental.houserental.service.PropertyService;
-import com.rental.houserental.service.UserService;
+import com.rental.houserental.dto.request.booking.BookingSearchRequestDTO;
+import com.rental.houserental.dto.response.booking.BookingHistoryDTO;
+import com.rental.houserental.dto.response.booking.BookingHistoryDetailDTO;
+import com.rental.houserental.enums.BookingStatus;
+import com.rental.houserental.service.BookingService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -25,8 +27,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.rental.houserental.constant.AtrributeNameConstant.*;
-import static com.rental.houserental.constant.ViewNamesConstant.*;
+import static com.rental.houserental.constant.ViewNamesConstant.BOOKING_DETAIL;
+import static com.rental.houserental.constant.ViewNamesConstant.LANDLORD_DASHBOARD;
 
 @Controller
 @RequestMapping("/landlord")
@@ -34,6 +36,10 @@ import static com.rental.houserental.constant.ViewNamesConstant.*;
 @RequiredArgsConstructor
 @Slf4j
 public class LandlordDashboardController {
+
+
+    @Autowired
+    private BookingService bookingService;
 
     @GetMapping("/dashboard")
     public String dashboard(Model model, Authentication authentication, HttpServletRequest request) {
@@ -105,4 +111,39 @@ public class LandlordDashboardController {
 
         return LANDLORD_DASHBOARD;
     }
+
+    @GetMapping("/bookings")
+    public String bookings(@Valid @ModelAttribute("bookingSearchRequestDTO") BookingSearchRequestDTO bookingSearchRequestDTO,
+                           BindingResult bindingResult,
+                           Model model,
+                           HttpServletRequest request) {
+
+        Page<BookingHistoryDTO> bookings;
+
+        if (bindingResult.hasErrors()) {
+            BookingSearchRequestDTO defaultRequest = new BookingSearchRequestDTO();
+            bookings = bookingService.getBookingHistoryByLandlord(defaultRequest);
+            model.addAttribute("error", bindingResult);
+        } else {
+            bookings = bookingService.getBookingHistoryByLandlord(bookingSearchRequestDTO);
+        }
+
+        model.addAttribute("bookings", bookings);
+        model.addAttribute("types", BookingStatus.getAllTypes());
+        model.addAttribute("bookingSearchRequestDTO", bookingSearchRequestDTO);
+        model.addAttribute("currentUri", request.getRequestURI());
+        return "landlord/bookings";
+
+    }
+
+    @GetMapping("/bookings/{id}")
+    public String bookingDetail(@PathVariable Long id, Model model, HttpServletRequest request) {
+        BookingHistoryDetailDTO bookingDetail = bookingService.getBookingHistoryDetail(id);
+        model.addAttribute("isRefundable", bookingService.isRefundable(id));
+        model.addAttribute("bookingDetail", bookingDetail);
+        model.addAttribute("currentUri", request.getRequestURI());
+        return "landlord/booking-detail";
+    }
+
+
 }
