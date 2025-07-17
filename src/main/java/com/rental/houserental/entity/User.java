@@ -19,7 +19,7 @@ import java.util.Set;
 @NoArgsConstructor
 public class User extends BaseEntity {
 
-    @Column(name = "FullName")
+    @Column(name = "FullName", length = 100,columnDefinition = "NVARCHAR(100)", nullable = false)
     private String name;
 
     @Column(name = "Email", unique = true, nullable = false)

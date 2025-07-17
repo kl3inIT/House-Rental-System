@@ -6,6 +6,8 @@ import com.rental.houserental.dto.request.user.UpdateProfileRequestDTO;
 import com.rental.houserental.dto.response.user.UserProfileResponseDTO;
 import com.rental.houserental.entity.User;
 
+import java.util.List;
+
 public interface UserService {
 
     User createUser(RegisterRequestDTO request);
@@ -22,4 +24,7 @@ public interface UserService {
 
     UserProfileResponseDTO getCurrentUserProfile();
 
+    List<User> getAllLandlords();
+
+    User findById(Long id);
 }

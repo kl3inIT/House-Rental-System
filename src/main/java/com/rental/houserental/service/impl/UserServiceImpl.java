@@ -21,6 +21,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import static com.rental.houserental.constant.ErrorMessageConstant.MSG_400;
+import java.util.List;
+import com.rental.houserental.enums.UserRole;
 
 @Service
 @RequiredArgsConstructor
@@ -55,6 +57,11 @@ public class UserServiceImpl implements UserService {
     public User findByEmail(String email) {
         return userRepository.findByEmail(email).orElse(null);
 
+    }
+
+    @Override
+    public User findById(Long id) {
+        return userRepository.findById(id).orElse(null);
     }
 
     @Override
@@ -105,6 +112,11 @@ public class UserServiceImpl implements UserService {
     public UserProfileResponseDTO getCurrentUserProfile() {
         User currentUser = getCurrentUser();
         return mapToUserProfileResponseDTO(currentUser);
+    }
+
+    @Override
+    public List<User> getAllLandlords() {
+        return userRepository.findByRoleOrderByCreatedAtDesc(UserRole.LANDLORD);
     }
 
     private UserProfileResponseDTO mapToUserProfileResponseDTO(User user) {

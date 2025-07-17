@@ -33,6 +33,15 @@
                         Users
                     </a>
                     
+                    <!-- Nút Landlord mới thêm -->
+                    <a th:href="@{/admin/landlords}"
+                       th:class="|group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ml-6 ${
+                         currentUri == '/admin/landlords' ? 'bg-red-600 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+                       }|">
+                        <i class="fas fa-user-tie mr-3 text-sm"></i>
+                        Landlord
+                    </a>
+                    
                     <a th:href="@{/admin/landlord-requests}" 
                        th:class="|group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ml-6 ${
                          currentUri == '/admin/landlord-requests' ? 'bg-red-600 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white'
@@ -42,6 +51,14 @@
                         <span class="ml-auto bg-yellow-500 text-yellow-900 text-xs px-2 py-1 rounded-full">3</span>
                     </a>
                 </div>
+                <!-- Nút Listing mới thêm -->
+                <a th:href="@{/admin/listings}"
+                   th:class="|group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
+                     #strings.startsWith(currentUri, '/admin/listings') ? 'bg-red-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                   }|">
+                    <i class="fas fa-list mr-3 text-lg"></i>
+                    Listing
+                </a>
 
                 <!-- Property Management -->
                 <div class="space-y-1">

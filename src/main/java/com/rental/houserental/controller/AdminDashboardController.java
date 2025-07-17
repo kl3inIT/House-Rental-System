@@ -1,12 +1,17 @@
 package com.rental.houserental.controller;
 
 import com.rental.houserental.dto.response.category.CategorySummaryResponseDTO;
+import com.rental.houserental.entity.User;
+import com.rental.houserental.entity.Listing;
 import com.rental.houserental.service.CategoryService;
+import com.rental.houserental.service.UserService;
+import com.rental.houserental.service.ListingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -23,6 +28,8 @@ import java.util.Map;
 public class AdminDashboardController {
 
     private final CategoryService categoryService;
+    private final UserService userService;
+    private final ListingService listingService;
 
     @GetMapping("/dashboard")
     public String dashboard(Model model, HttpServletRequest request) {
