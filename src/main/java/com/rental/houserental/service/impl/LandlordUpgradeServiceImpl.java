@@ -1,12 +1,12 @@
 package com.rental.houserental.service.impl;
 
-import com.rental.houserental.entity.LandlordUpgradeRequest;
+import com.rental.houserental.entity.LandlordUpgrade;
 import com.rental.houserental.entity.User;
 import com.rental.houserental.enums.LandlordUpgradeRequestStatus;
 import com.rental.houserental.enums.UserRole;
-import com.rental.houserental.repository.LandlordUpgradeRequestRepository;
+import com.rental.houserental.repository.LandlordUpgradeRepository;
 import com.rental.houserental.repository.UserRepository;
-import com.rental.houserental.service.LandlordUpgradeRequestService;
+import com.rental.houserental.service.LandlordUpgradeService;
 import com.rental.houserental.service.EmailService;
 import com.rental.houserental.service.NotificationService;
 import com.rental.houserental.service.NotificationWebSocketService;
@@ -19,9 +19,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-public class LandlordUpgradeRequestServiceImpl implements LandlordUpgradeRequestService {
+public class LandlordUpgradeServiceImpl implements LandlordUpgradeService {
     @Autowired
-    private LandlordUpgradeRequestRepository requestRepository;
+    private LandlordUpgradeRepository requestRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -31,17 +31,18 @@ public class LandlordUpgradeRequestServiceImpl implements LandlordUpgradeRequest
 
     @Autowired
     private NotificationService notificationService;
+
     @Autowired
     private NotificationWebSocketService notificationWebSocketService;
 
     @Override
     @Transactional
-    public LandlordUpgradeRequest createRequest(User user, String fullName, String phone, String reason) {
+    public LandlordUpgrade createRequest(User user, String fullName, String phone, String reason) {
         if (requestRepository.findByUserAndStatus(user, LandlordUpgradeRequestStatus.PENDING).isPresent()) {
             throw new LandlordRequestAlreadyExistsException(
                     "You already have a pending upgrade request. Please wait for admin review.");
         }
-        LandlordUpgradeRequest request = new LandlordUpgradeRequest();
+        LandlordUpgrade request = new LandlordUpgrade();
         request.setUser(user);
         request.setStatus(LandlordUpgradeRequestStatus.PENDING);
         request.setCreatedAt(LocalDateTime.now());
@@ -53,29 +54,29 @@ public class LandlordUpgradeRequestServiceImpl implements LandlordUpgradeRequest
     }
 
     @Override
-    public List<LandlordUpgradeRequest> getRequestsByStatus(LandlordUpgradeRequestStatus status) {
+    public List<LandlordUpgrade> getRequestsByStatus(LandlordUpgradeRequestStatus status) {
         return requestRepository.findAllByStatus(status);
     }
 
     @Override
-    public List<LandlordUpgradeRequest> getRequestsByUser(User user) {
+    public List<LandlordUpgrade> getRequestsByUser(User user) {
         return requestRepository.findAllByUser(user);
     }
 
     @Override
-    public LandlordUpgradeRequest getRequestById(Long id) {
+    public LandlordUpgrade getRequestById(Long id) {
         return requestRepository.findById(id).orElse(null);
     }
 
     @Override
-    public List<LandlordUpgradeRequest> getAllRequests() {
+    public List<LandlordUpgrade> getAllRequests() {
         return requestRepository.findAll();
     }
 
     @Override
     @Transactional
-    public LandlordUpgradeRequest approveRequest(Long requestId) {
-        LandlordUpgradeRequest request = requestRepository.findById(requestId)
+    public LandlordUpgrade approveRequest(Long requestId) {
+        LandlordUpgrade request = requestRepository.findById(requestId)
                 .orElseThrow(() -> new IllegalArgumentException("Request not found"));
         if (request.getStatus() != LandlordUpgradeRequestStatus.PENDING) {
             throw new IllegalStateException("Request is not pending");
@@ -100,8 +101,8 @@ public class LandlordUpgradeRequestServiceImpl implements LandlordUpgradeRequest
 
     @Override
     @Transactional
-    public LandlordUpgradeRequest rejectRequest(Long requestId, String reason) {
-        LandlordUpgradeRequest request = requestRepository.findById(requestId)
+    public LandlordUpgrade rejectRequest(Long requestId, String reason) {
+        LandlordUpgrade request = requestRepository.findById(requestId)
                 .orElseThrow(() -> new IllegalArgumentException("Request not found"));
         if (request.getStatus() != LandlordUpgradeRequestStatus.PENDING) {
             throw new IllegalStateException("Request is not pending");
@@ -114,7 +115,7 @@ public class LandlordUpgradeRequestServiceImpl implements LandlordUpgradeRequest
         emailService.sendLandlordRequestRejectionEmail(request.getUser(), reason);
 
         // Lưu notification
-        String message = "Yêu cầu nâng cấp tài khoản của bạn đã bị từ chối.";
+        String message = "Yêu cầu nâng cấp tài khoản của bạn đã bị từ chối. Lý do: " + reason;
         notificationService.createNotification(request.getUser(), message, "upgrade-request-rejected");
         // Gửi notification realtime
         notificationWebSocketService.sendNotification(request.getUser().getId(), message, "upgrade-request-rejected");

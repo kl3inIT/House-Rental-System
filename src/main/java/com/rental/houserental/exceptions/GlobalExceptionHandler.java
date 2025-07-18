@@ -9,6 +9,8 @@ import com.rental.houserental.exceptions.listing.InsufficientBalanceException;
 import com.rental.houserental.exceptions.property.*;
 import com.rental.houserental.exceptions.transaction.InvalidTransactionTypeException;
 import com.rental.houserental.exceptions.user.*;
+import com.rental.houserental.exceptions.wishlist.WishlistOperationException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -192,6 +194,16 @@ public class GlobalExceptionHandler {
         log.warn("Invalid booking status: {}", ex.getMessage());
         model.addAttribute(MESSAGE, "The specified booking status is not valid.");
         return GENERIC_ERROR;
+    }
+
+    @ExceptionHandler(WishlistOperationException.class)
+    public String handleWishlistOperationException(WishlistOperationException ex, RedirectAttributes redirectAttributes, HttpServletRequest request) {
+        redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+        String referer = request.getHeader("Referer");
+        if (referer != null && referer.contains("wishlist")) {
+            return "redirect:/wishlist";
+        }
+        return "redirect:" + (referer != null ? referer : "/");
     }
 
     //generic phải để cuối để bắt hết được lỗi

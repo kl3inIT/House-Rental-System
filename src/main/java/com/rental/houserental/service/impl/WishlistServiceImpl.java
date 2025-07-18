@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
+import com.rental.houserental.exceptions.wishlist.WishlistOperationException;
 
 @Service
 @RequiredArgsConstructor
@@ -67,8 +68,7 @@ public class WishlistServiceImpl implements WishlistService {
             return true;
             
         } catch (Exception e) {
-            log.error("Error adding property {} to wishlist for user {}", propertyId, userId, e);
-            return false;
+            throw new WishlistOperationException("Failed to add property to wishlist", e);
         }
     }
 
@@ -98,8 +98,7 @@ public class WishlistServiceImpl implements WishlistService {
             return false;
             
         } catch (Exception e) {
-            log.error("Error removing property {} from wishlist for user {}", propertyId, userId, e);
-            return false;
+            throw new WishlistOperationException("Failed to remove property from wishlist", e);
         }
     }
 
@@ -113,8 +112,7 @@ public class WishlistServiceImpl implements WishlistService {
             return Boolean.TRUE.equals(exists);
             
         } catch (Exception e) {
-            log.error("Error checking wishlist status for property {} and user {}", propertyId, userId, e);
-            return false;
+            throw new WishlistOperationException("Failed to check wishlist status", e);
         }
     }
 
@@ -126,8 +124,7 @@ public class WishlistServiceImpl implements WishlistService {
             return members != null ? members : new HashSet<>();
             
         } catch (Exception e) {
-            log.error("Error getting wishlist property IDs for user {}", userId, e);
-            return new HashSet<>();
+            throw new WishlistOperationException("Failed to get wishlist property IDs", e);
         }
     }
 
@@ -147,7 +144,7 @@ public class WishlistServiceImpl implements WishlistService {
             // Convert to Long IDs
             List<Long> ids = propertyIds.stream()
                     .map(Long::parseLong)
-                    .collect(Collectors.toList());
+                    .toList();
             
             // Fetch properties from database
             List<RentalProperty> properties = propertyRepository.findAllById(ids);
@@ -156,11 +153,10 @@ public class WishlistServiceImpl implements WishlistService {
             return properties.stream()
                     .map(property -> convertToWishlistDTO(property, timestamps))
                     .sorted((a, b) -> b.getAddedToWishlistAt().compareTo(a.getAddedToWishlistAt())) // Sort by newest first
-                    .collect(Collectors.toList());
+                    .toList();
                     
         } catch (Exception e) {
-            log.error("Error getting user wishlist for user {}", userId, e);
-            return new ArrayList<>();
+            throw new WishlistOperationException("Failed to get user wishlist", e);
         }
     }
 
@@ -172,8 +168,7 @@ public class WishlistServiceImpl implements WishlistService {
             return count != null ? count : 0;
             
         } catch (Exception e) {
-            log.error("Error getting wishlist count for user {}", userId, e);
-            return 0;
+            throw new WishlistOperationException("Failed to get wishlist count", e);
         }
     }
 
@@ -199,7 +194,7 @@ public class WishlistServiceImpl implements WishlistService {
             log.info("Cleared wishlist for user {}", userId);
             
         } catch (Exception e) {
-            log.error("Error clearing wishlist for user {}", userId, e);
+            throw new WishlistOperationException("Failed to clear wishlist", e);
         }
     }
 
@@ -217,10 +212,7 @@ public class WishlistServiceImpl implements WishlistService {
             return statusMap;
             
         } catch (Exception e) {
-            log.error("Error getting wishlist status for user {} and properties {}", userId, propertyIds, e);
-            // Return false for all properties on error
-            return propertyIds.stream()
-                    .collect(Collectors.toMap(id -> id, id -> false));
+            throw new WishlistOperationException("Failed to get wishlist status", e);
         }
     }
     

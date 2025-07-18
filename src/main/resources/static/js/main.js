@@ -128,45 +128,6 @@ function initializeHeader() {
     });
 }
 
-// Property heart toggle functionality
-function initializePropertyInteractions() {
-    const heartButtons = document.querySelectorAll('button i.fa-heart');
-    
-    heartButtons.forEach(heartIcon => {
-        const button = heartIcon.parentElement;
-        
-        button.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            // Toggle between outline and filled heart
-            if (heartIcon.classList.contains('far')) {
-                heartIcon.classList.remove('far');
-                heartIcon.classList.add('fas');
-                button.classList.remove('text-gray-400');
-                button.classList.add('text-red-500');
-                
-                // Add animation
-                heartIcon.style.transform = 'scale(1.2)';
-                setTimeout(() => {
-                    heartIcon.style.transform = 'scale(1)';
-                }, 150);
-                
-                // You could add API call here to save favorite
-                console.log('Added to favorites');
-            } else {
-                heartIcon.classList.remove('fas');
-                heartIcon.classList.add('far');
-                button.classList.remove('text-red-500');
-                button.classList.add('text-gray-400');
-                
-                // You could add API call here to remove favorite
-                console.log('Removed from favorites');
-            }
-        });
-    });
-}
-
 // Search functionality
 function initializeSearch() {
     const searchForm = document.querySelector('form');
@@ -193,7 +154,7 @@ function initializeSearch() {
 
 document.addEventListener('DOMContentLoaded', () => {
     initializeHeader();
-    initializePropertyInteractions();
+    // initializePropertyInteractions() - REMOVED: Conflicts with form-based wishlist system
     initializeSearch();
 
     // Tooltip functionality

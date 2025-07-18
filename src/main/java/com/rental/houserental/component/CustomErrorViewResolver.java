@@ -1,4 +1,4 @@
-package com.rental.houserental.config;
+package com.rental.houserental.component;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.boot.autoconfigure.web.servlet.error.ErrorViewResolver;

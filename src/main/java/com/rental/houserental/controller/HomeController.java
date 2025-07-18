@@ -64,22 +64,6 @@ public class HomeController {
         return INDEX;
     }
 
-
-
-
-//    @GetMapping("/properties/{id}")
-//    public String propertyDetail(@PathVariable Long id, Model model) {
-//        try {
-//            SearchPropertyResponseDTO property = propertyService.getPropertyById(id);
-//            model.addAttribute("property", property);
-//            return "property-detail";
-//        } catch (Exception e) {
-//            log.error("Error loading property detail for ID: {}", id, e);
-//            // Redirect to search page if property not found
-//            return "redirect:/properties/search";
-//        }
-//    }
-
     @GetMapping("/properties/search")
     public String searchProperties(
             @ModelAttribute SearchPropertyCriteriaDTO criteria,

@@ -7,6 +7,7 @@ import com.rental.houserental.dto.response.booking.BookingHistoryDetailDTO;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
+import java.util.Map;
 
 public interface BookingService {
 
@@ -16,4 +17,5 @@ public interface BookingService {
     void createBooking(PropertyBookingRequestDTO propertyBookingRequestDTO);
     void cancelBooking(Long bookingId);
     boolean isRefundable(Long bookingId);
+    Map<String, Long> getBookingStatsByLandLord();
 }

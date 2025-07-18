@@ -1,7 +1,144 @@
 // Simple page functionality
 document.addEventListener('DOMContentLoaded', function() {
     initializeHomeSearch();
+    initializeWishlistToggles();
+    createToastContainer();
 });
+
+// Toast Notification System
+function createToastContainer() {
+    if (document.getElementById('toast-container')) return;
+    
+    const container = document.createElement('div');
+    container.id = 'toast-container';
+    container.className = 'fixed top-4 right-4 z-50 space-y-2';
+    document.body.appendChild(container);
+}
+
+function showToast(message, type = 'success') {
+    const container = document.getElementById('toast-container');
+    
+    const toast = document.createElement('div');
+    const bgColor = type === 'success' ? 'bg-green-500' : 'bg-red-500';
+    
+    toast.className = `${bgColor} text-white px-6 py-3 rounded-lg shadow-lg mb-2 transform transition-all duration-300 translate-x-full opacity-0`;
+    toast.style.minWidth = '300px';
+    
+    toast.innerHTML = `
+        <div class="flex items-center justify-between">
+            <span class="font-medium">${message}</span>
+            <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `;
+    
+    container.appendChild(toast);
+    
+    // Animate in
+    setTimeout(() => {
+        toast.classList.remove('translate-x-full', 'opacity-0');
+    }, 100);
+    
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+        toast.classList.add('translate-x-full', 'opacity-0');
+        setTimeout(() => {
+            if (toast.parentElement) {
+                toast.remove();
+            }
+        }, 300);
+    }, 3000);
+}
+
+// Wishlist AJAX functionality
+function initializeWishlistToggles() {
+    const wishlistForms = document.querySelectorAll('form[action*="/wishlist/toggle/"]');
+    
+    wishlistForms.forEach(form => {
+        const button = form.querySelector('button[type="submit"]');
+        const heartIcon = button.querySelector('i');
+        
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(form);
+            const propertyId = form.action.split('/').pop();
+            
+            // Add loading state (make icon bolder)
+            heartIcon.classList.add('fa-pulse');
+            button.style.transform = 'scale(1.1)';
+            button.style.opacity = '0.8';
+            
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    
+                    if (result.added) {
+                        heartIcon.classList.remove('far', 'text-gray-600');
+                        heartIcon.classList.add('fas', 'text-red-500');
+                        button.title = 'Remove from wishlist';
+                        showToast('❤️ Added to wishlist!', 'success');
+                    } else {
+                        heartIcon.classList.remove('fas', 'text-red-500');
+                        heartIcon.classList.add('far', 'text-gray-600');
+                        button.title = 'Add to wishlist';
+                        showToast('💔 Removed from wishlist', 'success');
+                    }
+                    
+                    // Update wishlist count in header if exists
+                    updateWishlistCount(result.wishlistCount);
+                    
+                } else {
+                    throw new Error('Failed to update wishlist');
+                }
+                
+            } catch (error) {
+                console.error('Wishlist error:', error);
+                showToast('Failed to update wishlist!', 'error');
+            } finally {
+                // Always reset loading state
+                heartIcon.classList.remove('fa-pulse');
+                button.style.transform = '';
+                button.style.opacity = '';
+            }
+        });
+    });
+}
+
+function updateWishlistCount(count) {
+    const wishlistBadge = document.querySelector('[data-wishlist-count]');
+    if (wishlistBadge) {
+        wishlistBadge.textContent = count;
+        // Show badge if count > 0, hide if count = 0
+        if (count > 0) {
+            wishlistBadge.style.display = 'flex';
+        } else {
+            wishlistBadge.style.display = 'none';
+        }
+    }
+    
+    // Also update mobile menu badge if exists
+    const mobileBadges = document.querySelectorAll('a[href="/wishlist"] span');
+    mobileBadges.forEach(badge => {
+        if (badge && badge.classList.contains('bg-red-500')) {
+            badge.textContent = count;
+            if (count > 0) {
+                badge.style.display = 'flex';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+    });
+}
 
 // Home search functionality
 function initializeHomeSearch() {

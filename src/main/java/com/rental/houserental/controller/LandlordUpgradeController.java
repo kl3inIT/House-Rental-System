@@ -2,7 +2,7 @@ package com.rental.houserental.controller;
 
 import com.rental.houserental.dto.response.user.UserProfileResponseDTO;
 import com.rental.houserental.entity.User;
-import com.rental.houserental.service.LandlordUpgradeRequestService;
+import com.rental.houserental.service.LandlordUpgradeService;
 import com.rental.houserental.service.UserService;
 import com.rental.houserental.exceptions.user.LandlordRequestAlreadyExistsException;
 import lombok.RequiredArgsConstructor;
@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 @RequestMapping("/landlord-upgrade-requests")
 @RequiredArgsConstructor
-public class LandlordUpgradeRequestController {
+public class LandlordUpgradeController {
 
-    private final LandlordUpgradeRequestService requestService;
+    private final LandlordUpgradeService requestService;
     private final UserService userService;
 
     // User gửi request
