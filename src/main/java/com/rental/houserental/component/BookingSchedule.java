@@ -1,8 +1,11 @@
 package com.rental.houserental.component;
 
 import com.rental.houserental.entity.Booking;
+import com.rental.houserental.entity.RentalProperty;
 import com.rental.houserental.enums.BookingStatus;
+import com.rental.houserental.enums.PropertyStatus;
 import com.rental.houserental.repository.BookingRepository;
+import com.rental.houserental.repository.PropertyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -16,6 +19,7 @@ import java.util.List;
 public class BookingSchedule {
 
     private final BookingRepository bookingRepository;
+    private final PropertyRepository propertyRepository;
 
     @Scheduled(cron = "0 0/50 * * * ?")
     public void updateAllBookingStatus(){
@@ -31,6 +35,9 @@ public class BookingSchedule {
                 booking.setStatus(BookingStatus.ACTIVE);
             } else {
                 booking.setStatus(BookingStatus.COMPLETED);
+                RentalProperty rentalProperty = propertyRepository.findById(booking.getRentalProperty().getId()).get();
+                rentalProperty.setPropertyStatus(PropertyStatus.AVAILABLE);
+                propertyRepository.save(rentalProperty);
             }
             bookingRepository.save(booking);
         }

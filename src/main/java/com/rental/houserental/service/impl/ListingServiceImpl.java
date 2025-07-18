@@ -179,17 +179,6 @@ public class ListingServiceImpl implements ListingService {
     @Override
     @Transactional
     public Page<ListingListItemDTO> getListingsForLandlord(ListingFilterDTO filter, Long landlordId, Pageable pageable) {
-        LocalDateTime now = LocalDateTime.now();
-
-        List<Listing> expiredListings = listingRepository.findByLandlordIdAndEndDateBeforeAndStatusNot(
-                landlordId, now, ListingStatus.EXPIRED);
-        if (!expiredListings.isEmpty()) {
-            for (Listing l : expiredListings) {
-                l.setStatus(ListingStatus.EXPIRED);
-            }
-            listingRepository.saveAll(expiredListings);
-        }
-
         String searchTerm = (filter.getSearchTerm() != null && !filter.getSearchTerm().isBlank()) ? filter.getSearchTerm().trim() : null;
         Boolean isHighlight = null;
         if ("highlighted".equalsIgnoreCase(filter.getHighlight())) isHighlight = true;

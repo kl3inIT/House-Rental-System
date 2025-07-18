@@ -21,7 +21,6 @@ public class SystemConfigServiceImpl implements SystemConfigService {
 
     private static final String NORMAL_LISTING_PRICE_KEY = "listing.price.normal";
     private static final String HIGHLIGHT_LISTING_PRICE_KEY = "listing.price.highlight";
-
     
     @Override
     public Optional<SystemConfig> getConfigByKey(String key) {

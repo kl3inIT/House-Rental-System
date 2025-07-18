@@ -27,13 +27,4 @@ public class PropertyListItemDTO {
     private Integer bookingCount;
     private Integer listingCount;
     private LocalDateTime updateAt;
-
-    public String getFormattedRevenue() {
-        if (monthlyRent == null) return "0";
-        if (monthlyRent.stripTrailingZeros().scale() <= 0) {
-            return String.format("%,d", monthlyRent.longValue());
-        } else {
-            return String.format("%,.2f", monthlyRent);
-        }
-    }
 }

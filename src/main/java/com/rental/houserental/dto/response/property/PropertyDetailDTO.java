@@ -30,7 +30,7 @@ public class PropertyDetailDTO {
     private Integer bathrooms;
     private BigDecimal area;
 
-    private PropertyStatus propertyStatus;
+    private String propertyStatus;
 
     private String mainImageUrl;
     private List<String> imageUrls;
