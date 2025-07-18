@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/admin}">
+<head>
+    <title>Sửa cấu hình hệ thống</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="p-6 max-w-xl mx-auto">
+        <h1 class="text-3xl font-bold text-white mb-6">Edit Listing Price</h1>
+        <form th:action="@{'/admin/system-configs/edit/' + ${configId}}" method="post" th:object="${updateRequest}" class="bg-gray-800 rounded-lg shadow-md p-6 border border-gray-700">
+            <div class="mb-4">
+                <label class="block text-gray-300 text-sm mb-1">Value</label>
+                <input type="text" th:field="*{value}" class="rounded px-3 py-2 bg-gray-700 text-white w-full" />
+                <div th:if="${#fields.hasErrors('value')}" class="text-red-500 text-xs mt-1" th:errors="*{value}"></div>
+            </div>
+            <div class="mb-6">
+                <label class="block text-gray-300 text-sm mb-1">Description</label>
+                <input type="text" th:field="*{description}" class="rounded px-3 py-2 bg-gray-700 text-white w-full" />
+                <div th:if="${#fields.hasErrors('description')}" class="text-red-500 text-xs mt-1" th:errors="*{description}"></div>
+            </div>
+            <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 font-medium">Save</button>
+        </form>
+    </div>
+</div>
+</body>
+</html> 

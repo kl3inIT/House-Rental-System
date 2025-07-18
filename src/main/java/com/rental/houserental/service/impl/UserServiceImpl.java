@@ -17,10 +17,16 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import static com.rental.houserental.constant.ErrorMessageConstant.MSG_400;
+
+import java.util.List;
+import com.rental.houserental.enums.UserRole;
+import com.rental.houserental.dto.request.landlord.LandlordFilterRequestDTO;
 
 @Service
 @RequiredArgsConstructor
@@ -55,6 +61,11 @@ public class UserServiceImpl implements UserService {
     public User findByEmail(String email) {
         return userRepository.findByEmail(email).orElse(null);
 
+    }
+
+    @Override
+    public User findById(Long id) {
+        return userRepository.findById(id).orElse(null);
     }
 
     @Override
@@ -105,6 +116,50 @@ public class UserServiceImpl implements UserService {
     public UserProfileResponseDTO getCurrentUserProfile() {
         User currentUser = getCurrentUser();
         return mapToUserProfileResponseDTO(currentUser);
+    }
+
+    @Override
+    public Page<User> getAllLandlords(Pageable pageable) {
+        return userRepository.findByRoleOrderByCreatedAtDesc(UserRole.LANDLORD, pageable);
+    }
+
+    private boolean isBlank(String s) {
+        return s == null || s.trim().isEmpty();
+    }
+
+    @Override
+    public Page<User> searchLandlords(LandlordFilterRequestDTO filter, Pageable pageable) {
+        // Xác định sort
+        String sortBy = filter.getSortBy() != null ? filter.getSortBy() : "createdAt";
+        String sortDir = filter.getSortDir() != null ? filter.getSortDir() : "desc";
+        Sort sort;
+        switch (sortBy) {
+            case "status":
+                sort = Sort.by(Sort.Direction.fromString(sortDir), "status"); break;
+            case "balance":
+                sort = Sort.by(Sort.Direction.fromString(sortDir), "balance"); break;
+            case "createdAt":
+            default:
+                sort = Sort.by(Sort.Direction.fromString(sortDir), "createdAt"); break;
+        }
+        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+        com.rental.houserental.enums.UserStatus status = null;
+        if (filter.getStatus() != null && !filter.getStatus().isEmpty()) {
+            String statusInput = filter.getStatus().trim();
+            for (com.rental.houserental.enums.UserStatus us : com.rental.houserental.enums.UserStatus.values()) {
+                if (us.getDisplayName().equalsIgnoreCase(statusInput) || us.name().equalsIgnoreCase(statusInput)) {
+                    status = us;
+                    break;
+                }
+            }
+        }
+        return userRepository.searchLandlords(
+            isBlank(filter.getName()) ? null : filter.getName(),
+            isBlank(filter.getEmail()) ? null : filter.getEmail(),
+            isBlank(filter.getPhone()) ? null : filter.getPhone(),
+            status != null ? status.name() : null,
+            sortedPageable
+        );
     }
 
     private UserProfileResponseDTO mapToUserProfileResponseDTO(User user) {
