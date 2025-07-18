@@ -42,6 +42,7 @@ public interface PropertyService {
 
     PropertyCheckoutDTO getPropertyToCheckoutById(Long id);
 
+    Long countTotalRentalProperty();
 
-
+    Long countRevenueRentalProperty();
 }

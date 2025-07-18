@@ -196,7 +196,7 @@ public class BookingServiceImpl implements BookingService {
                 .orElseThrow(() -> new PropertyNotFoundException("Booking not found with ID: " + bookingId));
 
         if(isRefundable(bookingId)) {
-            booking.setStatus(BookingStatus.CANCELED);
+            booking.setStatus(BookingStatus.CANCELLED);
             bookingRepository.save(booking);
 
             // Update property status to AVAILABLE
@@ -247,13 +247,24 @@ public class BookingServiceImpl implements BookingService {
 
         long estimatedEarnings = 0;
         for(Booking booking : bookings) {
-            if(booking.getStatus() != BookingStatus.CANCELED) {
+            if(booking.getStatus() != BookingStatus.CANCELLED) {
                 estimatedEarnings += booking.getAmount().longValue();
             }
         }
         bookingStats.put("estimatedEarnings", estimatedEarnings);
 
         return bookingStats;
+    }
+
+
+    @Override
+    public Long countBookingsThisMonthByLandlord(Long landlordId) {
+        return bookingRepository.countBookingsThisMonthByLandlord(landlordId);
+    }
+
+    @Override
+    public Long countActiveBookingsByLandlord(Long landlordId) {
+        return bookingRepository.countActiveBookingsByLandlord(landlordId, BookingStatus.CONFIRMED);
     }
 
     public RentalProperty findPropertyById(Long id) {

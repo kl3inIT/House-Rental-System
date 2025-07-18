@@ -18,4 +18,6 @@ public interface BookingService {
     void cancelBooking(Long bookingId);
     boolean isRefundable(Long bookingId);
     Map<String, Long> getBookingStatsByLandLord();
+    Long countBookingsThisMonthByLandlord(Long landlordId);
+    Long countActiveBookingsByLandlord(Long landlordId);
 }

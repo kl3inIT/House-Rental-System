@@ -5,6 +5,9 @@ import com.rental.houserental.dto.response.booking.BookingHistoryDTO;
 import com.rental.houserental.dto.response.booking.BookingHistoryDetailDTO;
 import com.rental.houserental.enums.BookingStatus;
 import com.rental.houserental.service.BookingService;
+import com.rental.houserental.service.PropertyService;
+import com.rental.houserental.service.TransactionService;
+import com.rental.houserental.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +23,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-
+import org.springframework.security.core.userdetails.User;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,86 +40,51 @@ import static com.rental.houserental.constant.ViewNamesConstant.LANDLORD_DASHBOA
 @Slf4j
 public class LandlordDashboardController {
 
-
     @Autowired
     private BookingService bookingService;
 
+    @Autowired
+    private PropertyService propertyService;
+
+    @Autowired
+    private TransactionService transactionService;
+
+    @Autowired
+    private UserService userService;
+
     @GetMapping("/dashboard")
-    public String dashboard(Model model, Authentication authentication, HttpServletRequest request) {
+    public String dashboard(Model model, HttpServletRequest request) {
         model.addAttribute("currentUri", request.getRequestURI());
-        // Dashboard Statistics - using hardcoded values for now
+
+        // Lấy landlordId từ user hiện tại
+        Long landlordId = userService.getCurrentUser().getId();
+
+        // Lấy tổng số property
+        Long totalProperties = propertyService.countTotalRentalProperty();
+        // Lấy số booking trong tháng
+        Long bookingsThisMonth = bookingService.countBookingsThisMonthByLandlord(landlordId);
+        // Lấy tổng doanh thu
+        Long monthlyRevenue = propertyService.countRevenueRentalProperty();
+
+        Long activeBookings = bookingService.countActiveBookingsByLandlord(landlordId);
+
+        // Đưa vào dashboardStats
         Map<String, Object> dashboardStats = new HashMap<>();
-        dashboardStats.put("totalProperties", 12);
-        dashboardStats.put("occupiedProperties", 9);
-        dashboardStats.put("pendingRequests", 5);
-        dashboardStats.put("monthlyRevenue", new BigDecimal("18400.00"));
-
-        // Recent Requests (mock data for now)
-        List<Map<String, Object>> recentRequests = new ArrayList<>();
-
-        Map<String, Object> request1 = new HashMap<>();
-        request1.put("tenantName", "Michael Chen");
-        request1.put("propertyName", "Downtown Apartment - Unit 4B");
-        request1.put("message", "Interested in viewing the property this weekend. Available Saturday afternoon.");
-        request1.put("status", "PENDING");
-        recentRequests.add(request1);
-
-        Map<String, Object> request2 = new HashMap<>();
-        request2.put("tenantName", "Emily Rodriguez");
-        request2.put("propertyName", "Suburban House - 123 Oak St");
-        request2.put("message", "Looking to move in next month. Has excellent references and stable income.");
-        request2.put("status", "PENDING");
-        recentRequests.add(request2);
-
-        Map<String, Object> request3 = new HashMap<>();
-        request3.put("tenantName", "David Kim");
-        request3.put("propertyName", "Studio Apartment - Unit 2A");
-        request3.put("message", "Application approved. Lease signing scheduled for tomorrow.");
-        request3.put("status", "APPROVED");
-        recentRequests.add(request3);
-
-        // Property Performance (mock data for now)
-        List<Map<String, Object>> propertyPerformance = new ArrayList<>();
-
-        Map<String, Object> property1 = new HashMap<>();
-        property1.put("name", "Downtown Apartment");
-        property1.put("address", "123 Main St, Unit 4B");
-        property1.put("rent", new BigDecimal("1800.00"));
-        property1.put("isOccupied", true);
-        property1.put("monthlyViews", 45);
-        property1.put("interestLevel", 100);
-        propertyPerformance.add(property1);
-
-        Map<String, Object> property2 = new HashMap<>();
-        property2.put("name", "Suburban House");
-        property2.put("address", "456 Oak Ave");
-        property2.put("rent", new BigDecimal("2200.00"));
-        property2.put("isOccupied", false);
-        property2.put("monthlyViews", 23);
-        property2.put("interestLevel", 60);
-        propertyPerformance.add(property2);
-
-        Map<String, Object> property3 = new HashMap<>();
-        property3.put("name", "Studio Apartment");
-        property3.put("address", "789 Pine St, Unit 2A");
-        property3.put("rent", new BigDecimal("1200.00"));
-        property3.put("isOccupied", true);
-        property3.put("monthlyViews", 31);
-        property3.put("interestLevel", 100);
-        propertyPerformance.add(property3);
+        dashboardStats.put("totalProperties", totalProperties);
+        dashboardStats.put("bookingsThisMonth", bookingsThisMonth);
+        dashboardStats.put("activeBookings", activeBookings);
+        dashboardStats.put("monthlyRevenue", monthlyRevenue);
 
         model.addAttribute("dashboardStats", dashboardStats);
-        model.addAttribute("recentRequests", recentRequests);
-        model.addAttribute("propertyPerformance", propertyPerformance);
-
         return LANDLORD_DASHBOARD;
     }
 
     @GetMapping("/bookings")
-    public String bookings(@Valid @ModelAttribute("bookingSearchRequestDTO") BookingSearchRequestDTO bookingSearchRequestDTO,
-                           BindingResult bindingResult,
-                           Model model,
-                           HttpServletRequest request) {
+    public String bookings(
+            @Valid @ModelAttribute("bookingSearchRequestDTO") BookingSearchRequestDTO bookingSearchRequestDTO,
+            BindingResult bindingResult,
+            Model model,
+            HttpServletRequest request) {
 
         Page<BookingHistoryDTO> bookings;
 
@@ -145,8 +113,5 @@ public class LandlordDashboardController {
         model.addAttribute("currentUri", request.getRequestURI());
         return "landlord/booking-detail";
     }
-
-
-
 
 }

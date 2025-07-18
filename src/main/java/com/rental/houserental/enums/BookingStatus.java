@@ -14,7 +14,7 @@ public enum BookingStatus {
     CONFIRMED("Confirmed", "Booking and deposit successful."),
     ACTIVE("Active", "The tenant has checked in and is currently staying."),
     COMPLETED("Completed", "The stay has been completed successfully."),
-    CANCELED("Cancelled", "The booking was cancelled");
+    CANCELLED("Cancelled", "The booking was cancelled");
 
     private final String displayName;
     private final String description;
@@ -54,7 +54,7 @@ public enum BookingStatus {
     }
 
     public boolean isCancelled() {
-        return this == CANCELED;
+        return this == CANCELLED;
     }
 
     public static List<Map<String, String>> getStatusList() {

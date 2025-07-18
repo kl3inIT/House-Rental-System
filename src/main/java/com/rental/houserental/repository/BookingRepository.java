@@ -33,4 +33,10 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             Pageable pageable);
 
     List<Booking> findByRentalProperty_Landlord_Id(Long id);
+
+    @Query("SELECT COUNT(b) FROM Booking b WHERE b.rentalProperty.landlord.id = :landlordId AND MONTH(b.createdAt) = MONTH(CURRENT_DATE) AND YEAR(b.createdAt) = YEAR(CURRENT_DATE)")
+    Long countBookingsThisMonthByLandlord(@Param("landlordId") Long landlordId);
+
+    @Query("SELECT COUNT(b) FROM Booking b WHERE b.rentalProperty.landlord.id = :landlordId AND b.status = :status")
+    Long countActiveBookingsByLandlord(@Param("landlordId") Long landlordId, @Param("status") com.rental.houserental.enums.BookingStatus status);
 }

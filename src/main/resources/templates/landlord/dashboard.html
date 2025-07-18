@@ -37,9 +37,9 @@
                             <i class="fas fa-check-circle text-xl"></i>
                         </div>
                         <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-600">Occupied</p>
+                            <p class="text-sm font-medium text-gray-600">Bookings This Month</p>
                             <p class="text-2xl font-bold text-gray-900"
-                                th:text="${dashboardStats.occupiedProperties ?: 0}">0</p>
+                                th:text="${dashboardStats.bookingsThisMonth ?: 0}">0</p>
                         </div>
                     </div>
                 </div>
@@ -47,12 +47,12 @@
                 <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-200">
                     <div class="flex items-center">
                         <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
-                            <i class="fas fa-clock text-xl"></i>
+                            <i class="fas fa-calendar-alt text-xl"></i>
                         </div>
                         <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-600">Pending Requests</p>
-                            <p class="text-2xl font-bold text-gray-900"
-                                th:text="${dashboardStats.pendingRequests ?: 0}">0</p>
+                            <p class="text-sm font-medium text-gray-600">Active Bookings</p>
+                            <p class="text-2xl font-bold text-gray-900" th:text="${dashboardStats.activeBookings ?: 0}">
+                                0</p>
                         </div>
                     </div>
                 </div>
@@ -63,7 +63,7 @@
                             <i class="fas fa-dollar-sign text-xl"></i>
                         </div>
                         <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-600">Monthly Revenue</p>
+                            <p class="text-sm font-medium text-gray-600">Revenue</p>
                             <p class="text-2xl font-bold text-gray-900"
                                 th:text="'$' + ${#numbers.formatDecimal(dashboardStats.monthlyRevenue ?: 0, 1, 'COMMA', 0, 'POINT')}">
                                 $0</p>

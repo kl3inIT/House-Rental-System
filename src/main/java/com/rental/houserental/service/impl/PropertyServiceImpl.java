@@ -385,7 +385,15 @@ public class PropertyServiceImpl implements PropertyService {
                 .build();
     }
 
+    @Override
+    public Long countTotalRentalProperty() {
+        return propertyRepository.count();
+    }
 
+    @Override
+    public Long countRevenueRentalProperty() {
+        return propertyRepository.countRentedProperties();
+    }
 
 
     public RentalProperty findPropertyById(Long id) {
