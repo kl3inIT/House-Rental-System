@@ -204,7 +204,7 @@ public class PropertyServiceImpl implements PropertyService {
                 .province(property.getProvince())
                 .fullAddress(property.getStreetAddress() + ", " + property.getWard() + ", " + property.getProvince())
                 .description(property.getDescription())
-                .propertyStatus(property.getPropertyStatus())
+                .propertyStatus(property.getPropertyStatus().toString())
                 .furnishing(property.getFurnishing() != null ? property.getFurnishing() : FurnishingType.FULL)
                 .depositPercentage(property.getDepositPercentage())
                 .amenities(amenityDTOs)
@@ -350,7 +350,7 @@ public class PropertyServiceImpl implements PropertyService {
                         .fullAddress(
                                 property.getStreetAddress() + ", " + property.getWard() + ", " + property.getProvince())
                         .description(property.getDescription())
-                        .propertyStatus(property.getPropertyStatus())
+                        .propertyStatus(property.getPropertyStatus().toString())
                         .furnishing(property.getFurnishing())
                         .mainImageUrl(property.getMainImageUrl())
                         .imageUrls(
