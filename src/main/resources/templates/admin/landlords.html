@@ -8,6 +8,48 @@
 <body>
     <div layout:fragment="content">
         <div class="p-6">
+            <!-- Search/Filter Form -->
+            <form method="get" class="flex flex-wrap gap-4 items-end mb-6">
+                <div>
+                    <label class="block text-gray-300 text-xs mb-1">Name</label>
+                    <input type="text" name="name" th:value="${name}" placeholder="Search name..." class="rounded px-3 py-2 bg-gray-700 text-white focus:outline-none w-40" />
+                </div>
+                <div>
+                    <label class="block text-gray-300 text-xs mb-1">Email</label>
+                    <input type="text" name="email" th:value="${email}" placeholder="Search email..." class="rounded px-3 py-2 bg-gray-700 text-white focus:outline-none w-40" />
+                </div>
+                <div>
+                    <label class="block text-gray-300 text-xs mb-1">Phone</label>
+                    <input type="text" name="phone" th:value="${phone}" placeholder="Search phone..." class="rounded px-3 py-2 bg-gray-700 text-white focus:outline-none w-32" />
+                </div>
+                <div>
+                    <label class="block text-gray-300 text-xs mb-1">Status</label>
+                    <select name="status" id="status" class="rounded px-3 py-2 bg-gray-700 text-white focus:outline-none w-32">
+                        <option value="" th:selected="${status == null or status == ''}">All</option>
+                        <option value="ACTIVE" th:selected="${status == 'ACTIVE'}">Active</option>
+                        <option value="SUSPENDED" th:selected="${status == 'SUSPENDED'}">Suspended</option>
+                        <option value="BANNED" th:selected="${status == 'BANNED'}">Banned</option>
+                        <option value="PENDING" th:selected="${status == 'PENDING'}">Pending</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-gray-300 text-xs mb-1">Sort By</label>
+                    <select name="sortBy" class="rounded px-3 py-2 bg-gray-700 text-white focus:outline-none w-32">
+                        <option value="createdAt" th:selected="${sortBy == 'createdAt'}">Join Date</option>
+                        <option value="balance" th:selected="${sortBy == 'balance'}">Balance</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-gray-300 text-xs mb-1">Sort Dir</label>
+                    <select name="sortDir" class="rounded px-3 py-2 bg-gray-700 text-white focus:outline-none w-24">
+                        <option value="desc" th:selected="${sortDir == 'desc'}">Desc</option>
+                        <option value="asc" th:selected="${sortDir == 'asc'}">Asc</option>
+                    </select>
+                </div>
+                <div>
+                    <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 font-medium mt-5">Search</button>
+                </div>
+            </form>
             <!-- Header -->
             <div class="flex justify-between items-center mb-8">
                 <div>

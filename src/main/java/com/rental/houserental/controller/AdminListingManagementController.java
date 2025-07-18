@@ -38,7 +38,9 @@ public class AdminListingManagementController {
             @RequestParam(value = "categoryId", required = false) Long categoryId,
             @RequestParam(value = "sort", defaultValue = "desc") String sort,
             @RequestParam(value = "title", required = false) String title,
-            @RequestParam(value = "sortAmount", required = false) String sortAmount
+            @RequestParam(value = "sortAmount", required = false) String sortAmount,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "20") int size
     ) {
         if (landlordId != null) {
             User landlord = userService.findById(landlordId);
@@ -46,11 +48,20 @@ public class AdminListingManagementController {
                 landlordName = landlord.getName();
             }
         }
-        // Lấy toàn bộ listing, không phân trang
-        List<ListingResponseDTO> listings = listingService.getAllListingsForAdmin();
+        PageRequest pageable = PageRequest.of(page, size);
+        var listings = listingService.searchListingsForAdmin(
+            landlordName,
+            categoryId,
+            "desc".equalsIgnoreCase(sort),
+            pageable,
+            title,
+            sortAmount
+        );
         model.addAttribute("currentUri", request.getRequestURI());
         model.addAttribute("title", "All Listings - Admin Dashboard");
-        model.addAttribute("listings", listings);
+        model.addAttribute("listings", listings.getContent());
+        model.addAttribute("totalPages", listings.getTotalPages());
+        model.addAttribute("currentPage", listings.getNumber() + 1);
         model.addAttribute("landlordName", landlordName);
         model.addAttribute("landlordId", landlordId);
         model.addAttribute("categoryId", categoryId);
