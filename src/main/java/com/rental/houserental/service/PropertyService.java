@@ -1,13 +1,16 @@
 package com.rental.houserental.service;
 
-import com.rental.houserental.dto.request.property.*;
+import com.rental.houserental.dto.request.property.CreatePropertyRequestDTO;
+import com.rental.houserental.dto.request.property.LandlordPropertyFilterDTO;
+import com.rental.houserental.dto.request.property.SearchPropertyCriteriaDTO;
+import com.rental.houserental.dto.request.property.UpdatePropertyRequestDTO;
 import com.rental.houserental.dto.response.property.*;
 import com.rental.houserental.dto.request.property.SearchPropertyCriteriaDTO;
 import com.rental.houserental.entity.RentalProperty;
 import com.rental.houserental.entity.User;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -38,5 +41,7 @@ public interface PropertyService {
     List<RentalProperty> getPropertiesByLandlordStatusNotAvailable(Long landlordId);
 
     PropertyCheckoutDTO getPropertyToCheckoutById(Long id);
+
+
 
 }
