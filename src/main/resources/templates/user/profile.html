@@ -86,7 +86,8 @@
                             Settings
                         </a>
                         <a href="#" id="landlord-request-link"
-                            class="flex items-center px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-md">
+                            class="flex items-center px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-md"
+                            th:if="${userProfile.role != 'LandLord'}">
                             <i class="fas fa-user-plus mr-3"></i>
                             Upgrade to Landlord
                         </a>

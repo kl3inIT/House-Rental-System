@@ -5,8 +5,8 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "landlord_upgrade_requests")
-public class LandlordUpgradeRequest {
+@Table(name = "Landlord_upgrade")
+public class LandlordUpgrade {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

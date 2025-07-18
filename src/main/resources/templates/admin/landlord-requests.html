@@ -77,8 +77,8 @@
             <div class="space-y-6">
                 <div th:each="request : ${requests}"
                     class="bg-gray-800 rounded-lg shadow-md overflow-hidden border border-gray-700" th:class="|bg-gray-800 rounded-lg shadow-md overflow-hidden border border-gray-700 ${
-                       request['status'] == 'Pending' ? 'border-l-4 border-yellow-400' :
-                       request['status'] == 'Approved' ? 'border-l-4 border-green-400' :
+                       request.status.name() == 'PENDING' ? 'border-l-4 border-yellow-400' :
+                       request.status.name() == 'APPROVED' ? 'border-l-4 border-green-400' :
                        'border-l-4 border-red-400'
                      }|">
                     <div class="p-6">
@@ -87,37 +87,38 @@
                                 <img src="/placeholder.svg?height=48&width=48" alt="User"
                                     class="w-12 h-12 rounded-full mr-4">
                                 <div>
-                                    <h3 class="text-lg font-semibold text-white" th:text="${request['userName']}">User
-                                        Name</h3>
-                                    <p class="text-gray-300" th:text="${request['userEmail']}">user@email.com</p>
+                                    <h3 class="text-lg font-semibold text-white" th:text="${request.fullName}">User Name
+                                    </h3>
+                                    <p class="text-gray-300" th:text="${request.user.email}">user@email.com</p>
                                     <p class="text-sm text-gray-400">Requested: <span
-                                            th:text="${request['requestDate']}">Jan 15, 2024</span></p>
+                                            th:text="${#temporals.format(request.createdAt, 'dd/MM/yyyy HH:mm')}">Jan
+                                            15, 2024</span></p>
                                 </div>
                             </div>
                             <div class="text-right">
                                 <span th:class="|px-3 py-1 text-sm rounded-full ${
-                                  request['status'] == 'Pending' ? 'bg-yellow-900 text-yellow-300' :
-                                  request['status'] == 'Approved' ? 'bg-green-900 text-green-300' :
+                                  request.status.name() == 'PENDING' ? 'bg-yellow-900 text-yellow-300' :
+                                  request.status.name() == 'APPROVED' ? 'bg-green-900 text-green-300' :
                                   'bg-red-900 text-red-300'
-                                }|" th:text="${request['status']}">Pending</span>
+                                }|" th:text="${request.status.name()}">Pending</span>
                             </div>
                         </div>
 
                         <div class="mb-4">
                             <h4 class="font-medium text-white mb-2">Reason for Request:</h4>
-                            <p class="text-gray-300" th:text="${request['reason']}">Reason here</p>
+                            <p class="text-gray-300" th:text="${request.reason}">Reason here</p>
                         </div>
 
                         <div class="flex flex-wrap gap-2">
-                            <form th:action="@{'/admin/landlord-upgrade-requests/' + ${request['id']} + '/approve'}"
-                                method="post" th:if="${request['status'] == 'Pending'}">
+                            <form th:action="@{'/admin/landlord-upgrade-requests/' + ${request.id} + '/approve'}"
+                                method="post" th:if="${request.status.name() == 'PENDING'}">
                                 <button type="submit"
                                     class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 text-sm">
                                     <i class="fas fa-check mr-1"></i>Approve
                                 </button>
                             </form>
-                            <a th:href="@{'/admin/landlord-upgrade-requests/' + ${request['id']} + '/reject-form'}"
-                                th:if="${request['status'] == 'Pending'}"
+                            <a th:href="@{'/admin/landlord-upgrade-requests/' + ${request.id} + '/reject-form'}"
+                                th:if="${request.status.name() == 'PENDING'}"
                                 class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 text-sm inline-block">
                                 <i class="fas fa-times mr-1"></i>Reject
                             </a>
