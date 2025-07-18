@@ -198,6 +198,12 @@ public class BookingServiceImpl implements BookingService {
         if(isRefundable(bookingId)) {
             booking.setStatus(BookingStatus.CANCELED);
             bookingRepository.save(booking);
+
+            // Update property status to AVAILABLE
+            RentalProperty property = findPropertyById(booking.getRentalProperty().getId());
+            property.setPropertyStatus(PropertyStatus.AVAILABLE);
+            propertyRepository.save(property);
+
             User currentUser = getCurrentUser();
             User landlord = booking.getRentalProperty().getLandlord();
             currentUser.setBalance(currentUser.getBalance() + booking.getDeposit());

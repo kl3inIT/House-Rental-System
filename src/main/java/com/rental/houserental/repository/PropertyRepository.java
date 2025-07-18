@@ -18,11 +18,11 @@ public interface PropertyRepository extends JpaRepository<RentalProperty, Long>,
 
     @Query("""
             SELECT p FROM RentalProperty p 
-            WHERE p.propertyStatus = :status 
+             WHERE p.propertyStatus IN :statuses 
             AND EXISTS (SELECT 1 FROM PropertyImage pi WHERE pi.rentalProperty = p)
             ORDER BY p.createdAt DESC
             """)
-    List<RentalProperty> findFeaturedProperties(@Param("status") PropertyStatus status, Pageable pageable);
+    List<RentalProperty> findFeaturedProperties(@Param("statuses") List<PropertyStatus> statuses, Pageable pageable);
 
     List<RentalProperty> findByLandlordIdAndPropertyStatusNot(Long landlordId, PropertyStatus propertyStatus);
 
@@ -68,7 +68,6 @@ public interface PropertyRepository extends JpaRepository<RentalProperty, Long>,
             @Param("minPrice") Integer minPrice,
             @Param("maxPrice") Integer maxPrice
     );
-
 
     List<RentalProperty> findByCategoryIdAndIdNotAndPropertyStatus(
             Long categoryId,

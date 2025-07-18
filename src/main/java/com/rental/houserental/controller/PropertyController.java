@@ -19,6 +19,7 @@ import static com.rental.houserental.constant.ViewNamesConstant.PROPERTY_DETAIL;
 @RequestMapping("/properties")
 @RequiredArgsConstructor
 public class PropertyController {
+
     private final PropertyService propertyService;
     private final UserService userService;
 

@@ -109,7 +109,7 @@ public class PropertyServiceImpl implements PropertyService {
         try {
             Pageable pageable = PageRequest.of(0, limit);
             List<RentalProperty> properties = propertyRepository.findFeaturedProperties(
-                    PropertyStatus.AVAILABLE, pageable);
+                    List.of(PropertyStatus.AVAILABLE, PropertyStatus.BOOKED, PropertyStatus.RENTED), pageable);
 
             List<FeaturedPropertyResponseDTO> result = properties.stream()
                     .map(this::convertToFeaturedDTO)
