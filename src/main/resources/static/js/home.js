@@ -19,25 +19,15 @@ function showToast(message, type = 'success') {
     const container = document.getElementById('toast-container');
     
     const toast = document.createElement('div');
-    toast.className = `transform transition-all duration-300 ease-in-out translate-x-full opacity-0 max-w-sm w-full bg-white shadow-lg rounded-lg pointer-events-auto flex ring-1 ring-black ring-opacity-5`;
+    const bgColor = type === 'success' ? 'bg-green-500' : 'bg-red-500';
     
-    const iconColor = type === 'success' ? 'text-green-400' : 'text-red-400';
-    const icon = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+    toast.className = `${bgColor} text-white px-6 py-3 rounded-lg shadow-lg mb-2 transform transition-all duration-300 translate-x-full opacity-0`;
+    toast.style.minWidth = '300px';
     
     toast.innerHTML = `
-        <div class="flex-1 w-0 p-4">
-            <div class="flex items-start">
-                <div class="flex-shrink-0">
-                    <i class="${icon} ${iconColor} text-xl"></i>
-                </div>
-                <div class="ml-3 flex-1">
-                    <p class="text-sm font-medium text-gray-900">${message}</p>
-                </div>
-            </div>
-        </div>
-        <div class="flex border-l border-gray-200">
-            <button onclick="this.parentElement.parentElement.remove()" 
-                    class="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center text-sm font-medium text-gray-600 hover:text-gray-500 focus:outline-none">
+        <div class="flex items-center justify-between">
+            <span class="font-medium">${message}</span>
+            <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
                 <i class="fas fa-times"></i>
             </button>
         </div>
@@ -50,7 +40,7 @@ function showToast(message, type = 'success') {
         toast.classList.remove('translate-x-full', 'opacity-0');
     }, 100);
     
-    // Auto remove after 5 seconds
+    // Auto remove after 3 seconds
     setTimeout(() => {
         toast.classList.add('translate-x-full', 'opacity-0');
         setTimeout(() => {
@@ -58,7 +48,7 @@ function showToast(message, type = 'success') {
                 toast.remove();
             }
         }, 300);
-    }, 5000);
+    }, 3000);
 }
 
 // Wishlist AJAX functionality
@@ -75,10 +65,10 @@ function initializeWishlistToggles() {
             const formData = new FormData(form);
             const propertyId = form.action.split('/').pop();
             
-            // Add loading state
-            button.disabled = true;
-            heartIcon.classList.add('fa-spinner', 'fa-spin');
-            heartIcon.classList.remove('fa-heart');
+            // Add loading state (make icon bolder)
+            heartIcon.classList.add('fa-pulse');
+            button.style.transform = 'scale(1.1)';
+            button.style.opacity = '0.8';
             
             try {
                 const response = await fetch(form.action, {
@@ -91,10 +81,6 @@ function initializeWishlistToggles() {
                 
                 if (response.ok) {
                     const result = await response.json();
-                    
-                    // Update heart icon
-                    heartIcon.classList.remove('fa-spinner', 'fa-spin');
-                    heartIcon.classList.add('fa-heart');
                     
                     if (result.added) {
                         heartIcon.classList.remove('far', 'text-gray-600');
@@ -117,13 +103,12 @@ function initializeWishlistToggles() {
                 
             } catch (error) {
                 console.error('Wishlist error:', error);
-                showToast('Failed to update wishlist. Please try again.', 'error');
-                
-                // Reset icon
-                heartIcon.classList.remove('fa-spinner', 'fa-spin');
-                heartIcon.classList.add('fa-heart');
+                showToast('Failed to update wishlist!', 'error');
             } finally {
-                button.disabled = false;
+                // Always reset loading state
+                heartIcon.classList.remove('fa-pulse');
+                button.style.transform = '';
+                button.style.opacity = '';
             }
         });
     });
