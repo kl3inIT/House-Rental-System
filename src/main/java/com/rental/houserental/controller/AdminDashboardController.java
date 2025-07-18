@@ -2,11 +2,17 @@ package com.rental.houserental.controller;
 
 import com.rental.houserental.entity.LandlordUpgrade;
 import com.rental.houserental.service.LandlordUpgradeService;
+import com.rental.houserental.service.CategoryService;
+import com.rental.houserental.service.UserService;
+import com.rental.houserental.service.ListingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -23,6 +29,9 @@ import java.util.Map;
 public class AdminDashboardController {
 
     private final LandlordUpgradeService landlordUpgradeService;
+    private final CategoryService categoryService;
+    private final UserService userService;
+    private final ListingService listingService;
 
     @GetMapping("/dashboard")
     public String dashboard(Model model, HttpServletRequest request) {
@@ -234,56 +243,6 @@ public class AdminDashboardController {
         model.addAttribute("totalRevenue", totalRevenue);
         return "admin/bookings";
     }
-
-    @GetMapping("/categories")
-    public String categories(Model model, HttpServletRequest request) {
-        model.addAttribute("currentUri", request.getRequestURI());
-        model.addAttribute("title", "Manage Categories - Admin Dashboard");
-        
-        // Mock category data
-        List<Map<String, Object>> categories = new ArrayList<>();
-        
-        Map<String, Object> category1 = new HashMap<>();
-        category1.put("id", 1L);
-        category1.put("name", "Apartment");
-        category1.put("description", "Multi-unit residential buildings");
-        category1.put("propertyCount", 456);
-        category1.put("status", "Active");
-        category1.put("createdDate", "Jan 1, 2024");
-        categories.add(category1);
-
-        Map<String, Object> category2 = new HashMap<>();
-        category2.put("id", 2L);
-        category2.put("name", "House");
-        category2.put("description", "Single-family residential homes");
-        category2.put("propertyCount", 234);
-        category2.put("status", "Active");
-        category2.put("createdDate", "Jan 1, 2024");
-        categories.add(category2);
-
-        Map<String, Object> category3 = new HashMap<>();
-        category3.put("id", 3L);
-        category3.put("name", "Condo");
-        category3.put("description", "Condominium units");
-        category3.put("propertyCount", 189);
-        category3.put("status", "Active");
-        category3.put("createdDate", "Jan 1, 2024");
-        categories.add(category3);
-
-        // Calculate counts
-        long activeCount = categories.stream()
-                .filter(c -> "Active".equals(c.get("status")))
-                .count();
-        int totalProperties = categories.stream()
-                .mapToInt(c -> (Integer) c.get("propertyCount"))
-                .sum();
-
-        model.addAttribute("categories", categories);
-        model.addAttribute("activeCount", activeCount);
-        model.addAttribute("totalProperties", totalProperties);
-        return "admin/categories";
-    }
-
 
     @GetMapping("/reviews")
     public String reviews(Model model, HttpServletRequest request) {

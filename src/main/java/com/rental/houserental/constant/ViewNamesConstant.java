@@ -37,6 +37,10 @@ public final class ViewNamesConstant {
     // Checkout View
     public static final String CHECKOUT = "checkout";
 
+    //Category Views
+    public static final String CATEGORY_NEW = "admin/add-category";
+    public static final String REDIRECT_CATEGORY = "redirect:/admin/categories";
+
     // Simple Redirects
     public static final String REDIRECT_INDEX = "redirect:/";
     public static final String REDIRECT_LOGIN = "redirect:/login";
@@ -53,6 +57,7 @@ public final class ViewNamesConstant {
     public static final String REDIRECT_LANLORD_LISTINGS_CREATE = "redirect:/landlord/listings/create";
 
     public static final String REDIRECT_MY_BOOKING = "redirect:/my-bookings";
+
 
 
     // Utility methods for building redirects with parameters

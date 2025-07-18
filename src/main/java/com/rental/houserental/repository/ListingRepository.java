@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -29,6 +30,9 @@ public interface ListingRepository extends JpaRepository<Listing, Long> {
 
     List<Listing> findByLandlordIdAndEndDateBeforeAndStatusNot(Long landlordId, LocalDateTime now, ListingStatus status);
 
+    @EntityGraph(attributePaths = {"rentalProperty"})
+    List<Listing> findByLandlordIdOrderByCreatedAtDesc(Long landlordId);
+
     @Query("""
         SELECT l FROM Listing l
         WHERE l.rentalProperty.landlord.id = :landlordId
@@ -48,6 +52,30 @@ public interface ListingRepository extends JpaRepository<Listing, Long> {
             @Param("status") ListingStatus status,
             @Param("propertyId") Long propertyId,
             Pageable pageable
+    );
+
+    @Query(value = """
+        SELECT l.* FROM Listings l
+        JOIN Users landlord ON l.LandlordId = landlord.id
+        JOIN RentalProperties property ON l.PropertyId = property.id
+        JOIN Categories category ON property.CategoryId = category.id
+        WHERE (:landlordName IS NULL OR landlord.FullName LIKE CONCAT('%', :landlordName, '%'))
+          AND (:categoryId IS NULL OR category.id = :categoryId)
+          AND (:title IS NULL OR property.Title LIKE CONCAT('%', :title, '%'))
+    """, countQuery = """
+        SELECT COUNT(*) FROM Listings l
+        JOIN Users landlord ON l.LandlordId = landlord.id
+        JOIN RentalProperties property ON l.PropertyId = property.id
+        JOIN Categories category ON property.CategoryId = category.id
+        WHERE (:landlordName IS NULL OR landlord.FullName LIKE CONCAT('%', :landlordName, '%'))
+          AND (:categoryId IS NULL OR category.id = :categoryId)
+          AND (:title IS NULL OR property.Title LIKE CONCAT('%', :title, '%'))
+    """, nativeQuery = true)
+    Page<Listing> searchListingsForAdmin(
+        @Param("landlordName") String landlordName,
+        @Param("categoryId") Long categoryId,
+        @Param("title") String title,
+        Pageable pageable
     );
 
 

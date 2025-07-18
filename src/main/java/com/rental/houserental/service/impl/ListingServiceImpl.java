@@ -5,6 +5,7 @@ import com.rental.houserental.dto.request.listing.ListingFilterDTO;
 import com.rental.houserental.dto.response.listing.ListingListItemDTO;
 import com.rental.houserental.dto.response.listing.ListingPriceDTO;
 import com.rental.houserental.dto.response.listing.ListingStatsDTO;
+import com.rental.houserental.dto.response.listing.ListingResponseDTO;
 import com.rental.houserental.entity.*;
 import com.rental.houserental.enums.ListingStatus;
 import com.rental.houserental.enums.PropertyStatus;
@@ -23,13 +24,17 @@ import com.rental.houserental.service.SystemConfigService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -53,9 +58,6 @@ public class ListingServiceImpl implements ListingService {
         if (!property.getLandlord().getId().equals(landlord.getId())) {
             throw new UnauthorizedListingAccessException("You can only create listings for your own properties");
         }
-
-        property.setPropertyStatus(PropertyStatus.AVAILABLE);
-        propertyRepository.save(property);
 
         LocalDateTime startDateTime = request.getStartDate().atStartOfDay();
         LocalDateTime endDateTime = calculateEndDate(startDateTime, request.getDuration(), request.getDurationType());
@@ -179,17 +181,6 @@ public class ListingServiceImpl implements ListingService {
     @Override
     @Transactional
     public Page<ListingListItemDTO> getListingsForLandlord(ListingFilterDTO filter, Long landlordId, Pageable pageable) {
-        LocalDateTime now = LocalDateTime.now();
-
-        List<Listing> expiredListings = listingRepository.findByLandlordIdAndEndDateBeforeAndStatusNot(
-                landlordId, now, ListingStatus.EXPIRED);
-        if (!expiredListings.isEmpty()) {
-            for (Listing l : expiredListings) {
-                l.setStatus(ListingStatus.EXPIRED);
-            }
-            listingRepository.saveAll(expiredListings);
-        }
-
         String searchTerm = (filter.getSearchTerm() != null && !filter.getSearchTerm().isBlank()) ? filter.getSearchTerm().trim() : null;
         Boolean isHighlight = null;
         if ("highlighted".equalsIgnoreCase(filter.getHighlight())) isHighlight = true;
@@ -303,4 +294,76 @@ public class ListingServiceImpl implements ListingService {
         return (int) (targetDate.toEpochDay() - now.toEpochDay());
     }
 
+    @Override
+    public List<ListingResponseDTO> getListingsByLandlord(ListingFilterDTO filter, Long landlordId) {
+        // Có thể dùng filter để lọc thêm nếu cần
+        List<Listing> listings = listingRepository.findByLandlordIdOrderByCreatedAtDesc(landlordId);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        return listings.stream().map(l -> {
+            ListingResponseDTO dto = new ListingResponseDTO();
+            dto.setId(l.getId());
+            dto.setTitle(l.getRentalProperty().getTitle());
+            dto.setLandlordName(l.getLandlord().getName());
+            dto.setCategoryName(l.getRentalProperty().getCategory().getName());
+            dto.setAmount(l.getAmount());
+            dto.setCreatedAt(l.getCreatedAt().format(formatter));
+            dto.setStatus(l.getStatus().name());
+            return dto;
+        }).toList();
+    }
+
+    @Override
+    public List<ListingResponseDTO> getAllListings(ListingFilterDTO filter) {
+        // Có thể dùng filter để lọc thêm nếu cần
+        List<Listing> listings = listingRepository.findAll();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        return listings.stream().map(l -> {
+            ListingResponseDTO dto = new ListingResponseDTO();
+            dto.setId(l.getId());
+            dto.setTitle(l.getRentalProperty().getTitle());
+            dto.setLandlordName(l.getLandlord().getName());
+            dto.setCategoryName(l.getRentalProperty().getCategory().getName());
+            dto.setAmount(l.getAmount());
+            dto.setCreatedAt(l.getCreatedAt().format(formatter));
+            dto.setStatus(l.getStatus().name());
+            return dto;
+        }).toList();
+    }
+
+    private static String removeAccent(String s) {
+        if (s == null) return null;
+        String temp = java.text.Normalizer.normalize(s, java.text.Normalizer.Form.NFD);
+        return temp.replaceAll("\\p{M}", "").replaceAll("đ", "d").replaceAll("Đ", "D").toLowerCase();
+    }
+
+    @Override
+    public Page<ListingResponseDTO> searchListingsForAdmin(String landlordName, Long categoryId, boolean newestFirst, Pageable pageable, String title, String sortAmount) {
+        Sort sort;
+        if ("asc".equalsIgnoreCase(sortAmount)) {
+            sort = Sort.by(Sort.Direction.ASC, "amount");
+        } else if ("desc".equalsIgnoreCase(sortAmount)) {
+            sort = Sort.by(Sort.Direction.DESC, "amount");
+        } else {
+            sort = Sort.by(Sort.Direction.DESC, "createdAt");
+        }
+        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+        Page<Listing> page = listingRepository.searchListingsForAdmin(landlordName, categoryId, title, sortedPageable);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        return page.map(l -> {
+            ListingResponseDTO dto = new ListingResponseDTO();
+            dto.setId(l.getId());
+            dto.setTitle(l.getRentalProperty().getTitle());
+            dto.setLandlordName(l.getLandlord().getName());
+            dto.setCategoryName(l.getRentalProperty().getCategory().getName());
+            dto.setAmount(l.getAmount());
+            dto.setCreatedAt(l.getCreatedAt().format(formatter));
+            dto.setStatus(l.getStatus().name());
+            return dto;
+        });
+    }
+
+    @Override
+    public List<ListingResponseDTO> getAllListingsForAdmin() {
+        return getAllListings(null);
+    }
 } 

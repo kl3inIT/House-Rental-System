@@ -14,36 +14,25 @@
                     <h1 class="text-3xl font-bold text-white">Manage Categories</h1>
                     <p class="text-gray-300 mt-2">Organize and manage property categories</p>
                 </div>
-                <button class="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 font-medium">
+                <a th:href="@{/admin/categories/add}" class="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 font-medium flex items-center">
                     <i class="fas fa-plus mr-2"></i>Add New Category
-                </button>
+                </a>
             </div>
 
             <!-- Stats -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                <div class="bg-gray-800 rounded-lg shadow-md p-6 border border-gray-700">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 justify-items-center">
+                <div class="bg-gray-800 rounded-lg shadow-md p-6 border border-gray-700 w-full">
                     <div class="flex items-center">
                         <div class="p-3 rounded-full bg-blue-900 text-blue-300">
                             <i class="fas fa-tags text-xl"></i>
                         </div>
                         <div class="ml-4">
                             <p class="text-sm font-medium text-gray-300">Total Categories</p>
-                            <p class="text-2xl font-bold text-white" th:text="${categories.size()}">3</p>
+                            <p class="text-2xl font-bold text-white" th:text="${totalCategories}">3</p>
                         </div>
                     </div>
                 </div>
-                <div class="bg-gray-800 rounded-lg shadow-md p-6 border border-gray-700">
-                    <div class="flex items-center">
-                        <div class="p-3 rounded-full bg-green-900 text-green-300">
-                            <i class="fas fa-check-circle text-xl"></i>
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-300">Active</p>
-                            <p class="text-2xl font-bold text-white" th:text="${activeCount}">3</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-gray-800 rounded-lg shadow-md p-6 border border-gray-700">
+                <div class="bg-gray-800 rounded-lg shadow-md p-6 border border-gray-700 w-full">
                     <div class="flex items-center">
                         <div class="p-3 rounded-full bg-yellow-900 text-yellow-300">
                             <i class="fas fa-home text-xl"></i>
@@ -51,17 +40,6 @@
                         <div class="ml-4">
                             <p class="text-sm font-medium text-gray-300">Total Properties</p>
                             <p class="text-2xl font-bold text-white" th:text="${totalProperties}">879</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-gray-800 rounded-lg shadow-md p-6 border border-gray-700">
-                    <div class="flex items-center">
-                        <div class="p-3 rounded-full bg-purple-900 text-purple-300">
-                            <i class="fas fa-plus text-xl"></i>
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-300">New This Month</p>
-                            <p class="text-2xl font-bold text-white">0</p>
                         </div>
                     </div>
                 </div>
@@ -73,12 +51,6 @@
                     <div class="flex justify-between items-center">
                         <h3 class="text-lg font-semibold text-white">Categories List</h3>
                         <div class="flex space-x-2">
-                            <button class="text-gray-300 hover:text-white">
-                                <i class="fas fa-download mr-1"></i>Export
-                            </button>
-                            <button class="text-gray-300 hover:text-white">
-                                <i class="fas fa-filter mr-1"></i>Filter
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -87,59 +59,50 @@
                     <table class="min-w-full divide-y divide-gray-700">
                         <thead class="bg-gray-900">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                                    <input type="checkbox" class="rounded border-gray-600 bg-gray-700">
-                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">No.</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Category</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Description</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Properties</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Status</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Created</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Created At</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Updated At</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
                         <tbody class="bg-gray-800 divide-y divide-gray-700">
-                            <tr th:each="category : ${categories}" class="hover:bg-gray-700">
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <input type="checkbox" class="rounded border-gray-600 bg-gray-700">
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
+                            <tr th:each="category, stat : ${categories}" class="hover:bg-gray-700">
+                                <td class="px-6 py-4 whitespace-nowrap text-white" th:text="${stat.index + 1}"></td>
+                                <td class="px-6 py-4 whitespace-nowrap max-w-xs">
                                     <div class="flex items-center">
                                         <div class="w-10 h-10 bg-blue-900 rounded-lg flex items-center justify-center mr-3">
                                             <i class="fas fa-home text-blue-300"></i>
                                         </div>
                                         <div>
-                                            <div class="text-sm font-medium text-white" th:text="${category.name}">Apartment</div>
-                                            <div class="text-sm text-gray-400" th:text="'ID: ' + ${category.id}">ID: 1</div>
+                                            <div class="text-sm font-medium text-white truncate" style="max-width: 200px;" th:text="${category.name.length() > 50 ? category.name.substring(0, 50) + '...' : category.name}">Apartment</div>
                                         </div>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4">
-                                    <div class="text-sm text-gray-200" th:text="${category.description}">Multi-unit residential buildings</div>
+                                <td class="px-6 py-4 max-w-md">
+                                    <div class="text-sm text-gray-200 break-words" th:text="${category.description}">Multi-unit residential buildings</div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm font-medium text-white" th:text="${category.propertyCount}">456</div>
+                                    <div class="text-sm font-medium text-white" th:text="${category.totalProperties}">456</div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span th:class="|px-2 py-1 text-xs rounded-full ${
-                                      category.status == 'Active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                                    }|" 
-                                          th:text="${category.status}">Active</span>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400" th:text="${#temporals.format(category.createdAt, 'yyyy-MM-dd HH:mm')}">
+                                    Jan 1, 2024
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400" th:text="${category.createdDate}">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400" th:text="${#temporals.format(category.updatedAt, 'yyyy-MM-dd HH:mm')}">
                                     Jan 1, 2024
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <div class="flex space-x-2">
-                                        <button class="text-blue-600 hover:text-blue-900">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="text-green-600 hover:text-green-900">
+                                        <a th:href="@{'/admin/categories/edit/' + ${category.id}}" class="text-green-600 hover:text-green-900" title="Chỉnh sửa">
                                             <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="text-red-600 hover:text-red-900">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
+                                        </a>
+                                        <form th:action="@{'/admin/categories/delete/' + ${category.id}}" method="post" th:onsubmit="return confirm('Bạn có chắc muốn xóa?');" style="display:inline;">
+                                            <button type="submit" class="text-red-600 hover:text-red-900" title="Xóa">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
                                     </div>
                                 </td>
                             </tr>
@@ -152,17 +115,32 @@
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
                             <p class="text-sm text-gray-300">
-                                Showing <span class="font-medium">1</span> to <span class="font-medium" th:text="${categories.size()}">3</span> of <span class="font-medium" th:text="${categories.size()}">3</span> results
+                                Showing
+                                <span class="font-medium" th:text="${categories.number * categories.size + (categories.numberOfElements > 0 ? 1 : 0)}">1</span>
+                                to
+                                <span class="font-medium"
+                                      th:text="${categories.number * categories.size + categories.numberOfElements}">5</span>
+                                of
+                                <span class="font-medium" th:text="${categories.totalElements}">20</span>
+                                results
                             </p>
                         </div>
                         <div class="flex space-x-2">
-                            <button class="px-3 py-2 text-gray-400 bg-gray-700 border border-gray-600 rounded-md hover:bg-gray-600">
+                            <a th:if="${categories.hasPrevious()}"
+                               th:href="@{|/admin/categories?page=${categories.number - 1}&size=${categories.size}|}"
+                               class="px-3 py-2 text-gray-400 bg-gray-700 border border-gray-600 rounded-md hover:bg-gray-600">
                                 <i class="fas fa-chevron-left"></i>
-                            </button>
-                            <button class="px-3 py-2 text-white bg-blue-600 border border-blue-600 rounded-md">1</button>
-                            <button class="px-3 py-2 text-gray-400 bg-gray-700 border border-gray-600 rounded-md hover:bg-gray-600">
+                            </a>
+                            <a th:each="pageNum : ${#numbers.sequence(0, categories.totalPages - 1)}"
+                               th:href="@{|/admin/categories?page=${pageNum}&size=${categories.size}|}"
+                               th:text="${pageNum + 1}"
+                               th:classappend="${pageNum == categories.number} ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-400 hover:bg-gray-600 hover:text-white'"
+                               class="px-3 py-2 leading-tight rounded"></a>
+                            <a th:if="${categories.hasNext()}"
+                               th:href="@{|/admin/categories?page=${categories.number + 1}&size=${categories.size}|}"
+                               class="px-3 py-2 text-gray-400 bg-gray-700 border border-gray-600 rounded-md hover:bg-gray-600">
                                 <i class="fas fa-chevron-right"></i>
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>

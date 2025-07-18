@@ -161,7 +161,7 @@
                                     class="px-2 py-0.5 bg-gray-200 text-gray-800 text-xs rounded font-semibold"></span>
                          </div>
                          <div class="text-gray-500 mb-2 text-sm" th:text="${listing.propertyAddress}">Address</div>
-                         <div class="text-blue-600 font-bold text-xl mb-1" th:text="${#numbers.formatDecimal(listing.amount, 0, 0)} + ' VND'">0 VND</div>
+                         <div class="text-blue-600 font-bold text-xl mb-1" th:text="${#numbers.formatDecimal(listing.amount, 0, 'COMMA', 0, 'POINT')} + ' VND'">0 VND</div>
                          <div class="flex items-center text-gray-400 text-sm mb-2">
                               <i class="fas fa-calendar-alt mr-2"></i>
                               <span th:text="${#temporals.format(listing.startDate, 'MMM d, yyyy')} + ' - ' + ${#temporals.format(listing.endDate, 'MMM d, yyyy')}"></span>
@@ -252,7 +252,6 @@
                </a>
           </nav>
      </div>
-     <script src="/js/landlord/listing-action.js"></script>
 </div>
 </body>
 </html>

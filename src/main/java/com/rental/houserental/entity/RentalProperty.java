@@ -21,7 +21,7 @@ import java.util.Set;
 @NoArgsConstructor
 public class RentalProperty extends BaseEntity {
 
-    @Column(name = "Title", nullable = false)
+    @Column(name = "Title", nullable = false, length = 50, columnDefinition = "NVARCHAR(50)")
     private String title;
 
     @ManyToOne(fetch = FetchType.EAGER)
