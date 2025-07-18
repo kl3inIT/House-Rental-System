@@ -204,7 +204,7 @@ public class PropertyServiceImpl implements PropertyService {
                 .province(property.getProvince())
                 .fullAddress(property.getStreetAddress() + ", " + property.getWard() + ", " + property.getProvince())
                 .description(property.getDescription())
-                .propertyStatus(property.getPropertyStatus())
+                .propertyStatus(property.getPropertyStatus().toString())
                 .furnishing(property.getFurnishing() != null ? property.getFurnishing() : FurnishingType.FULL)
                 .depositPercentage(property.getDepositPercentage())
                 .amenities(amenityDTOs)
@@ -350,7 +350,7 @@ public class PropertyServiceImpl implements PropertyService {
                         .fullAddress(
                                 property.getStreetAddress() + ", " + property.getWard() + ", " + property.getProvince())
                         .description(property.getDescription())
-                        .propertyStatus(property.getPropertyStatus())
+                        .propertyStatus(property.getPropertyStatus().toString())
                         .furnishing(property.getFurnishing())
                         .mainImageUrl(property.getMainImageUrl())
                         .imageUrls(
@@ -408,6 +408,9 @@ public class PropertyServiceImpl implements PropertyService {
                 .fullAddress(p.getStreetAddress() + ", " + p.getWard() + ", " + p.getProvince())
                 .bedrooms(p.getBedrooms())
                 .bathrooms(p.getBathrooms())
+                .updateAt(p.getUpdatedAt())
+                .listingCount(p.getListings().size())
+                .bookingCount(p.getBookings().size())
                 .area(p.getArea())
                 .mainImageUrl(p.getMainImageUrl() != null ? p.getMainImageUrl() : "")
                 .bookingCount(p.getBookings().size())
