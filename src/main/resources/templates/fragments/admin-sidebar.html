@@ -23,52 +23,84 @@
                     Dashboard
                 </a>
 
-                <!-- User Management -->
+                <!-- User Management (dropdown) -->
                 <div class="space-y-1">
-                    <a th:href="@{/admin/landlords}"
-                       th:class="|group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${currentUri == '/admin/landlords' ? 'bg-red-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white'}|">
+                    <button type="button"
+                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 w-full text-left text-gray-300 hover:bg-gray-800 hover:text-white focus:outline-none"
+                        onclick="document.getElementById('user-submenu-unique').classList.toggle('hidden')">
                         <i class="fas fa-users mr-3 text-lg"></i>
-                        Users
-                    </a>
-                    
-                    <!-- Nút Landlord mới thêm -->
-                    <a th:href="@{/admin/landlords}"
-                       th:class="|group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ml-6 ${currentUri == '/admin/landlords' ? 'bg-red-600 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white'}|">
-                        <i class="fas fa-user-tie mr-3 text-sm"></i>
-                        Landlord
-                    </a>
-                    
-                    <a th:href="@{/admin/landlord-requests}" 
-                       th:class="|group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ml-6 ${
-                         currentUri == '/admin/landlord-requests' ? 'bg-red-600 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white'
-                       }|">
-                        <i class="fas fa-user-plus mr-3 text-sm"></i>
-                        Landlord Requests
-                        <span class="ml-auto bg-yellow-500 text-yellow-900 text-xs px-2 py-1 rounded-full">3</span>
-                    </a>
+                        User
+                        <svg class="ml-auto h-4 w-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div id="user-submenu-unique" class="ml-6 space-y-1 hidden">
+                        <a th:href="@{/admin/landlords}"
+                           th:class="|group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
+                             currentUri == '/admin/landlords' ? 'bg-red-600 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+                           }|">
+                            <i class="fas fa-user-tie mr-3 text-sm"></i>
+                            Landlord
+                        </a>
+                        <a th:href="@{/admin/landlord-requests}"
+                           th:class="|group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
+                             currentUri == '/admin/landlord-requests' ? 'bg-red-600 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+                           }|">
+                            <i class="fas fa-user-plus mr-3 text-sm"></i>
+                            Landlord Requests
+                        </a>
+                    </div>
                 </div>
-                <!-- Nút Listing mới thêm -->
-                <a th:href="@{/admin/listings}"
-                   th:class="|group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
-                     #strings.startsWith(currentUri, '/admin/listings') ? 'bg-red-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white'
-                   }|">
-                    <i class="fas fa-list mr-3 text-lg"></i>
-                    Listing
-                </a>
 
-                <!-- Property Management -->
+                <!-- Listing Management (dropdown) -->
                 <div class="space-y-1">
-                    <a th:href="@{/admin/categories}"
-                       th:class="|group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${currentUri == '/admin/categories' ? 'bg-red-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white'}|">
+                    <button type="button"
+                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 w-full text-left text-gray-300 hover:bg-gray-800 hover:text-white focus:outline-none"
+                        onclick="document.getElementById('listing-submenu-unique').classList.toggle('hidden')">
+                        <i class="fas fa-list mr-3 text-lg"></i>
+                        Listing
+                        <svg class="ml-auto h-4 w-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div id="listing-submenu-unique" class="ml-6 space-y-1 hidden">
+                        <a th:href="@{/admin/listings}"
+                           th:class="|group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
+                             currentUri != null and #strings.startsWith(currentUri, '/admin/listings') ? 'bg-red-600 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+                           }|">
+                            <i class="fas fa-list-ul mr-3 text-sm"></i>
+                            Listing Management
+                        </a>
+                        <a th:href="@{/admin/system-configs}"
+                           th:class="|group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
+                             currentUri == '/admin/system-configs' ? 'bg-red-600 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+                           }|">
+                            <i class="fas fa-sliders-h mr-3 text-sm"></i>
+                            Listing Price
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Property Management (dropdown) -->
+                <div class="space-y-1">
+                    <button type="button"
+                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 w-full text-left text-gray-300 hover:bg-gray-800 hover:text-white focus:outline-none"
+                        onclick="document.getElementById('property-submenu-unique').classList.toggle('hidden')">
                         <i class="fas fa-home mr-3 text-lg"></i>
-                        Properties
-                    </a>
-                    
-                    <a th:href="@{/admin/categories}"
-                       th:class="|group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ml-6 ${currentUri == '/admin/categories' ? 'bg-red-600 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white'}|">
-                        <i class="fas fa-tags mr-3 text-sm"></i>
-                        Categories
-                    </a>
+                        Property
+                        <svg class="ml-auto h-4 w-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div id="property-submenu-unique" class="ml-6 space-y-1 hidden">
+                        <a th:href="@{/admin/categories}"
+                           th:class="|group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
+                             currentUri == '/admin/categories' ? 'bg-red-600 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+                           }|">
+                            <i class="fas fa-tags mr-3 text-sm"></i>
+                            Categories
+                        </a>
+                    </div>
                 </div>
 
                 <!-- Booking Management -->
@@ -103,7 +135,7 @@
                 <div class="space-y-1">
                     <a th:href="@{/admin/reports}" 
                        th:class="|group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
-                         #strings.startsWith(currentUri, '/admin/reports') ? 'bg-red-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                         currentUri != null and #strings.startsWith(currentUri, '/admin/reports') ? 'bg-red-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white'
                        }|">
                         <i class="fas fa-chart-bar mr-3 text-lg"></i>
                         Reports
@@ -120,15 +152,14 @@
 
                 <!-- System Management -->
                 <div class="pt-6 border-t border-gray-700">
-                    <a th:href="@{/admin/settings}" 
+                    <a th:href="@{/admin/settings}"
                        th:class="|group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
                          currentUri == '/admin/settings' ? 'bg-red-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white'
                        }|">
                         <i class="fas fa-cog mr-3 text-lg"></i>
                         Settings
                     </a>
-                    
-                    <a th:href="@{/admin/logs}" 
+                    <a th:href="@{/admin/logs}"
                        th:class="|group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
                          currentUri == '/admin/logs' ? 'bg-red-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white'
                        }|">

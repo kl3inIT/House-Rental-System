@@ -352,39 +352,28 @@ public class ListingServiceImpl implements ListingService {
 
     @Override
     public Page<ListingResponseDTO> searchListingsForAdmin(String landlordName, Long categoryId, boolean newestFirst, Pageable pageable, String title, String sortAmount) {
-        Sort sort = newestFirst ? Sort.by(Sort.Direction.DESC, "createdAt") : Sort.by(Sort.Direction.ASC, "createdAt");
-        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
-        Page<Listing> page = listingRepository.searchListingsForAdmin(null, categoryId, sortedPageable); // bỏ filter landlordName ở DB
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        String landlordNameNoAccent = removeAccent(landlordName);
-        String titleNoAccent = removeAccent(title);
-        List<Listing> filtered = page.getContent().stream()
-            .filter(l -> l != null && l.getRentalProperty() != null && l.getRentalProperty().getTitle() != null && l.getLandlord() != null && l.getRentalProperty().getCategory() != null)
-            .filter(l -> landlordNameNoAccent == null || landlordNameNoAccent.isBlank() || removeAccent(l.getLandlord().getName()).contains(landlordNameNoAccent))
-            .filter(l -> titleNoAccent == null || titleNoAccent.isBlank() || removeAccent(l.getRentalProperty().getTitle()).contains(titleNoAccent))
-            .toList();
-        // Sort by amount if requested
-        if (sortAmount != null && !sortAmount.isBlank()) {
-            if (sortAmount.equalsIgnoreCase("asc")) {
-                filtered = filtered.stream().sorted(java.util.Comparator.comparingDouble(Listing::getAmount)).toList();
-            } else if (sortAmount.equalsIgnoreCase("desc")) {
-                filtered = filtered.stream().sorted((a, b) -> Double.compare(b.getAmount(), a.getAmount())).toList();
-            }
+        Sort sort;
+        if ("asc".equalsIgnoreCase(sortAmount)) {
+            sort = Sort.by(Sort.Direction.ASC, "amount");
+        } else if ("desc".equalsIgnoreCase(sortAmount)) {
+            sort = Sort.by(Sort.Direction.DESC, "amount");
+        } else {
+            sort = Sort.by(Sort.Direction.DESC, "createdAt");
         }
-        List<ListingResponseDTO> dtoList = filtered.stream()
-            .map(l -> {
-                ListingResponseDTO dto = new ListingResponseDTO();
-                dto.setId(l.getId());
-                dto.setTitle(l.getRentalProperty().getTitle());
-                dto.setLandlordName(l.getLandlord().getName());
-                dto.setCategoryName(l.getRentalProperty().getCategory().getName());
-                dto.setAmount(l.getAmount());
-                dto.setCreatedAt(l.getCreatedAt().format(formatter));
-                dto.setStatus(l.getStatus().name());
-                return dto;
-            })
-            .toList();
-        return new PageImpl<>(dtoList, sortedPageable, filtered.size());
+        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+        Page<Listing> page = listingRepository.searchListingsForAdmin(landlordName, categoryId, title, sortedPageable);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        return page.map(l -> {
+            ListingResponseDTO dto = new ListingResponseDTO();
+            dto.setId(l.getId());
+            dto.setTitle(l.getRentalProperty().getTitle());
+            dto.setLandlordName(l.getLandlord().getName());
+            dto.setCategoryName(l.getRentalProperty().getCategory().getName());
+            dto.setAmount(l.getAmount());
+            dto.setCreatedAt(l.getCreatedAt().format(formatter));
+            dto.setStatus(l.getStatus().name());
+            return dto;
+        });
     }
 
     @Override

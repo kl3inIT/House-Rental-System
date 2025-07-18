@@ -55,21 +55,28 @@ public interface ListingRepository extends JpaRepository<Listing, Long> {
     );
 
     @Query(value = """
-        SELECT l.* FROM [Listings] l
-        JOIN [Users] landlord ON l.LandlordId = landlord.id
-        JOIN [RentalProperties] property ON l.PropertyId = property.id
-        JOIN [Categories] category ON property.CategoryId = category.id
+        SELECT l.* FROM Listings l
+        JOIN Users landlord ON l.LandlordId = landlord.id
+        JOIN RentalProperties property ON l.PropertyId = property.id
+        JOIN Categories category ON property.CategoryId = category.id
         WHERE (:landlordName IS NULL OR landlord.FullName LIKE CONCAT('%', :landlordName, '%'))
-        AND (:categoryId IS NULL OR category.id = :categoryId)
+          AND (:categoryId IS NULL OR category.id = :categoryId)
+          AND (:title IS NULL OR property.Title LIKE CONCAT('%', :title, '%'))
     """, countQuery = """
-        SELECT COUNT(*) FROM [Listings] l
-        JOIN [Users] landlord ON l.LandlordId = landlord.id
-        JOIN [RentalProperties] property ON l.PropertyId = property.id
-        JOIN [Categories] category ON property.CategoryId = category.id
+        SELECT COUNT(*) FROM Listings l
+        JOIN Users landlord ON l.LandlordId = landlord.id
+        JOIN RentalProperties property ON l.PropertyId = property.id
+        JOIN Categories category ON property.CategoryId = category.id
         WHERE (:landlordName IS NULL OR landlord.FullName LIKE CONCAT('%', :landlordName, '%'))
-        AND (:categoryId IS NULL OR category.id = :categoryId)
+          AND (:categoryId IS NULL OR category.id = :categoryId)
+          AND (:title IS NULL OR property.Title LIKE CONCAT('%', :title, '%'))
     """, nativeQuery = true)
-    Page<Listing> searchListingsForAdmin(@Param("landlordName") String landlordName, @Param("categoryId") Long categoryId, Pageable pageable);
+    Page<Listing> searchListingsForAdmin(
+        @Param("landlordName") String landlordName,
+        @Param("categoryId") Long categoryId,
+        @Param("title") String title,
+        Pageable pageable
+    );
 
 
 } 

@@ -6,6 +6,9 @@ import com.rental.houserental.dto.request.user.UpdateProfileRequestDTO;
 import com.rental.houserental.dto.response.user.UserProfileResponseDTO;
 import com.rental.houserental.entity.User;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.util.List;
 
 public interface UserService {
@@ -24,7 +27,7 @@ public interface UserService {
 
     UserProfileResponseDTO getCurrentUserProfile();
 
-    List<User> getAllLandlords();
+    Page<User> getAllLandlords(Pageable pageable);
 
     User findById(Long id);
 }

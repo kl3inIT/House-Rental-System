@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
+
 
 @Controller
 @RequestMapping("/admin/listings")
@@ -31,8 +33,6 @@ public class AdminListingManagementController {
     public String listAllListings(
             Model model,
             HttpServletRequest request,
-            @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "size", defaultValue = "10") int size,
             @RequestParam(value = "landlordName", required = false) String landlordName,
             @RequestParam(value = "landlordId", required = false) Long landlordId,
             @RequestParam(value = "categoryId", required = false) Long categoryId,
@@ -40,16 +40,14 @@ public class AdminListingManagementController {
             @RequestParam(value = "title", required = false) String title,
             @RequestParam(value = "sortAmount", required = false) String sortAmount
     ) {
-        // Nếu có landlordId thì lấy tên landlord từ DB
         if (landlordId != null) {
             User landlord = userService.findById(landlordId);
             if (landlord != null) {
                 landlordName = landlord.getName();
             }
         }
-        boolean newestFirst = !"asc".equalsIgnoreCase(sort);
-        Pageable pageable = PageRequest.of(page, size);
-        Page<ListingResponseDTO> listings = listingService.searchListingsForAdmin(landlordName, categoryId, newestFirst, pageable, title, sortAmount);
+        // Lấy toàn bộ listing, không phân trang
+        List<ListingResponseDTO> listings = listingService.getAllListingsForAdmin();
         model.addAttribute("currentUri", request.getRequestURI());
         model.addAttribute("title", "All Listings - Admin Dashboard");
         model.addAttribute("listings", listings);

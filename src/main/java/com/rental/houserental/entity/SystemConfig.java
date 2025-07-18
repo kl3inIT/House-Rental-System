@@ -24,7 +24,7 @@ public class SystemConfig extends BaseEntity {
     @Column(name = "ConfigValue", nullable = false)
     private String configValue;
     
-    @Column(name = "description")
+    @Column(name = "description", length = 100,columnDefinition = "NVARCHAR(100)")
     private String description;
     
     @Column(name = "ConfigType")

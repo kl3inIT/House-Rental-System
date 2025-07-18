@@ -1,9 +1,8 @@
 package com.rental.houserental.enums;
 
 public enum ConfigType {
-    PRICING,
-    FEATURE_FLAG,
-    SYSTEM_SETTING,
-    NOTIFICATION,
-    OTHER
+        NORMAL_LISTING_WEEK,
+        HIGHLIGHT_LISTING_WEEK,
+        NORMAL_LISTING_MONTH,
+        HIGHLIGHT_LISTING_MONTH,
 }

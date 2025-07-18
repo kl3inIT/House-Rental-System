@@ -65,8 +65,8 @@
                         </tr>
                     </thead>
                     <tbody class="bg-gray-800 divide-y divide-gray-700">
-                        <tr th:each="listing, stat : ${listings.content}" class="hover:bg-gray-700">
-                            <td class="px-6 py-4 whitespace-nowrap text-white" th:text="${stat.index + 1 + listings.number * listings.size}"></td>
+                        <tr th:each="listing, stat : ${listings}" class="hover:bg-gray-700">
+                            <td class="px-6 py-4 whitespace-nowrap text-white" th:text="${stat.index + 1}"></td>
                             <td class="px-6 py-4 whitespace-nowrap text-white" th:text="${listing.title}"></td>
                             <td class="px-6 py-4 whitespace-nowrap text-white" th:text="${listing.landlordName}"></td>
                             <td class="px-6 py-4 whitespace-nowrap text-white" th:text="${listing.categoryName}"></td>
@@ -81,25 +81,6 @@
                     </tbody>
                 </table>
             </div>
-        </div>
-        <!-- Pagination -->
-        <div class="flex justify-center mt-6">
-            <nav th:if="${listings.totalPages > 1}">
-                <ul class="inline-flex -space-x-px">
-                    <li th:if="${!listings.first}">
-                        <a th:href="@{|?page=${listings.number - 1}&size=${listings.size}&landlordName=${landlordName}&categoryId=${categoryId}&sort=${sort}&title=${title}&sortAmount=${sortAmount}|}" class="px-3 py-2 ml-0 leading-tight text-gray-400 bg-gray-700 rounded-l-lg hover:bg-gray-600 hover:text-white">Trước</a>
-                    </li>
-                    <li th:each="pageNum : ${#numbers.sequence(0, listings.totalPages - 1)}">
-                        <a th:href="@{|?page=${pageNum}&size=${listings.size}&landlordName=${landlordName}&categoryId=${categoryId}&sort=${sort}&title=${title}&sortAmount=${sortAmount}|}"
-                           th:text="${pageNum + 1}"
-                           th:classappend="${pageNum == listings.number} ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-400 hover:bg-gray-600 hover:text-white'"
-                           class="px-3 py-2 leading-tight rounded"></a>
-                    </li>
-                    <li th:if="${!listings.last}">
-                        <a th:href="@{|?page=${listings.number + 1}&size=${listings.size}&landlordName=${landlordName}&categoryId=${categoryId}&sort=${sort}&title=${title}&sortAmount=${sortAmount}|}" class="px-3 py-2 leading-tight text-gray-400 bg-gray-700 rounded-r-lg hover:bg-gray-600 hover:text-white">Sau</a>
-                    </li>
-                </ul>
-            </nav>
         </div>
     </div>
 </div>
