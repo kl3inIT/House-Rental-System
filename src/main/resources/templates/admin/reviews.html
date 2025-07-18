@@ -3,7 +3,8 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/admin}">
 <head>
-    <title th:text="${title}">Manage Reviews - Admin Dashboard</title>
+    <title>Manage Reviews - Admin Dashboard</title>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
 </head>
 <body>
     <div layout:fragment="content">
@@ -16,70 +17,38 @@
                 </div>
             </div>
 
-            <!-- Stats -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                <div class="bg-gray-800 rounded-lg shadow-md p-6 border border-gray-700">
-                    <div class="flex items-center">
-                        <div class="p-3 rounded-full bg-blue-900 text-blue-300">
-                            <i class="fas fa-star text-xl"></i>
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-300">Total Reviews</p>
-                            <p class="text-2xl font-bold text-white" th:text="${reviews.size()}">1,234</p>
-                        </div>
-                    </div>
+            <!-- Filter/Search Form -->
+            <form id="review-filter-form" method="get" class="flex flex-wrap gap-4 items-end bg-gray-800 p-4 rounded-lg mb-6 border border-gray-700">
+                <div>
+                    <label class="block text-gray-300 text-sm mb-1">Description</label>
+                    <input type="text" name="description" th:value="${description}" class="bg-gray-700 text-white rounded px-3 py-2 focus:outline-none focus:ring w-48" placeholder="Search description...">
                 </div>
-                <div class="bg-gray-800 rounded-lg shadow-md p-6 border border-gray-700">
-                    <div class="flex items-center">
-                        <div class="p-3 rounded-full bg-green-900 text-green-300">
-                            <i class="fas fa-check-circle text-xl"></i>
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-300">Active</p>
-                            <p class="text-2xl font-bold text-white" th:text="${activeCount}">1,156</p>
-                        </div>
-                    </div>
+                <div>
+                    <label class="block text-gray-300 text-sm mb-1">Reviewer</label>
+                    <input type="text" name="tenantName" th:value="${tenantName}" class="bg-gray-700 text-white rounded px-3 py-2 focus:outline-none focus:ring w-40" placeholder="Name or email...">
                 </div>
-                <div class="bg-gray-800 rounded-lg shadow-md p-6 border border-gray-700">
-                    <div class="flex items-center">
-                        <div class="p-3 rounded-full bg-red-900 text-red-300">
-                            <i class="fas fa-flag text-xl"></i>
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-300">Flagged</p>
-                            <p class="text-2xl font-bold text-white" th:text="${flaggedCount}">78</p>
-                        </div>
-                    </div>
+                <div>
+                    <label class="block text-gray-300 text-sm mb-1">Star</label>
+                    <select name="star" class="bg-gray-700 text-white rounded px-3 py-2 w-24">
+                        <option value="" th:selected="${star == null}">All</option>
+                        <option value="5" th:selected="${star == 5}">5 stars</option>
+                        <option value="4" th:selected="${star == 4}">4 stars</option>
+                        <option value="3" th:selected="${star == 3}">3 stars</option>
+                        <option value="2" th:selected="${star == 2}">2 stars</option>
+                        <option value="1" th:selected="${star == 1}">1 star</option>
+                    </select>
                 </div>
-                <div class="bg-gray-800 rounded-lg shadow-md p-6 border border-gray-700">
-                    <div class="flex items-center">
-                        <div class="p-3 rounded-full bg-yellow-900 text-yellow-300">
-                            <i class="fas fa-star-half-alt text-xl"></i>
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-300">Avg Rating</p>
-                            <p class="text-2xl font-bold text-white" th:text="${#numbers.formatDecimal(avgRating, 1, 1)}">4.2</p>
-                        </div>
-                    </div>
+                <div class="flex gap-2">
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-semibold flex items-center"><i class="fas fa-search mr-2"></i>Search</button>
+                    <a href="/admin/reviews" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded font-semibold flex items-center"><i class="fas fa-undo mr-2"></i>Reset</a>
                 </div>
-            </div>
+            </form>
 
-            <!-- Reviews List -->
+            <!-- Reviews Table -->
             <div class="bg-gray-800 rounded-lg shadow-md overflow-hidden border border-gray-700">
-                <div class="px-6 py-4 border-b border-gray-600">
-                    <div class="flex justify-between items-center">
-                        <h3 class="text-lg font-semibold text-white">Reviews List</h3>
-                        <div class="flex space-x-2">
-                            <button class="text-gray-300 hover:text-white">
-                                <i class="fas fa-download mr-1"></i>Export
-                            </button>
-                            <button class="text-gray-300 hover:text-white">
-                                <i class="fas fa-filter mr-1"></i>Filter
-                            </button>
-                        </div>
-                    </div>
+                <div class="px-6 py-4 border-b border-gray-600 flex justify-between items-center">
+                    <h3 class="text-lg font-semibold text-white">Reviews List</h3>
                 </div>
-
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-600">
                         <thead class="bg-gray-700">
@@ -87,86 +56,42 @@
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Review</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Tenant</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Property</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Category</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Rating</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Status</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Reports</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Date</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
                         <tbody class="bg-gray-800 divide-y divide-gray-600">
-                            <tr th:each="review : ${reviews}" class="hover:bg-gray-700">
-                                <td class="px-6 py-4">
-                                    <div class="text-sm text-white max-w-xs truncate" th:text="${review.comment}">Great location and amenities. Highly recommended!</div>
+                            <tr th:if="${#lists.isEmpty(reviews)}">
+                                <td colspan="6" class="text-center text-gray-400 py-6">No reviews found</td>
+                            </tr>
+                            <tr th:each="review : ${reviews}">
+                                <td class="px-6 py-4 text-white max-w-xs truncate" th:text="${review.description}"></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-white">
+                                    <span th:text="${review.tenantName}"></span><br>
+                                    <span class="text-xs text-gray-400" th:text="${review.tenantEmail}"></span>
                                 </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-white" th:text="${review.propertyName}"></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-white" th:text="${review.categoryName}"></td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm font-medium text-white" th:text="${review.tenantName}">John Doe</div>
+                                    <span class="inline-block bg-yellow-900 text-yellow-300 px-2 py-1 rounded text-xs font-bold">
+                                        <span th:text="${review.star}"></span> <i class="fas fa-star"></i>
+                                    </span>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-white" th:text="${review.propertyName}">Downtown Apartment</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="flex items-center">
-                                        <div class="flex text-yellow-400">
-                                            <i th:each="i : ${#numbers.sequence(1, 5)}" 
-                                               th:class="|fas fa-star ${i le review.rating ? 'text-yellow-400' : 'text-gray-500'}|"></i>
-                                        </div>
-                                        <span class="ml-2 text-sm text-gray-300" th:text="${review.rating}">4.5</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span th:class="|px-2 py-1 text-xs rounded-full ${
-                                      review.status == 'Active' ? 'bg-green-900 text-green-300' :
-                                      review.status == 'Flagged' ? 'bg-red-900 text-red-300' :
-                                      'bg-gray-700 text-gray-300'
-                                    }|" 
-                                          th:text="${review.status}">Active</span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span th:if="${review.reports > 0}" 
-                                          th:class="|px-2 py-1 text-xs rounded-full bg-red-900 text-red-300|" 
-                                          th:text="${review.reports}">3</span>
-                                    <span th:if="${review.reports == 0}" class="text-gray-500">-</span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300" th:text="${review.date}">
-                                    Jan 15, 2024
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <div class="flex space-x-2">
-                                        <button class="text-blue-600 hover:text-blue-900">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="text-green-600 hover:text-green-900">
-                                            <i class="fas fa-check"></i>
-                                        </button>
-                                        <button class="text-red-600 hover:text-red-900">
-                                            <i class="fas fa-ban"></i>
-                                        </button>
-                                    </div>
-                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-gray-300" th:text="${#temporals.format(review.createdAt, 'dd/MM/yyyy HH:mm')}"></td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-
                 <!-- Pagination -->
-                <div class="bg-gray-800 px-4 py-3 border-t border-gray-600 sm:px-6">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center">
-                            <p class="text-sm text-gray-300">
-                                Showing <span class="font-medium">1</span> to <span class="font-medium" th:text="${reviews.size()}">2</span> of <span class="font-medium" th:text="${reviews.size()}">2</span> results
-                            </p>
-                        </div>
-                        <div class="flex space-x-2">
-                            <button class="px-3 py-2 text-gray-400 bg-gray-800 border border-gray-600 rounded-md hover:bg-gray-700">
-                                <i class="fas fa-chevron-left"></i>
-                            </button>
-                            <button class="px-3 py-2 text-white bg-blue-600 border border-blue-600 rounded-md">1</button>
-                            <button class="px-3 py-2 text-gray-400 bg-gray-800 border border-gray-600 rounded-md hover:bg-gray-700">
-                                <i class="fas fa-chevron-right"></i>
-                            </button>
-                        </div>
+                <div class="bg-gray-800 px-4 py-3 border-t border-gray-600 sm:px-6 flex items-center justify-between">
+                    <div th:if="${totalPages > 1}" class="flex space-x-2">
+                        <a th:each="i : ${#numbers.sequence(0, totalPages-1)}"
+                           th:href="@{'/admin/reviews'(page=${i}, size=${10}, description=${description}, tenantName=${tenantName}, star=${star}, categoryId=${categoryId})}"
+                           th:class="${i == currentPage ? 'px-3 py-2 text-white bg-blue-600 border border-blue-600 rounded-md' : 'px-3 py-2 text-gray-400 bg-gray-800 border border-gray-600 rounded-md hover:bg-gray-700'}"
+                           th:text="${i+1}"></a>
                     </div>
+                    <!-- Đã bỏ phần hiển thị tổng số kết quả -->
                 </div>
             </div>
         </div>

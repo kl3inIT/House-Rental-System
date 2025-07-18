@@ -121,17 +121,17 @@
                 <div class="bg-gray-800 px-4 py-3 border-t border-gray-700 sm:px-6">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
-                            <p class="text-sm text-gray-300">
-                                Hiển thị
+                            <p class="text-sm text-gray-300" th:if="${landlords.totalElements > 0}">
+                                Showing
                                 <span class="font-medium" th:text="${landlords.number * landlords.size + (landlords.numberOfElements > 0 ? 1 : 0)}">1</span>
-                                đến
+                                to
                                 <span class="font-medium" th:text="${landlords.number * landlords.size + landlords.numberOfElements}">10</span>
-                                trong tổng số
+                                of
                                 <span class="font-medium" th:text="${landlords.totalElements}">20</span>
-                                kết quả
+                                results
                             </p>
                         </div>
-                        <div class="flex space-x-2">
+                        <div class="flex space-x-2" th:if="${landlords.totalElements > 0}">
                             <a th:if="${landlords.hasPrevious()}"
                                th:href="@{|/admin/landlords?page=${landlords.number - 1}&size=10|}"
                                class="px-3 py-2 text-gray-400 bg-gray-700 border border-gray-600 rounded-md hover:bg-gray-600">

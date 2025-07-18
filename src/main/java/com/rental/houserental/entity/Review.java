@@ -15,7 +15,7 @@ public class Review extends BaseEntity {
     @Column(name = "Star", nullable = false)
     private int star;
 
-    @Column(name = "Description", columnDefinition = "TEXT")
+    @Column(name = "Description", length = 500, columnDefinition = "NVARCHAR(500)")
     private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)

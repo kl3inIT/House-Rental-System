@@ -244,8 +244,8 @@ public class AdminDashboardController {
         return "admin/bookings";
     }
 
-    @GetMapping("/reviews")
-    public String reviews(Model model, HttpServletRequest request) {
+    @GetMapping("/reviews-dashboard")
+    public String reviewsDashboard(Model model, HttpServletRequest request) {
         model.addAttribute("currentUri", request.getRequestURI());
         model.addAttribute("title", "Manage Reviews - Admin Dashboard");
         
