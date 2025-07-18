@@ -103,23 +103,6 @@
                     </div>
                 </div>
 
-                <!-- Booking Management -->
-                <a th:href="@{/admin/bookings}" 
-                   th:class="|group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
-                     currentUri == '/admin/bookings' ? 'bg-red-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white'
-                   }|">
-                    <i class="fas fa-calendar-check mr-3 text-lg"></i>
-                    Bookings
-                </a>
-
-                <!-- Transaction Management -->
-                <a th:href="@{/admin/transactions}" 
-                   th:class="|group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
-                     currentUri == '/admin/transactions' ? 'bg-red-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white'
-                   }|">
-                    <i class="fas fa-credit-card mr-3 text-lg"></i>
-                    Transactions
-                </a>
 
                 <!-- Review Management -->
                 <a th:href="@{/admin/reviews}" 
@@ -130,43 +113,6 @@
                     Reviews
                     <span class="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">2</span>
                 </a>
-
-                <!-- Reports & Analytics -->
-                <div class="space-y-1">
-                    <a th:href="@{/admin/reports}" 
-                       th:class="|group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
-                         currentUri != null and #strings.startsWith(currentUri, '/admin/reports') ? 'bg-red-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white'
-                       }|">
-                        <i class="fas fa-chart-bar mr-3 text-lg"></i>
-                        Reports
-                    </a>
-                    
-                    <a th:href="@{/admin/analytics}" 
-                       th:class="|group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ml-6 ${
-                         currentUri == '/admin/analytics' ? 'bg-red-600 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white'
-                       }|">
-                        <i class="fas fa-chart-line mr-3 text-sm"></i>
-                        Analytics
-                    </a>
-                </div>
-
-                <!-- System Management -->
-                <div class="pt-6 border-t border-gray-700">
-                    <a th:href="@{/admin/settings}"
-                       th:class="|group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
-                         currentUri == '/admin/settings' ? 'bg-red-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white'
-                       }|">
-                        <i class="fas fa-cog mr-3 text-lg"></i>
-                        Settings
-                    </a>
-                    <a th:href="@{/admin/logs}"
-                       th:class="|group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
-                         currentUri == '/admin/logs' ? 'bg-red-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white'
-                       }|">
-                        <i class="fas fa-file-alt mr-3 text-lg"></i>
-                        System Logs
-                    </a>
-                </div>
             </div>
         </nav>
     </div>
