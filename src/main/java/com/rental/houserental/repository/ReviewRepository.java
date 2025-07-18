@@ -33,4 +33,9 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
         @Param("categoryId") Long categoryId,
         Pageable pageable
     );
+
+    @Query(value = "SELECT * FROM Reviews WHERE PropertyId = :propertyId ORDER BY CreatedAt DESC", nativeQuery = true)
+    java.util.List<Review> findByPropertyId(@Param("propertyId") Long propertyId);
+
+    boolean existsByUserIdAndRentalPropertyId(Long userId, Long rentalPropertyId);
 } 
