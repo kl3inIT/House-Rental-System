@@ -54,9 +54,6 @@ public class ListingServiceImpl implements ListingService {
             throw new UnauthorizedListingAccessException("You can only create listings for your own properties");
         }
 
-        property.setPropertyStatus(PropertyStatus.AVAILABLE);
-        propertyRepository.save(property);
-
         LocalDateTime startDateTime = request.getStartDate().atStartOfDay();
         LocalDateTime endDateTime = calculateEndDate(startDateTime, request.getDuration(), request.getDurationType());
 
