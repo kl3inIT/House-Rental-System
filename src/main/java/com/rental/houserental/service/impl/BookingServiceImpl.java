@@ -31,7 +31,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.rental.houserental.constant.ErrorMessageConstant.MSG_400;
 
@@ -228,6 +230,24 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new PropertyNotFoundException("Booking not found with ID: " + bookingId));
         return LocalDateTime.now().isBefore(booking.getCreatedAt().plusHours(24)) && booking.getStatus() == BookingStatus.CONFIRMED;
+    }
+
+    @Override
+    public Map<String, Long> getBookingStatsByLandLord() {
+        List<Booking> bookings = bookingRepository.findByRentalProperty_Landlord_Id(getCurrentUser().getId());
+        Map<String, Long> bookingStats = new HashMap<>();
+        Long totalBookings = (long) bookings.size();
+        bookingStats.put("totalBookings", totalBookings);
+
+        long estimatedEarnings = 0;
+        for(Booking booking : bookings) {
+            if(booking.getStatus() != BookingStatus.CANCELED) {
+                estimatedEarnings += booking.getAmount().longValue();
+            }
+        }
+        bookingStats.put("estimatedEarnings", estimatedEarnings);
+
+        return bookingStats;
     }
 
     public RentalProperty findPropertyById(Long id) {

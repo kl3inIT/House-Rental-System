@@ -386,6 +386,8 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
 
+
+
     public RentalProperty findPropertyById(Long id) {
         return propertyRepository.findById(id)
                 .orElseThrow(() -> new PropertyNotFoundException("Property not found with ID: " + id));
