@@ -179,7 +179,7 @@
                                 </button>
                             </form>
                         </div>
-                        <div class="text-gray-700" th:text="${review.description}"></div>
+                        <div class="text-gray-700" style="word-break: break-all;" th:text="${review.description}"></div>
                     </div>
                 </div>
                 <div sec:authorize="isAuthenticated()" class="mt-8">
@@ -188,6 +188,7 @@
                     </div>
                     <div th:if="${!hasReviewed}">
                         <h4 class="text-md font-semibold text-gray-800 mb-2">Leave a Review</h4>
+                        <div th:if="${error}" class="text-red-500 text-sm mb-2" th:text="${error}"></div>
                         <form th:action="@{'/properties/' + ${property.id} + '/reviews'}" method="post" class="space-y-4">
                             <div>
                                 <label for="star" class="block text-sm font-medium text-gray-700">Rating</label>
@@ -197,8 +198,8 @@
                                 </select>
                             </div>
                             <div>
-                                <label for="description" class="block text-sm font-medium text-gray-700">Your Review</label>
-                                <textarea id="description" name="description" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required></textarea>
+                                <label for="description" class="block text-sm font-medium text-gray-700">Your Review <span class="text-xs text-gray-400">(Optional, max 500 characters)</span></label>
+                                <textarea id="description" name="description" rows="4" maxlength="500" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="Write your review (optional)..."></textarea>
                             </div>
                             <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 font-medium">Submit Review</button>
                         </form>

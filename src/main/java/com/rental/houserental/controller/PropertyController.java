@@ -5,6 +5,7 @@ import com.rental.houserental.entity.User;
 import com.rental.houserental.service.PropertyService;
 import com.rental.houserental.service.ReviewService;
 import com.rental.houserental.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,6 +22,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.security.Principal;
 
 import static com.rental.houserental.constant.ViewNamesConstant.PROPERTY_DETAIL;
+import org.springframework.validation.BindingResult;
 
 @Controller
 @RequestMapping("/properties")
@@ -56,12 +58,20 @@ public class PropertyController {
 
     @PostMapping("/{id}/reviews")
     public String addReview(@PathVariable Long id,
-                           @ModelAttribute ReviewRequestDTO reviewRequestDTO,
+                           @Valid @ModelAttribute ReviewRequestDTO reviewRequestDTO,
+                           BindingResult bindingResult,
                            Principal principal,
                            RedirectAttributes redirectAttributes) {
         if (principal == null) {
             redirectAttributes.addFlashAttribute("error", "You must be logged in to review.");
             return "redirect:/login";
+        }
+        if (bindingResult.hasErrors()) {
+            String errorMsg = bindingResult.getFieldError("description") != null
+                    ? bindingResult.getFieldError("description").getDefaultMessage()
+                    : "Invalid input!";
+            redirectAttributes.addFlashAttribute("error", errorMsg);
+            return "redirect:/properties/" + id + "#reviews-content";
         }
         User user = userService.findByEmail(principal.getName());
         reviewRequestDTO.setPropertyId(id);
