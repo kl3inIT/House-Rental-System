@@ -171,48 +171,7 @@
                                 </select>
                             </div>
 
-                            <!-- Published Date -->
-                            <div>
-                                <h4 class="font-medium text-gray-700 mb-3">Published Date</h4>
-                                <div class="space-y-2">
-                                    <label class="flex items-center">
-                                        <input type="checkbox" name="publishedRanges" value="today" 
-                                               th:checked="${#lists.contains(searchCriteria.publishedRanges, 'today')}"
-                                               class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                                        <span class="ml-2 text-sm text-gray-600">Today</span>
-                                    </label>
-                                    <label class="flex items-center">
-                                        <input type="checkbox" name="publishedRanges" value="week" 
-                                               th:checked="${#lists.contains(searchCriteria.publishedRanges, 'week')}"
-                                               class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                                        <span class="ml-2 text-sm text-gray-600">This Week</span>
-                                    </label>
-                                    <label class="flex items-center">
-                                        <input type="checkbox" name="publishedRanges" value="month" 
-                                               th:checked="${#lists.contains(searchCriteria.publishedRanges, 'month')}"
-                                               class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                                        <span class="ml-2 text-sm text-gray-600">This Month</span>
-                                    </label>
-                                    <label class="flex items-center">
-                                        <input type="checkbox" name="publishedRanges" value="3months" 
-                                               th:checked="${#lists.contains(searchCriteria.publishedRanges, '3months')}"
-                                               class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                                        <span class="ml-2 text-sm text-gray-600">Last 3 Months</span>
-                                    </label>
-                                    <label class="flex items-center">
-                                        <input type="checkbox" name="publishedRanges" value="6months" 
-                                               th:checked="${#lists.contains(searchCriteria.publishedRanges, '6months')}"
-                                               class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                                        <span class="ml-2 text-sm text-gray-600">Last 6 Months</span>
-                                    </label>
-                                    <label class="flex items-center">
-                                        <input type="checkbox" name="publishedRanges" value="year" 
-                                               th:checked="${#lists.contains(searchCriteria.publishedRanges, 'year')}"
-                                               class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                                        <span class="ml-2 text-sm text-gray-600">Last Year</span>
-                                    </label>
-                                </div>
-                            </div>
+
 
                             <!-- Action Buttons -->
                             <div class="space-y-3 pt-4 border-t border-gray-200">
@@ -410,8 +369,7 @@
                                                            areaRanges=${searchCriteria?.areaRanges}, 
                                                            propertyTypes=${searchCriteria?.propertyTypes}, 
                                                            minBedrooms=${searchCriteria?.minBedrooms}, 
-                                                           minBathrooms=${searchCriteria?.minBathrooms}, 
-                                                           publishedRanges=${searchCriteria?.publishedRanges})}"
+                                                           minBathrooms=${searchCriteria?.minBathrooms})}"
                                class="px-3 py-2 text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
                                 <i class="fas fa-chevron-left"></i>
                             </a>
@@ -429,8 +387,7 @@
                                                            areaRanges=${searchCriteria?.areaRanges}, 
                                                            propertyTypes=${searchCriteria?.propertyTypes}, 
                                                            minBedrooms=${searchCriteria?.minBedrooms}, 
-                                                           minBathrooms=${searchCriteria?.minBathrooms}, 
-                                                           publishedRanges=${searchCriteria?.publishedRanges})}"
+                                                           minBathrooms=${searchCriteria?.minBathrooms})}"
                                th:class="${pageNum == currentPage ? 'px-3 py-2 text-white bg-blue-600 border border-blue-600 rounded-md' : 'px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50'}"
                                th:text="${pageNum}">1</a>
                             
@@ -447,8 +404,7 @@
                                                            areaRanges=${searchCriteria?.areaRanges}, 
                                                            propertyTypes=${searchCriteria?.propertyTypes}, 
                                                            minBedrooms=${searchCriteria?.minBedrooms}, 
-                                                           minBathrooms=${searchCriteria?.minBathrooms}, 
-                                                           publishedRanges=${searchCriteria?.publishedRanges})}"
+                                                           minBathrooms=${searchCriteria?.minBathrooms})}"
                                class="px-3 py-2 text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
                                 <i class="fas fa-chevron-right"></i>
                             </a>

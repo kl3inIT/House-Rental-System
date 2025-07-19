@@ -6,9 +6,6 @@ import com.rental.houserental.enums.PropertyStatus;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
@@ -129,30 +126,7 @@ public class RentalPropertySpecification {
                 predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("bathrooms"), criteria.getMaxBathrooms()));
             }
 
-            // Published Date filters
-            if (!criteria.getPublishedRanges().isEmpty()) {
-                List<jakarta.persistence.criteria.Predicate> publishedPredicates = new ArrayList<>();
-                
-                for (String range : criteria.getPublishedRanges()) {
-                    LocalDateTime fromDate = getPublishedFromDate(range);
-                    LocalDateTime toDate = getPublishedToDate(range);
-                    
-                    if (fromDate != null && toDate != null) {
-                        publishedPredicates.add(criteriaBuilder.and(
-                            criteriaBuilder.greaterThanOrEqualTo(root.get("publishedAt"), fromDate),
-                            criteriaBuilder.lessThanOrEqualTo(root.get("publishedAt"), toDate)
-                        ));
-                    } else if (fromDate != null) {
-                        publishedPredicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("publishedAt"), fromDate));
-                    } else if (toDate != null) {
-                        publishedPredicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("publishedAt"), toDate));
-                    }
-                }
-                
-                if (!publishedPredicates.isEmpty()) {
-                    predicates.add(criteriaBuilder.or(publishedPredicates.toArray(new jakarta.persistence.criteria.Predicate[0])));
-                }
-            }
+
 
             // Keyword search (title, description)
             if (criteria.getKeyword() != null && !criteria.getKeyword().trim().isEmpty()) {
@@ -198,41 +172,5 @@ public class RentalPropertySpecification {
         };
     }
 
-    private static LocalDateTime getPublishedFromDate(String range) {
-        LocalDate today = LocalDate.now();
-        
-        switch (range.toLowerCase()) {
-            case "today":
-                return today.atStartOfDay();
-            case "week":
-                return today.minusWeeks(1).atStartOfDay();
-            case "month":
-                return today.minusMonths(1).atStartOfDay();
-            case "3months":
-                return today.minusMonths(3).atStartOfDay();
-            case "6months":
-                return today.minusMonths(6).atStartOfDay();
-            case "year":
-                return today.minusYears(1).atStartOfDay();
-            default:
-                return null;
-        }
-    }
 
-    private static LocalDateTime getPublishedToDate(String range) {
-        LocalDate today = LocalDate.now();
-        
-        switch (range.toLowerCase()) {
-            case "today":
-                return today.atTime(LocalTime.MAX);
-            case "week":
-            case "month":
-            case "3months":
-            case "6months":
-            case "year":
-                return today.atTime(LocalTime.MAX);
-            default:
-                return null;
-        }
-    }
 }

@@ -42,9 +42,7 @@ public class SearchPropertyCriteriaDTO {
     private Integer minBathrooms;
     private Integer maxBathrooms;
     
-    // Published date filters
-    @Builder.Default
-    private List<String> publishedRanges = new ArrayList<>();
+
     
     // Pagination and sorting
     private Integer page;
