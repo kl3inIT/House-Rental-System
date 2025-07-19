@@ -47,7 +47,7 @@
                     <input id="name" name="name" type="text" th:field="*{name}"
                            class="appearance-none rounded-md w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                            placeholder="Enter your full name" required pattern="[A-Za-z\s]{2,50}"
-                           title="Name should be 2-50 letters">
+                           title="Name should be 2-50 letters and spaces only">
                     <span class="text-red-500 text-sm" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
                 </div>
 
@@ -65,8 +65,8 @@
                     <div class="relative">
                         <input id="password" name="password" type="password" th:field="*{password}"
                                class="appearance-none rounded-md w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                               placeholder="Create a password" required pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$"
-                               title="Password must be at least 8 characters with letters and numbers">
+                               placeholder="Create a password" required pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,50}$"
+                               title="Password must be 8-50 characters with at least one letter and one number">
                     </div>
                     <div id="passwordTooltip" class="text-xs text-gray-500 mt-1 hidden relative"></div>
                     <span class="text-red-500 text-sm" th:if="${#fields.hasErrors('password')}"

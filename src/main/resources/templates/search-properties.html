@@ -229,7 +229,7 @@
                         <div th:each="property : ${properties}" 
                              class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 property-card">
                             
-                            <!-- Property Image -->
+                                <!-- Property Image -->
                             <div class="relative h-48 bg-gray-200 overflow-hidden group">
                                 <!-- Heart Icon with Dynamic State -->
                                 <div sec:authorize="isAuthenticated()" class="absolute top-3 right-3 z-30">
@@ -244,25 +244,25 @@
                                         </button>
                                     </form>
                                 </div>
-
-                                <!-- Status Badge -->
-                                <div class="absolute top-3 left-3">
+                                        
+                                        <!-- Status Badge -->
+                                        <div class="absolute top-3 left-3">
                                     <span th:class="${property.propertyStatus == 'AVAILABLE' ? 'bg-green-100 text-green-800' : 
                                                    property.propertyStatus == 'BOOKED' ? 'bg-yellow-100 text-yellow-800' : 
                                                    property.propertyStatus == 'RENTED' ? 'bg-gray-100 text-gray-800' : 'bg-gray-100 text-gray-800'}"
-                                          class="px-2 py-1 text-xs rounded-full font-medium"
-                                          th:text="${property.propertyStatus}">
-                                        Available
-                                    </span>
-                                </div>
-                                
-                                <!-- Property Type Badge -->
+                                                  class="px-2 py-1 text-xs rounded-full font-medium"
+                                                  th:text="${property.propertyStatus}">
+                                                Available
+                                            </span>
+                                        </div>
+                                        
+                                        <!-- Property Type Badge -->
                                 <div class="absolute bottom-3 left-3">
-                                    <span class="bg-blue-100 text-blue-800 px-2 py-1 text-xs rounded-full font-medium"
-                                          th:text="${property.categoryName}">
-                                        Apartment
-                                    </span>
-                                </div>
+                                            <span class="bg-blue-100 text-blue-800 px-2 py-1 text-xs rounded-full font-medium"
+                                                  th:text="${property.categoryName}">
+                                                Apartment
+                                            </span>
+                                        </div>
 
                                 <!-- Single Image or Placeholder -->
                                 <div th:if="${property.mainImageUrl == null}"
@@ -274,7 +274,7 @@
                                     th:alt="${property.title}"
                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                     loading="lazy">
-                            </div>
+                                            </div>
 
                             <!-- Property Info -->
                             <div class="p-4 space-y-3">
@@ -282,28 +282,28 @@
                                 <div>
                                     <h3 class="font-semibold text-gray-900 text-base leading-tight line-clamp-2"
                                         th:text="${property.title}">Property Title</h3>
-                                </div>
+                                    </div>
 
                                 <!-- Location -->
                                 <p class="text-gray-600 text-sm flex items-center">
-                                    <i class="fas fa-map-marker-alt mr-2 text-blue-500"></i>
+                                        <i class="fas fa-map-marker-alt mr-2 text-blue-500"></i>
                                     <span th:text="${property.fullAddress}" class="line-clamp-1">Location</span>
-                                </p>
+                                    </p>
 
-                                <!-- Property Features -->
+                                    <!-- Property Features -->
                                 <div class="flex items-center space-x-4 text-sm text-gray-600">
-                                    <span class="flex items-center">
-                                        <i class="fas fa-bed mr-1 text-blue-500"></i>
+                                        <span class="flex items-center">
+                                            <i class="fas fa-bed mr-1 text-blue-500"></i>
                                         <span th:text="${property.bedrooms == 0 ? 'Studio' : property.bedrooms}">2</span>
-                                    </span>
-                                    <span class="flex items-center">
-                                        <i class="fas fa-bath mr-1 text-blue-500"></i>
+                                        </span>
+                                        <span class="flex items-center">
+                                            <i class="fas fa-bath mr-1 text-blue-500"></i>
                                         <span th:text="${property.bathrooms}">2</span>
-                                    </span>
+                                        </span>
                                     <span class="flex items-center" th:if="${property.area != null}">
-                                        <i class="fas fa-ruler-combined mr-1 text-blue-500"></i>
+                                            <i class="fas fa-ruler-combined mr-1 text-blue-500"></i>
                                         <span th:text="${property.area + ' m²'}">85 m²</span>
-                                    </span>
+                                        </span>
                                 </div>
 
                                 <!-- Price -->
@@ -314,16 +314,16 @@
                                     </div>
                                     <div class="flex items-center text-xs text-gray-500" th:if="${property.publishedAt != null}">
                                         <i class="fas fa-calendar-alt mr-1"></i>
-                                        <span th:text="${#temporals.format(property.publishedAt, 'dd/MM/yyyy')}">01/01/2024</span>
+                                            <span th:text="${#temporals.format(property.publishedAt, 'dd/MM/yyyy')}">01/01/2024</span>
                                     </div>
                                 </div>
 
-                                <!-- Action Button -->
+                                    <!-- Action Button -->
                                 <div class="pt-2">
-                                    <a th:href="@{/properties/{id}(id=${property.id})}" 
+                                        <a th:href="@{/properties/{id}(id=${property.id})}" 
                                        class="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200 font-medium text-center block">
-                                        View Details
-                                    </a>
+                                            View Details
+                                        </a>
                                 </div>
                             </div>
                         </div>
