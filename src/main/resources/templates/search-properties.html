@@ -83,10 +83,22 @@
                                         <span class="ml-2 text-sm text-gray-600">3M - 5M VND</span>
                                     </label>
                                     <label class="flex items-center">
-                                        <input type="checkbox" name="priceRanges" value="5000000-999999999" 
-                                               th:checked="${#lists.contains(searchCriteria.priceRanges, '5000000-999999999')}"
+                                        <input type="checkbox" name="priceRanges" value="5000000-10000000" 
+                                               th:checked="${#lists.contains(searchCriteria.priceRanges, '5000000-10000000')}"
                                                class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                                        <span class="ml-2 text-sm text-gray-600">Above 5M VND</span>
+                                        <span class="ml-2 text-sm text-gray-600">5M - 10M VND</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="priceRanges" value="10000000-20000000" 
+                                               th:checked="${#lists.contains(searchCriteria.priceRanges, '10000000-20000000')}"
+                                               class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                        <span class="ml-2 text-sm text-gray-600">10M - 20M VND</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="priceRanges" value="20000000-999999999" 
+                                               th:checked="${#lists.contains(searchCriteria.priceRanges, '20000000-999999999')}"
+                                               class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                        <span class="ml-2 text-sm text-gray-600">Above 20M VND</span>
                                     </label>
                                 </div>
                             </div>
@@ -338,8 +350,8 @@
                                 <!-- Price -->
                                 <div class="flex items-center justify-between">
                                     <div class="text-lg font-bold text-blue-600" 
-                                         th:text="'₫' + ${#numbers.formatDecimal(property.monthlyRent, 0, 'COMMA', 0, 'POINT')} + '/mo'">
-                                        ₫1,800,000/mo
+                                         th:text="'₫' + ${#numbers.formatDecimal(property.monthlyRent, 0, 'COMMA', 0, 'POINT')} + '/tháng'">
+                                        ₫1,800,000/tháng
                                     </div>
                                     <div class="flex items-center text-xs text-gray-500" th:if="${property.publishedAt != null}">
                                         <i class="fas fa-calendar-alt mr-1"></i>

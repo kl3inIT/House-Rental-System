@@ -11,8 +11,12 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RentalPropertySpecification {
+
+    private static final Logger log = LoggerFactory.getLogger(RentalPropertySpecification.class);
 
     private RentalPropertySpecification() {
         // Private constructor to prevent instantiation
@@ -74,6 +78,10 @@ public class RentalPropertySpecification {
                 if (!pricePredicates.isEmpty()) {
                     predicates.add(criteriaBuilder.or(pricePredicates.toArray(new jakarta.persistence.criteria.Predicate[0])));
                 }
+            } else if (criteria.getMaxPrice() != null) {
+                // Max Price filter (for home page search) - only apply if no priceRanges are specified
+                log.info("Applying maxPrice filter: {}", criteria.getMaxPrice());
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("monthlyRent"), criteria.getMaxPrice()));
             }
 
             // Area Range filters
