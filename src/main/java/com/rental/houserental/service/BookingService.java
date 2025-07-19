@@ -12,10 +12,24 @@ import java.util.Map;
 public interface BookingService {
 
     List<BookingHistoryDTO> getBookingHistory();
+
     Page<BookingHistoryDTO> getBookingHistoryByLandlord(BookingSearchRequestDTO bookingSearchRequestDTO);
+
     BookingHistoryDetailDTO getBookingHistoryDetail(Long bookingId);
+
     void createBooking(PropertyBookingRequestDTO propertyBookingRequestDTO);
+
     void cancelBooking(Long bookingId);
+
     boolean isRefundable(Long bookingId);
+
     Map<String, Long> getBookingStatsByLandLord();
+
+    Long countBookingsThisMonthByLandlord(Long landlordId);
+
+    Long countActiveBookingsByLandlord(Long landlordId);
+
+    List<BookingHistoryDTO> getCurrentRentedProperties();
+
+    List<BookingHistoryDTO> getRentHistoryProperties();
 }

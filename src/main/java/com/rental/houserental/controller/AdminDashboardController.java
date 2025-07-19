@@ -285,11 +285,11 @@ public class AdminDashboardController {
         model.addAttribute("requests", requests);
         // Calculate counts
         long pendingCount = requests.stream()
-                .filter(r -> r.getStatus().name().equals("Pending")).count();
+                .filter(r -> r.getStatus().getName().equals("Pending")).count();
         long approvedCount = requests.stream()
-                .filter(r -> r.getStatus().name().equals("Approve")).count();
+                .filter(r -> r.getStatus().getName().equals("Approved")).count();
         long rejectedCount = requests.stream()
-                .filter(r -> r.getStatus().name().equals("Reject")).count();
+                .filter(r -> r.getStatus().getName().equals("Rejected")).count();
 
         model.addAttribute("requests", requests);
         model.addAttribute("pendingCount", pendingCount);

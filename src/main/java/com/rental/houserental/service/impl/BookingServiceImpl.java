@@ -37,7 +37,6 @@ import java.util.Map;
 
 import static com.rental.houserental.constant.ErrorMessageConstant.MSG_400;
 
-
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -47,6 +46,7 @@ public class BookingServiceImpl implements BookingService {
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
     private final TransactionRepository transactionRepository;
+
     @Override
     public List<BookingHistoryDTO> getBookingHistory() {
         List<Booking> bookings = bookingRepository.findByUserId(getCurrentUser().getId());
@@ -68,8 +68,7 @@ public class BookingServiceImpl implements BookingService {
     public Page<BookingHistoryDTO> getBookingHistoryByLandlord(BookingSearchRequestDTO bookingSearchRequestDTO) {
         Pageable pageable = PageRequest.of(
                 bookingSearchRequestDTO.getPage(),
-                bookingSearchRequestDTO.getSize()
-        );
+                bookingSearchRequestDTO.getSize());
 
         LocalDateTime startDateTime = null;
         LocalDateTime endDateTime = null;
@@ -93,13 +92,12 @@ public class BookingServiceImpl implements BookingService {
                 endDateTime,
                 propertyTitle,
                 getCurrentUser().getId(),
-                pageable
-        );
+                pageable);
 
         return bookings.map(this::bookingHistoryDTO);
     }
 
-    public BookingHistoryDTO bookingHistoryDTO(Booking booking){
+    public BookingHistoryDTO bookingHistoryDTO(Booking booking) {
         return BookingHistoryDTO.builder()
                 .bookingId(booking.getId())
                 .propertyId(booking.getRentalProperty().getId())
@@ -136,14 +134,15 @@ public class BookingServiceImpl implements BookingService {
         bookingDetail.setRenterPhone(booking.getUser().getPhone());
         bookingDetail.setBookingDate(booking.getCreatedAt());
         bookingDetail.setPropertyPrice(booking.getRentalProperty().getMonthlyRent().toBigInteger().doubleValue());
-        bookingDetail.setDurationInMonths(booking.getEndDate().getMonthValue() - booking.getStartDate().getMonthValue());
+        bookingDetail
+                .setDurationInMonths(booking.getEndDate().getMonthValue() - booking.getStartDate().getMonthValue());
         return bookingDetail;
     }
 
     @Override
     public void createBooking(PropertyBookingRequestDTO propertyBookingRequestDTO) {
         RentalProperty property = findPropertyById(propertyBookingRequestDTO.getId());
-        if(!property.getPropertyStatus().equals(PropertyStatus.AVAILABLE)) {
+        if (!property.getPropertyStatus().equals(PropertyStatus.AVAILABLE)) {
             throw new InvalidBookingStatusException("Booking status not available");
         }
 
@@ -195,8 +194,8 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new PropertyNotFoundException("Booking not found with ID: " + bookingId));
 
-        if(isRefundable(bookingId)) {
-            booking.setStatus(BookingStatus.CANCELED);
+        if (isRefundable(bookingId)) {
+            booking.setStatus(BookingStatus.CANCELLED);
             bookingRepository.save(booking);
 
             // Update property status to AVAILABLE
@@ -227,7 +226,6 @@ public class BookingServiceImpl implements BookingService {
             landlordTransaction.setBalanceAfter(landlord.getBalance());
             transactionRepository.save(landlordTransaction);
 
-
         }
     }
 
@@ -235,7 +233,8 @@ public class BookingServiceImpl implements BookingService {
     public boolean isRefundable(Long bookingId) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new PropertyNotFoundException("Booking not found with ID: " + bookingId));
-        return LocalDateTime.now().isBefore(booking.getCreatedAt().plusHours(24)) && booking.getStatus() == BookingStatus.CONFIRMED;
+        return LocalDateTime.now().isBefore(booking.getCreatedAt().plusHours(24))
+                && booking.getStatus() == BookingStatus.CONFIRMED;
     }
 
     @Override
@@ -246,14 +245,38 @@ public class BookingServiceImpl implements BookingService {
         bookingStats.put("totalBookings", totalBookings);
 
         long estimatedEarnings = 0;
-        for(Booking booking : bookings) {
-            if(booking.getStatus() != BookingStatus.CANCELED) {
+        for (Booking booking : bookings) {
+            if (booking.getStatus() != BookingStatus.CANCELLED) {
                 estimatedEarnings += booking.getAmount().longValue();
             }
         }
         bookingStats.put("estimatedEarnings", estimatedEarnings);
 
         return bookingStats;
+    }
+
+    @Override
+    public List<BookingHistoryDTO> getCurrentRentedProperties() {
+        List<Booking> activeBookings = bookingRepository.findByUserIdAndStatus(getCurrentUser().getId(),
+                BookingStatus.ACTIVE);
+        return activeBookings.stream().map(this::bookingHistoryDTO).toList();
+    }
+
+    @Override
+    public List<BookingHistoryDTO> getRentHistoryProperties() {
+        List<Booking> completedBookings = bookingRepository.findByUserIdAndStatusIsCompleted(
+                getCurrentUser().getId(), BookingStatus.COMPLETED);
+        return completedBookings.stream().map(this::bookingHistoryDTO).toList();
+    }
+
+    @Override
+    public Long countBookingsThisMonthByLandlord(Long landlordId) {
+        return bookingRepository.countBookingsThisMonthByLandlord(landlordId);
+    }
+
+    @Override
+    public Long countActiveBookingsByLandlord(Long landlordId) {
+        return bookingRepository.countActiveBookingsByLandlord(landlordId, BookingStatus.CONFIRMED);
     }
 
     public RentalProperty findPropertyById(Long id) {
@@ -264,8 +287,8 @@ public class BookingServiceImpl implements BookingService {
     public User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
-        return userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("User not found", MSG_400));
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found", MSG_400));
     }
-
 
 }

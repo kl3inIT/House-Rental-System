@@ -43,7 +43,6 @@ public class TransactionServiceImpl implements TransactionService {
         User user = userRepository.findById(extractUserIdFromContent(transactionDetails.get("content")))
                 .orElseThrow(() -> new UserNotFoundException("User not found", MSG_400));
 
-
         transaction.setAmount(Double.parseDouble(transactionDetails.get("transferAmount")));
         transaction.setDescription("Top-up from SePay");
         transaction.setBalanceAfter(user.getBalance());
@@ -86,8 +85,7 @@ public class TransactionServiceImpl implements TransactionService {
                 transactionRequestDTO.getAmountFrom(),
                 transactionRequestDTO.getAmountTo(),
                 getCurrentUser().getId(),
-                pageable
-        );
+                pageable);
 
         return transactions.map(this::transactionResponseDTO);
     }
@@ -110,8 +108,7 @@ public class TransactionServiceImpl implements TransactionService {
                 transactionRequestDTO.getAmountFrom(),
                 transactionRequestDTO.getAmountTo(),
                 transactionRequestDTO.getUserEmail(),
-                pageable
-        );
+                pageable);
         return transactions.map(this::transactionResponseDTO);
     }
 
@@ -120,17 +117,17 @@ public class TransactionServiceImpl implements TransactionService {
         return transactionRepository.getDepositStats();
     }
 
-
-
+    @Override
+    public Long getLandlordRevenueByPeriod(Long userId, LocalDateTime start, LocalDateTime end) {
+        return transactionRepository.getLandlordRevenueByPeriod(userId, start, end);
+    }
 
     public User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
-        return userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("User not found", MSG_400));
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found", MSG_400));
     }
-
-
-
 
     private TransactionResponseDTO transactionResponseDTO(Transaction transaction) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy");
