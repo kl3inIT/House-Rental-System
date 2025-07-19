@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.security.Principal;
 import java.util.List;
@@ -67,16 +68,71 @@ public class HomeController {
     @GetMapping("/properties/search")
     public String searchProperties(
             @ModelAttribute SearchPropertyCriteriaDTO criteria,
+            @RequestParam(value = "propertyTypes", required = false) Long propertyType,
+            @RequestParam(value = "maxPrice", required = false) Integer maxPrice,
             @PageableDefault(size = 12) Pageable pageable,
-            Model model) {
+            Model model,
+            Principal principal) {
+        
+        // Debug logging
+        log.info("Search criteria - maxPrice: {}, propertyType: {}", maxPrice, propertyType);
+        log.info("Search criteria DTO - maxPrice: {}, propertyTypes: {}", criteria.getMaxPrice(), criteria.getPropertyTypes());
+        
+        // Handle propertyTypes from home page search form (single value to list conversion)
+        if (propertyType != null && criteria.getPropertyTypes().isEmpty()) {
+            criteria.getPropertyTypes().add(propertyType);
+        }
+        
+        // Handle maxPrice from home page search form
+        if (maxPrice != null && criteria.getMaxPrice() == null) {
+            criteria.setMaxPrice(maxPrice);
+            log.info("Set maxPrice from request param: {}", maxPrice);
+        }
+        
+        // Additional validation
+        if (criteria.getMaxPrice() != null) {
+            log.info("Final maxPrice value: {} (type: {})", criteria.getMaxPrice(), criteria.getMaxPrice().getClass().getSimpleName());
+        }
+        
+        log.info("Final search criteria - maxPrice: {}, propertyTypes: {}", criteria.getMaxPrice(), criteria.getPropertyTypes());
+        
         Page<SearchPropertyResponseDTO> page = propertyService.searchProperties(criteria, pageable);
+        
+        // Load wishlist status if user is authenticated
+        if (principal != null) {
+            try {
+                User currentUser = userService.findByEmail(principal.getName());
+                List<Long> propertyIds = page.getContent().stream()
+                        .map(SearchPropertyResponseDTO::getId)
+                        .toList();
+                
+                Map<Long, Boolean> wishlistStatus = wishlistService.getWishlistStatus(currentUser.getId(), propertyIds);
+                model.addAttribute("wishlistStatus", wishlistStatus);
+            } catch (Exception e) {
+                log.warn("Error loading wishlist status for user: {}", principal.getName(), e);
+            }
+        }
+        
+        // Add sort options
+        List<Map<String, String>> sortOptions = List.of(
+            Map.of("value", "date", "displayName", "Latest"),
+            Map.of("value", "price", "displayName", "Price"),
+            Map.of("value", "views", "displayName", "Most Viewed"),
+            Map.of("value", "area", "displayName", "Area"),
+            Map.of("value", "bedrooms", "displayName", "Bedrooms"),
+            Map.of("value", "bathrooms", "displayName", "Bathrooms")
+        );
+        
         model.addAttribute("properties", page.getContent());
         model.addAttribute("totalElements", page.getTotalElements());
         model.addAttribute("totalPages", page.getTotalPages());
         model.addAttribute("currentPage", page.getNumber() + 1);
         model.addAttribute("searchCriteria", criteria);
         model.addAttribute("categories", categoryService.getAllCategories());
-        // TODO: add sort options if needed
+        model.addAttribute("sortOptions", sortOptions);
+        model.addAttribute("sortBy", criteria.getSortBy() != null ? criteria.getSortBy() : "date");
+        model.addAttribute("sortDirection", criteria.getSortDirection() != null ? criteria.getSortDirection() : "desc");
+        
         return "search-properties";
     }
 }

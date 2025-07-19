@@ -6,13 +6,14 @@ import com.rental.houserental.enums.PropertyStatus;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RentalPropertySpecification {
+
+    private static final Logger log = LoggerFactory.getLogger(RentalPropertySpecification.class);
 
     private RentalPropertySpecification() {
         // Private constructor to prevent instantiation
@@ -74,6 +75,10 @@ public class RentalPropertySpecification {
                 if (!pricePredicates.isEmpty()) {
                     predicates.add(criteriaBuilder.or(pricePredicates.toArray(new jakarta.persistence.criteria.Predicate[0])));
                 }
+            } else if (criteria.getMaxPrice() != null) {
+                // Max Price filter (for home page search) - only apply if no priceRanges are specified
+                log.info("Applying maxPrice filter: {}", criteria.getMaxPrice());
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("monthlyRent"), criteria.getMaxPrice()));
             }
 
             // Area Range filters
@@ -121,30 +126,7 @@ public class RentalPropertySpecification {
                 predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("bathrooms"), criteria.getMaxBathrooms()));
             }
 
-            // Published Date filters
-            if (!criteria.getPublishedRanges().isEmpty()) {
-                List<jakarta.persistence.criteria.Predicate> publishedPredicates = new ArrayList<>();
-                
-                for (String range : criteria.getPublishedRanges()) {
-                    LocalDateTime fromDate = getPublishedFromDate(range);
-                    LocalDateTime toDate = getPublishedToDate(range);
-                    
-                    if (fromDate != null && toDate != null) {
-                        publishedPredicates.add(criteriaBuilder.and(
-                            criteriaBuilder.greaterThanOrEqualTo(root.get("publishedAt"), fromDate),
-                            criteriaBuilder.lessThanOrEqualTo(root.get("publishedAt"), toDate)
-                        ));
-                    } else if (fromDate != null) {
-                        publishedPredicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("publishedAt"), fromDate));
-                    } else if (toDate != null) {
-                        publishedPredicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("publishedAt"), toDate));
-                    }
-                }
-                
-                if (!publishedPredicates.isEmpty()) {
-                    predicates.add(criteriaBuilder.or(publishedPredicates.toArray(new jakarta.persistence.criteria.Predicate[0])));
-                }
-            }
+
 
             // Keyword search (title, description)
             if (criteria.getKeyword() != null && !criteria.getKeyword().trim().isEmpty()) {
@@ -163,50 +145,32 @@ public class RentalPropertySpecification {
                 } catch (IllegalArgumentException e) {
                     // Invalid status, ignore this filter
                 }
+            } else if (!criteria.getStatuses().isEmpty()) {
+                // Handle multiple statuses
+                List<PropertyStatus> validStatuses = new ArrayList<>();
+                for (String statusStr : criteria.getStatuses()) {
+                    try {
+                        PropertyStatus status = PropertyStatus.valueOf(statusStr.toUpperCase());
+                        validStatuses.add(status);
+                    } catch (IllegalArgumentException e) {
+                        // Invalid status, ignore this one
+                    }
+                }
+                if (!validStatuses.isEmpty()) {
+                    predicates.add(root.get("propertyStatus").in(validStatuses));
+                }
             } else {
-                // Default: only show available properties if no status filter is specified
-                predicates.add(criteriaBuilder.equal(root.get("propertyStatus"), PropertyStatus.AVAILABLE));
+                // Default: show AVAILABLE, BOOKED, and RENTED properties if no status filter is specified
+                predicates.add(root.get("propertyStatus").in(
+                    PropertyStatus.AVAILABLE, 
+                    PropertyStatus.BOOKED, 
+                    PropertyStatus.RENTED
+                ));
             }
 
             return criteriaBuilder.and(predicates.toArray(new jakarta.persistence.criteria.Predicate[0]));
         };
     }
 
-    private static LocalDateTime getPublishedFromDate(String range) {
-        LocalDate today = LocalDate.now();
-        
-        switch (range.toLowerCase()) {
-            case "today":
-                return today.atStartOfDay();
-            case "week":
-                return today.minusWeeks(1).atStartOfDay();
-            case "month":
-                return today.minusMonths(1).atStartOfDay();
-            case "3months":
-                return today.minusMonths(3).atStartOfDay();
-            case "6months":
-                return today.minusMonths(6).atStartOfDay();
-            case "year":
-                return today.minusYears(1).atStartOfDay();
-            default:
-                return null;
-        }
-    }
 
-    private static LocalDateTime getPublishedToDate(String range) {
-        LocalDate today = LocalDate.now();
-        
-        switch (range.toLowerCase()) {
-            case "today":
-                return today.atTime(LocalTime.MAX);
-            case "week":
-            case "month":
-            case "3months":
-            case "6months":
-            case "year":
-                return today.atTime(LocalTime.MAX);
-            default:
-                return null;
-        }
-    }
 }

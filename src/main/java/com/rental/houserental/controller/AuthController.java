@@ -48,7 +48,10 @@ public class AuthController {
 
     @GetMapping("/register")
     public String registerPage(Model model) {
-        model.addAttribute(REGISTER_REQUEST, new RegisterRequestDTO());
+        // Check if there's a binding result from flash attributes (redirect case)
+        if (!model.containsAttribute(BINDING_RESULT_KEY)) {
+            model.addAttribute(REGISTER_REQUEST, new RegisterRequestDTO());
+        }
         model.addAttribute(ERROR, model.getAttribute(ERROR));
         return REGISTER;
     }
@@ -58,18 +61,24 @@ public class AuthController {
                            BindingResult result,
                            RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
-            redirectAttributes.addFlashAttribute(BINDING_RESULT_KEY, result);
-            redirectAttributes.addFlashAttribute(REGISTER_REQUEST, request);
-            return REDIRECT_REGISTER;
+            // Return view directly to preserve binding result
+            return REGISTER;
         }
 
-        User user = authService.register(request);
-        if (user.getStatus() == UserStatus.PENDING) {
-            redirectAttributes.addFlashAttribute(MESSAGE, "Account already registered but not verified. OTP has been resent. Please check your email.");
-        } else {
-            redirectAttributes.addFlashAttribute(MESSAGE, "Registration successful! Please check your email.");
+        try {
+            User user = authService.register(request);
+            if (user.getStatus() == UserStatus.PENDING) {
+                redirectAttributes.addFlashAttribute(MESSAGE, "Account already registered but not verified. OTP has been resent. Please check your email.");
+            } else {
+                redirectAttributes.addFlashAttribute(MESSAGE, "Registration successful! Please check your email.");
+            }
+            return redirectVerifyOtpWithEmail(request.getEmail());
+        } catch (Exception e) {
+            // For business logic errors, redirect with flash attributes
+            redirectAttributes.addFlashAttribute(REGISTER_REQUEST, request);
+            redirectAttributes.addFlashAttribute(ERROR, e.getMessage());
+            return REDIRECT_REGISTER;
         }
-        return redirectVerifyOtpWithEmail(request.getEmail());
     }
 
     @GetMapping("/verify-otp")

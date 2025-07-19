@@ -126,12 +126,40 @@ public class PropertyServiceImpl implements PropertyService {
 
     @Override
     public Page<SearchPropertyResponseDTO> searchProperties(SearchPropertyCriteriaDTO criteria, Pageable pageable) {
+        // Apply sorting if specified
+        Pageable sortedPageable = pageable;
+        if (criteria.getSortBy() != null && !criteria.getSortBy().trim().isEmpty()) {
+            String sortBy = criteria.getSortBy().trim();
+            String sortDirection = criteria.getSortDirection() != null ? criteria.getSortDirection().trim() : "desc";
+            
+            org.springframework.data.domain.Sort sort = org.springframework.data.domain.Sort.by(
+                "desc".equalsIgnoreCase(sortDirection) ? 
+                org.springframework.data.domain.Sort.Direction.DESC : 
+                org.springframework.data.domain.Sort.Direction.ASC,
+                getSortField(sortBy)
+            );
+            
+            sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+        }
+        
         Specification<RentalProperty> spec = RentalPropertySpecification.withCriteria(criteria);
-        Page<RentalProperty> propertyPage = propertyRepository.findAll(spec, pageable);
+        Page<RentalProperty> propertyPage = propertyRepository.findAll(spec, sortedPageable);
         List<SearchPropertyResponseDTO> dtoList = propertyPage.getContent().stream()
                 .map(this::convertToSearchDTO)
                 .toList();
         return new PageImpl<>(dtoList, pageable, propertyPage.getTotalElements());
+    }
+    
+    private String getSortField(String sortBy) {
+        return switch (sortBy.toLowerCase()) {
+            case "price" -> "monthlyRent";
+            case "date" -> "publishedAt";
+            case "views" -> "views";
+            case "area" -> "area";
+            case "bedrooms" -> "bedrooms";
+            case "bathrooms" -> "bathrooms";
+            default -> "publishedAt"; // Default sort by published date
+        };
     }
 
     @Override
@@ -482,9 +510,8 @@ public class PropertyServiceImpl implements PropertyService {
 
     private SearchPropertyResponseDTO convertToSearchDTO(RentalProperty property) {
         try {
-            List<String> imageUrls = property.getImages().stream()
-                    .map(PropertyImage::getImageUrl)
-                    .toList();
+            // Only get the main image URL, not all images
+            String mainImageUrl = property.getMainImageUrl();
             
             return SearchPropertyResponseDTO.builder()
                     .id(property.getId())
@@ -496,12 +523,13 @@ public class PropertyServiceImpl implements PropertyService {
                     .streetAddress(property.getStreetAddress())
                     .ward(property.getWard())
                     .province(property.getProvince())
+                    .fullAddress(property.getFullAddress())
                     .description(property.getDescription())
                     .propertyStatus(property.getPropertyStatus().name())
-                    .categoryName(property.getCategory().getName())
-                    .mainImageUrl(property.getMainImageUrl())
-                    .imageUrls(imageUrls)
-                    .imageCount(imageUrls.size())
+                    .categoryName(property.getCategory() != null ? property.getCategory().getName() : null)
+                    .mainImageUrl(mainImageUrl)
+                    .imageUrls(mainImageUrl != null ? List.of(mainImageUrl) : List.of()) // Only main image
+                    .imageCount(mainImageUrl != null ? 1 : 0)
                     .publishedAt(property.getPublishedAt())
                     .build();
                     

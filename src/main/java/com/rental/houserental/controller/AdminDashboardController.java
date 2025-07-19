@@ -29,9 +29,6 @@ import java.util.Map;
 public class AdminDashboardController {
 
     private final LandlordUpgradeService landlordUpgradeService;
-    private final CategoryService categoryService;
-    private final UserService userService;
-    private final ListingService listingService;
 
     @GetMapping("/dashboard")
     public String dashboard(Model model, HttpServletRequest request) {
