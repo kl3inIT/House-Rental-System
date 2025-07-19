@@ -60,6 +60,14 @@ public class CategoryServiceImpl implements CategoryService {
         if (!categoryRepository.existsById(id)) {
             throw new CategoryNotFoundException("Category not found with id: " + id);
         }
+        // Check if category has any property
+        int propertyCount = categoryRepository.findAllWithPropertyCount().stream()
+            .filter(row -> ((Long) row[0]).equals(id))
+            .map(row -> ((Long) row[5]).intValue())
+            .findFirst().orElse(0);
+        if (propertyCount > 0) {
+            throw new RuntimeException("Cannot delete category because it contains properties.");
+        }
         categoryRepository.deleteById(id);
     }
 
