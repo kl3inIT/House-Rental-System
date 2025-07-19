@@ -72,47 +72,6 @@
                 </div>
             </div>
 
-            <!-- Analytics Section -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-                <!-- Revenue Chart -->
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-xl font-bold text-gray-900">Monthly Revenue</h2>
-                        <select
-                            class="text-sm border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            <option>Last 6 months</option>
-                            <option>Last year</option>
-                            <option>All time</option>
-                        </select>
-                    </div>
-                    <div class="h-64 bg-gray-50 rounded-lg flex items-center justify-center">
-                        <div class="text-center">
-                            <i class="fas fa-chart-line text-4xl text-gray-300 mb-2"></i>
-                            <p class="text-gray-500">Revenue chart will be displayed here</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Occupancy Chart -->
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-xl font-bold text-gray-900">Occupancy Rate</h2>
-                        <select
-                            class="text-sm border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            <option>Last 6 months</option>
-                            <option>Last year</option>
-                            <option>All time</option>
-                        </select>
-                    </div>
-                    <div class="h-64 bg-gray-50 rounded-lg flex items-center justify-center">
-                        <div class="text-center">
-                            <i class="fas fa-chart-pie text-4xl text-gray-300 mb-2"></i>
-                            <p class="text-gray-500">Occupancy chart will be displayed here</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <!-- Property Performance -->
             <div class="bg-white rounded-lg shadow-md p-6 mb-8">
                 <div class="flex justify-between items-center mb-6">
@@ -129,6 +88,9 @@
                                     Property</th>
                                 <th
                                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Address</th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Monthly Rent</th>
                                 <th
                                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -136,59 +98,25 @@
                                 <th
                                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Inquiries</th>
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Occupancy</th>
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Rating</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            <tr>
+                            <tr th:each="prop : ${propertyPerformanceList}">
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div>
-                                        <div class="text-sm font-medium text-gray-900">Downtown Apartment</div>
-                                        <div class="text-sm text-gray-500">123 Main St</div>
+                                        <div class="text-sm font-medium text-gray-900" th:text="${prop.propertyName}">
+                                        </div>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">$1,800</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">45</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">8</td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">100%</span>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${prop.address}">
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">4.8</td>
-                            </tr>
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div>
-                                        <div class="text-sm font-medium text-gray-900">Suburban House</div>
-                                        <div class="text-sm text-gray-500">456 Oak Ave</div>
-                                    </div>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                                    th:text="'₫' + ${#numbers.formatDecimal(prop.monthlyRent, 1, 'COMMA', 0, 'POINT')}">
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">$2,200</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">23</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">3</td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">0%</span>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${prop.views}">
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">-</td>
-                            </tr>
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div>
-                                        <div class="text-sm font-medium text-gray-900">Studio Apartment</div>
-                                        <div class="text-sm text-gray-500">789 Pine St</div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">$1,200</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">31</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">5</td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">100%</span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">4.6</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                                    th:text="${prop.inquiries}"></td>
                             </tr>
                         </tbody>
                     </table>
@@ -201,68 +129,26 @@
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <h2 class="text-xl font-bold text-gray-900 mb-6">Recent Inquiries</h2>
                     <div class="space-y-4">
-                        <div class="flex items-start space-x-3">
-                            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                                <i class="fas fa-envelope text-blue-600 text-sm"></i>
+                        <div class="flex items-start space-x-3 border rounded-lg p-3 hover:shadow transition"
+                            th:each="inq : ${recentInquiries}">
+                            <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                                <i class="fas fa-user text-blue-600 text-lg"></i>
                             </div>
                             <div class="flex-1">
-                                <p class="text-sm font-medium text-gray-900">New inquiry from Michael Chen</p>
-                                <p class="text-sm text-gray-600">Downtown Apartment - Unit 4B</p>
-                                <p class="text-xs text-gray-500">2 hours ago</p>
-                            </div>
-                        </div>
-                        <div class="flex items-start space-x-3">
-                            <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                                <i class="fas fa-check text-green-600 text-sm"></i>
-                            </div>
-                            <div class="flex-1">
-                                <p class="text-sm font-medium text-gray-900">Application approved</p>
-                                <p class="text-sm text-gray-600">Studio Apartment - Unit 2A</p>
-                                <p class="text-xs text-gray-500">1 day ago</p>
-                            </div>
-                        </div>
-                        <div class="flex items-start space-x-3">
-                            <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
-                                <i class="fas fa-eye text-yellow-600 text-sm"></i>
-                            </div>
-                            <div class="flex-1">
-                                <p class="text-sm font-medium text-gray-900">Property viewed</p>
-                                <p class="text-sm text-gray-600">Suburban House - 123 Oak St</p>
-                                <p class="text-xs text-gray-500">2 days ago</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Revenue Breakdown -->
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="text-xl font-bold text-gray-900 mb-6">Revenue Breakdown</h2>
-                    <div class="space-y-4">
-                        <div class="flex justify-between items-center">
-                            <div class="flex items-center space-x-3">
-                                <div class="w-4 h-4 bg-blue-500 rounded"></div>
-                                <span class="text-sm text-gray-700">Downtown Apartment</span>
-                            </div>
-                            <span class="text-sm font-medium text-gray-900">$1,800</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <div class="flex items-center space-x-3">
-                                <div class="w-4 h-4 bg-green-500 rounded"></div>
-                                <span class="text-sm text-gray-700">Studio Apartment</span>
-                            </div>
-                            <span class="text-sm font-medium text-gray-900">$1,200</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <div class="flex items-center space-x-3">
-                                <div class="w-4 h-4 bg-yellow-500 rounded"></div>
-                                <span class="text-sm text-gray-700">Suburban House</span>
-                            </div>
-                            <span class="text-sm font-medium text-gray-900">$0</span>
-                        </div>
-                        <div class="border-t pt-4">
-                            <div class="flex justify-between items-center">
-                                <span class="text-sm font-medium text-gray-900">Total</span>
-                                <span class="text-lg font-bold text-gray-900">$3,000</span>
+                                <p class="text-base font-semibold text-gray-900" th:text="${inq.tenantName}"></p>
+                                <p class="text-sm text-gray-600" th:text="${inq.propertyName}"></p>
+                                <div class="flex items-center space-x-2 mt-1">
+                                    <span class="text-xs text-gray-500"
+                                        th:text="${#temporals.format(inq.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
+                                    <span th:if="${inq.status == 'COMPLETED'}"
+                                        class="px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-xs font-medium">Completed</span>
+                                    <span th:if="${inq.status == 'CANCELLED'}"
+                                        class="px-2 py-0.5 rounded-full bg-red-100 text-red-700 text-xs font-medium">Cancelled</span>
+                                    <span th:if="${inq.status == 'ACTIVE'}"
+                                        class="px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700 text-xs font-medium">Active</span>
+                                    <span th:if="${inq.status == 'CONFIRMED'}"
+                                        class="px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 text-xs font-medium">Confirmed</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -270,6 +156,66 @@
             </div>
         </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Đảm bảo script chạy sau khi DOM và layout Thymeleaf đã render xong
+        setTimeout(function () {
+            console.log('Script chạy!');
+            const revenueCanvas = document.getElementById('revenueChart');
+            const occupancyCanvas = document.getElementById('occupancyChart');
+            console.log('revenueCanvas:', revenueCanvas);
+            console.log('occupancyCanvas:', occupancyCanvas);
+            // Revenue Chart với dữ liệu fix cứng
+            if (revenueCanvas) {
+                const revenueCtx = revenueCanvas.getContext('2d');
+                new Chart(revenueCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                        datasets: [{
+                            label: 'Revenue',
+                            data: [1200, 1500, 1800, 1700, 2000, 2100],
+                            borderColor: '#6366f1',
+                            backgroundColor: 'rgba(99,102,241,0.1)',
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { display: false } }
+                    }
+                });
+            } else {
+                console.error('Không tìm thấy canvas revenueChart');
+            }
+            // Occupancy Chart với dữ liệu fix cứng
+            if (occupancyCanvas) {
+                const occupancyCtx = occupancyCanvas.getContext('2d');
+                new Chart(occupancyCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                        datasets: [{
+                            label: 'Occupancy Rate (%)',
+                            data: [80, 85, 90, 88, 92, 95],
+                            backgroundColor: '#facc15'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { beginAtZero: true, max: 100 }
+                        }
+                    }
+                });
+            } else {
+                console.error('Không tìm thấy canvas occupancyChart');
+            }
+        }, 300);
+    </script>
 </body>
 
 </html>

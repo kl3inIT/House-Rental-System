@@ -3,6 +3,7 @@ package com.rental.houserental.controller;
 import com.rental.houserental.dto.request.user.ChangePasswordRequestDTO;
 import com.rental.houserental.dto.request.user.UpdateProfileRequestDTO;
 import com.rental.houserental.dto.response.user.UserProfileResponseDTO;
+import com.rental.houserental.service.BookingService;
 import com.rental.houserental.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,30 +15,22 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import static com.rental.houserental.constant.ViewNamesConstant.USER_PROFILE;
 
-
 @Controller
 @RequestMapping("/user")
 @RequiredArgsConstructor
 public class UserProfileController {
 
     private final UserService userService;
+    private final BookingService bookingService;
 
     @GetMapping("/profile")
     public String profile(Model model) {
         UserProfileResponseDTO userProfile = userService.getCurrentUserProfile();
-        UpdateProfileRequestDTO updateProfileRequest = new UpdateProfileRequestDTO();
-        updateProfileRequest.setName(userProfile.getName());
-        updateProfileRequest.setEmail(userProfile.getEmail());
-        updateProfileRequest.setPhone(userProfile.getPhone());
-        updateProfileRequest.setAddress(userProfile.getAddress());
-        updateProfileRequest.setGender(userProfile.getGender());
-        if (userProfile.getDateOfBirth() != null) {
-            updateProfileRequest.setDateOfBirth(userProfile.getDateOfBirth().toLocalDate());
-        }
-
         model.addAttribute("userProfile", userProfile);
-        model.addAttribute("updateProfileRequest", updateProfileRequest);
+        model.addAttribute("updateProfileRequest", userProfile);
         model.addAttribute("changePasswordRequest", new ChangePasswordRequestDTO());
+        model.addAttribute("currentRented", bookingService.getCurrentRentedProperties());
+        model.addAttribute("retalhistory", bookingService.getRentHistoryProperties());
         return USER_PROFILE; // templates/user/profile.html
     }
 
@@ -59,6 +52,8 @@ public class UserProfileController {
         model.addAttribute("userProfile", userProfile);
         model.addAttribute("updateProfileRequest", request);
         model.addAttribute("changePasswordRequest", new ChangePasswordRequestDTO());
+        model.addAttribute("currentRented", bookingService.getCurrentRentedProperties());
+        model.addAttribute("retalhistory", bookingService.getRentHistoryProperties());
         return USER_PROFILE;
     }
 
@@ -77,18 +72,11 @@ public class UserProfileController {
             model.addAttribute("error", e.getMessage());
         }
         UserProfileResponseDTO userProfile = userService.getCurrentUserProfile();
-        UpdateProfileRequestDTO updateProfileRequest = new UpdateProfileRequestDTO();
-        updateProfileRequest.setName(userProfile.getName());
-        updateProfileRequest.setEmail(userProfile.getEmail());
-        updateProfileRequest.setPhone(userProfile.getPhone());
-        updateProfileRequest.setAddress(userProfile.getAddress());
-        updateProfileRequest.setGender(userProfile.getGender());
-        if (userProfile.getDateOfBirth() != null) {
-            updateProfileRequest.setDateOfBirth(userProfile.getDateOfBirth().toLocalDate());
-        }
         model.addAttribute("userProfile", userProfile);
-        model.addAttribute("updateProfileRequest", updateProfileRequest);
+        model.addAttribute("updateProfileRequest", userProfile);
         model.addAttribute("changePasswordRequest", request);
+        model.addAttribute("currentRented", bookingService.getCurrentRentedProperties());
+        model.addAttribute("retalhistory", bookingService.getRentHistoryProperties());
         return USER_PROFILE;
     }
 }

@@ -1,5 +1,6 @@
 package com.rental.houserental.service.impl;
 
+import com.rental.houserental.dto.dashboard.RecentInquiryDTO;
 import com.rental.houserental.dto.request.property.*;
 import com.rental.houserental.dto.response.property.*;
 import com.rental.houserental.entity.*;
@@ -15,6 +16,12 @@ import com.rental.houserental.repository.PropertyRepository;
 import com.rental.houserental.exceptions.user.UserNotFoundException;
 import com.rental.houserental.repository.*;
 import com.rental.houserental.repository.specification.RentalPropertySpecification;
+import com.rental.houserental.dto.dashboard.PropertyPerformanceDTO;
+import com.rental.houserental.entity.Booking;
+import com.rental.houserental.entity.Review;
+import com.rental.houserental.enums.BookingStatus;
+import com.rental.houserental.repository.BookingRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.rental.houserental.service.*;
 import jakarta.transaction.Transactional;
@@ -36,8 +43,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.time.temporal.ChronoUnit;
 
 import static com.rental.houserental.constant.ErrorMessageConstant.MSG_400;
+import static java.util.stream.Collectors.toList;
 
 @Service
 @RequiredArgsConstructor
@@ -51,10 +60,13 @@ public class PropertyServiceImpl implements PropertyService {
     private final S3Service s3Service;
     private final UserRepository userRepository;
 
+    @Autowired
+    private BookingRepository bookingRepository;
+
     @Override
     @Transactional
     public void createProperty(CreatePropertyRequestDTO request, User landlord,
-                                         MultipartFile[] imageFiles) {
+            MultipartFile[] imageFiles) {
         try {
             Set<Amenity> amenities = new HashSet<>();
             if (request.getAmenityIds() != null && !request.getAmenityIds().isEmpty()) {
@@ -73,7 +85,8 @@ public class PropertyServiceImpl implements PropertyService {
                     .description(request.getDescription())
                     .propertyStatus(PropertyStatus.DRAFT)
                     .landlord(landlord)
-                    .furnishing(request.getFurnishing() != null ? FurnishingType.fromString(request.getFurnishing()) : FurnishingType.NONE)
+                    .furnishing(request.getFurnishing() != null ? FurnishingType.fromString(request.getFurnishing())
+                            : FurnishingType.NONE)
                     .depositPercentage(request.getDepositPercentage())
                     .amenities(amenities)
                     .latitude(request.getLatitude())
@@ -95,10 +108,11 @@ public class PropertyServiceImpl implements PropertyService {
                 } catch (Exception e) {
                     // Delete the property since image upload failed
                     propertyRepository.delete(savedProperty);
-                    throw new ImageUploadException("Failed to upload images for property. Property creation cancelled.", e);
+                    throw new ImageUploadException("Failed to upload images for property. Property creation cancelled.",
+                            e);
                 }
             }
-            
+
         } catch (Exception e) {
             log.error("Failed to create property for landlord: {}", landlord.getEmail(), e);
             throw e;
@@ -120,7 +134,7 @@ public class PropertyServiceImpl implements PropertyService {
 
             log.info("Found {} featured properties", result.size());
             return result;
-            
+
         } catch (Exception e) {
             log.error("Error fetching featured properties", e);
             return List.of();
@@ -147,8 +161,7 @@ public class PropertyServiceImpl implements PropertyService {
                 filter.getKeyword(),
                 filter.getMinPrice() != null ? filter.getMinPrice() : null,
                 filter.getMaxPrice() != null ? filter.getMaxPrice() : null,
-                pageable
-        );
+                pageable);
         return page.map(this::toPropertyListItemDTO);
     }
 
@@ -159,8 +172,7 @@ public class PropertyServiceImpl implements PropertyService {
                 filter.getStatus(),
                 filter.getKeyword(),
                 filter.getMinPrice(),
-                filter.getMaxPrice()
-        );
+                filter.getMaxPrice());
 
         Object[] arr = (results != null && !results.isEmpty()) ? results.getFirst() : new Object[11];
 
@@ -190,7 +202,8 @@ public class PropertyServiceImpl implements PropertyService {
                         .name(amenity.getName())
                         .description(amenity.getDescription())
                         .icon(amenity.getIcon())
-                        .build()).toList();
+                        .build())
+                .toList();
         return PropertyDetailDTO.builder()
                 .id(property.getId())
                 .title(property.getTitle())
@@ -264,7 +277,8 @@ public class PropertyServiceImpl implements PropertyService {
         List<MultipartFile> validFiles = new ArrayList<>();
         if (imageFiles != null) {
             for (MultipartFile f : imageFiles) {
-                if (f != null && !f.isEmpty() && f.getOriginalFilename() != null && !f.getOriginalFilename().isBlank()) {
+                if (f != null && !f.isEmpty() && f.getOriginalFilename() != null
+                        && !f.getOriginalFilename().isBlank()) {
                     validFiles.add(f);
                 }
             }
@@ -320,7 +334,6 @@ public class PropertyServiceImpl implements PropertyService {
         throw new IllegalArgumentException("Không thể xác định object key từ url: " + imageUrl);
     }
 
-
     @Override
     public List<PropertyDetailDTO> getSimularProperties(Integer limit, Long propertyId) {
         PropertyDetailDTO currentProperty = getPropertyDetailById(propertyId);
@@ -331,15 +344,15 @@ public class PropertyServiceImpl implements PropertyService {
                         categoryId,
                         propertyId,
                         PropertyStatus.AVAILABLE,
-                        PageRequest.of(0, limit)
-                );
+                        PageRequest.of(0, limit));
 
         return properties.stream()
                 .map(property -> PropertyDetailDTO.builder()
                         .id(property.getId())
                         .title(property.getTitle())
                         .categoryId(property.getCategory() != null ? property.getCategory().getId() : null)
-//                        .categoryName(property.getCategory() != null ? property.getCategory().getName() : null)
+                        // .categoryName(property.getCategory() != null ?
+                        // property.getCategory().getName() : null)
                         .monthlyRent(property.getMonthlyRent())
                         .bedrooms(property.getBedrooms())
                         .bathrooms(property.getBathrooms())
@@ -391,10 +404,9 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
-    public Long countRevenueRentalProperty() {
+    public Long countRevenueRentalProperty(Long landlordId) {
         return propertyRepository.countRentedProperties();
     }
-
 
     public RentalProperty findPropertyById(Long id) {
         return propertyRepository.findById(id)
@@ -404,7 +416,8 @@ public class PropertyServiceImpl implements PropertyService {
     public User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
-        return userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("User not found", MSG_400));
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found", MSG_400));
     }
 
     private PropertyListItemDTO toPropertyListItemDTO(RentalProperty p) {
@@ -432,16 +445,16 @@ public class PropertyServiceImpl implements PropertyService {
     @Override
     public SearchPropertyResponseDTO getPropertyById(Long id) {
         log.info("Fetching property with ID: {}", id);
-        
+
         try {
             RentalProperty property = propertyRepository.findById(id)
                     .orElseThrow(() -> new PropertyNotFoundException("Property not found with ID: " + id));
-            
+
             SearchPropertyResponseDTO result = convertToSearchDTO(property);
             log.info("Found property: {}", result.getTitle());
-            
+
             return result;
-            
+
         } catch (PropertyNotFoundException e) {
             log.warn("Property not found with ID: {}", id);
             throw e;
@@ -456,16 +469,16 @@ public class PropertyServiceImpl implements PropertyService {
             log.debug("Converting property {} to featured DTO", property.getId());
             log.debug("Property title: {}", property.getTitle());
             log.debug("Property images count: {}", property.getImages() != null ? property.getImages().size() : 0);
-            
+
             String mainImageUrl = property.getMainImageUrl();
             log.debug("Main image URL: {}", mainImageUrl);
-            
+
             // Get top 3-4 amenities for display
             List<String> topAmenities = property.getAmenities().stream()
                     .limit(4)
                     .map(amenity -> amenity.getName())
                     .toList();
-            
+
             return FeaturedPropertyResponseDTO.builder()
                     .id(property.getId())
                     .title(property.getTitle())
@@ -484,7 +497,7 @@ public class PropertyServiceImpl implements PropertyService {
                     .rating(4.5)
                     .reviewCount(12)
                     .build();
-                    
+
         } catch (Exception e) {
             log.error("Error converting property to featured DTO: {}", property.getId(), e);
             throw e;
@@ -496,7 +509,7 @@ public class PropertyServiceImpl implements PropertyService {
             List<String> imageUrls = property.getImages().stream()
                     .map(PropertyImage::getImageUrl)
                     .toList();
-            
+
             return SearchPropertyResponseDTO.builder()
                     .id(property.getId())
                     .title(property.getTitle())
@@ -515,7 +528,7 @@ public class PropertyServiceImpl implements PropertyService {
                     .imageCount(imageUrls.size())
                     .publishedAt(property.getPublishedAt())
                     .build();
-                    
+
         } catch (Exception e) {
             log.error("Error converting property to search DTO: {}", property.getId(), e);
             throw e;
@@ -534,6 +547,51 @@ public class PropertyServiceImpl implements PropertyService {
     @Override
     public List<RentalProperty> getPropertiesByLandlordStatusNotAvailable(Long landlordId) {
         return propertyRepository.findByLandlordIdAndPropertyStatusNot(landlordId, PropertyStatus.AVAILABLE);
+    }
+
+    @Override
+    public List<RentalProperty> findByLandlordId(Long landlordId) {
+        return propertyRepository.findByLandlordId(landlordId);
+    }
+
+    @Override
+    public List<RentalProperty> findByLandlordIdWithBookings(Long landlordId) {
+        return propertyRepository.findByLandlordIdWithBookings(landlordId);
+    }
+
+    @Override
+    public List<PropertyPerformanceDTO> getPropertyPerformanceForLandlord(Long landlordId) {
+        List<RentalProperty> properties = findByLandlordId(landlordId);
+        return properties.stream().map(property -> {
+            List<Booking> bookings = bookingRepository.findByRentalPropertyId(property.getId());
+            int inquiries = 0;
+            for (Booking booking : bookings) {
+                if (booking.getStatus() == BookingStatus.CONFIRMED || booking.getStatus() == BookingStatus.ACTIVE
+                        || booking.getStatus() == BookingStatus.COMPLETED) {
+                    inquiries++;
+                }
+            }
+            int views = property.getViews() != null ? property.getViews() : 0;
+            return new PropertyPerformanceDTO(
+                    property.getId(),
+                    property.getTitle(),
+                    property.getFullAddress(),
+                    property.getMonthlyRent(),
+                    views,
+                    inquiries);
+        }).collect(toList());
+    }
+
+    @Override
+    public List<RecentInquiryDTO> getRecentInquiriesForLandlord(
+            Long landlordId, int limit) {
+        List<Booking> bookings = bookingRepository.findRecentByLandlordId(landlordId,
+                PageRequest.of(0, limit));
+        return bookings.stream().map(b -> new RecentInquiryDTO(
+                b.getUser().getName(),
+                b.getRentalProperty().getTitle(),
+                b.getCreatedAt(),
+                b.getStatus().name())).toList();
     }
 
 }

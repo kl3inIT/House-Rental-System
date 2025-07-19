@@ -81,4 +81,7 @@ public interface PropertyRepository
 
         @Query("SELECT SUM(p.monthlyRent) FROM RentalProperty p WHERE p.propertyStatus = 'RENTED'")
         Long countRentedProperties();
+
+        @Query("SELECT DISTINCT p FROM RentalProperty p LEFT JOIN FETCH p.bookings WHERE p.landlord.id = :landlordId")
+        List<RentalProperty> findByLandlordIdWithBookings(@Param("landlordId") Long landlordId);
 }

@@ -78,10 +78,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserProfileResponseDTO updateProfile(UpdateProfileRequestDTO request) {
         User currentUser = getCurrentUser();
-
-        // Không cập nhật email!
-        // currentUser.setEmail(request.getEmail());
-
         currentUser.setName(request.getName());
         currentUser.setPhone(request.getPhone());
         currentUser.setAddress(request.getAddress());
@@ -115,6 +111,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserProfileResponseDTO getCurrentUserProfile() {
         User currentUser = getCurrentUser();
+        UpdateProfileRequestDTO updateProfileRequest = new UpdateProfileRequestDTO();
+        updateProfileRequest.setName(currentUser.getName());
+        updateProfileRequest.setEmail(currentUser.getEmail());
+        updateProfileRequest.setPhone(currentUser.getPhone());
+        updateProfileRequest.setAddress(currentUser.getAddress());
+        updateProfileRequest.setGender(currentUser.getGender());
+        if (currentUser.getDateOfBirth() != null) {
+            updateProfileRequest.setDateOfBirth(currentUser.getDateOfBirth().toLocalDate());
+        }
         return mapToUserProfileResponseDTO(currentUser);
     }
 

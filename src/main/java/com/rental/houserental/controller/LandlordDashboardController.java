@@ -1,13 +1,15 @@
 package com.rental.houserental.controller;
 
+import com.rental.houserental.dto.dashboard.RecentInquiryDTO;
 import com.rental.houserental.dto.request.booking.BookingSearchRequestDTO;
 import com.rental.houserental.dto.response.booking.BookingHistoryDTO;
 import com.rental.houserental.dto.response.booking.BookingHistoryDetailDTO;
 import com.rental.houserental.enums.BookingStatus;
 import com.rental.houserental.service.BookingService;
 import com.rental.houserental.service.PropertyService;
-import com.rental.houserental.service.TransactionService;
 import com.rental.houserental.service.UserService;
+import com.rental.houserental.dto.dashboard.DashboardStatsDTO;
+import com.rental.houserental.dto.dashboard.PropertyPerformanceDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -23,14 +24,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.security.core.userdetails.User;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-import static com.rental.houserental.constant.ViewNamesConstant.BOOKING_DETAIL;
+import java.math.BigDecimal;
+import java.util.List;
+
 import static com.rental.houserental.constant.ViewNamesConstant.LANDLORD_DASHBOARD;
 
 @Controller
@@ -47,33 +44,34 @@ public class LandlordDashboardController {
     private PropertyService propertyService;
 
     @Autowired
-    private TransactionService transactionService;
-
-    @Autowired
     private UserService userService;
 
     @GetMapping("/dashboard")
     public String dashboard(Model model, HttpServletRequest request) {
         model.addAttribute("currentUri", request.getRequestURI());
-
         // Lấy landlordId từ user hiện tại
         Long landlordId = userService.getCurrentUser().getId();
-
         // Lấy tổng số property
         Long totalProperties = propertyService.countTotalRentalProperty();
         // Lấy số booking trong tháng
         Long bookingsThisMonth = bookingService.countBookingsThisMonthByLandlord(landlordId);
-        // Lấy tổng doanh thu
-        Long monthlyRevenue = propertyService.countRevenueRentalProperty();
-
+        // Lấy tổng doanh thu (tất cả thời gian)
+        Long monthlyRevenue = propertyService.countRevenueRentalProperty(landlordId);
         Long activeBookings = bookingService.countActiveBookingsByLandlord(landlordId);
 
-        // Đưa vào dashboardStats
-        Map<String, Object> dashboardStats = new HashMap<>();
-        dashboardStats.put("totalProperties", totalProperties);
-        dashboardStats.put("bookingsThisMonth", bookingsThisMonth);
-        dashboardStats.put("activeBookings", activeBookings);
-        dashboardStats.put("monthlyRevenue", monthlyRevenue);
+        DashboardStatsDTO dashboardStats = new DashboardStatsDTO();
+        dashboardStats.setTotalProperties(totalProperties);
+        dashboardStats.setBookingsThisMonth(bookingsThisMonth);
+        dashboardStats.setActiveBookings(activeBookings);
+        dashboardStats.setMonthlyRevenue(monthlyRevenue);
+        // Lấy danh sách property performance cho landlord
+        List<PropertyPerformanceDTO> propertyPerformanceList = propertyService
+                .getPropertyPerformanceForLandlord(landlordId);
+        List<RecentInquiryDTO> recentInquiries = propertyService
+                .getRecentInquiriesForLandlord(landlordId, 5);
+        model.addAttribute("propertyPerformanceList", propertyPerformanceList);
+        model.addAttribute("recentInquiries", recentInquiries);
+        model.addAttribute("totalRevenue", BigDecimal.ZERO);
 
         model.addAttribute("dashboardStats", dashboardStats);
         return LANDLORD_DASHBOARD;

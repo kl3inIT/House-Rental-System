@@ -8,7 +8,6 @@ import com.rental.houserental.service.PropertyService;
 import com.rental.houserental.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,15 +29,16 @@ public class BookingController {
 
     @GetMapping("/booking/{propertyId}")
     public String checkout(@PathVariable Long propertyId, Model model) {
-        PropertyBookingRequestDTO propertyBooking =  new PropertyBookingRequestDTO();
+        PropertyBookingRequestDTO propertyBooking = new PropertyBookingRequestDTO();
         propertyBooking.setId(propertyId);
         model.addAttribute("propertyCheckout", propertyService.getPropertyToCheckoutById(propertyId));
-        model.addAttribute("propertyBooking",propertyBooking);
+        model.addAttribute("propertyBooking", propertyBooking);
         return CHECKOUT;
     }
 
     @PostMapping("/booking/{propertyId}")
-    public String bookProperty(@PathVariable Long propertyId, PropertyBookingRequestDTO propertyBookingRequestDTO, Model model) {
+    public String bookProperty(@PathVariable Long propertyId, PropertyBookingRequestDTO propertyBookingRequestDTO,
+            Model model) {
         double userBalance = userService.getCurrentUser().getBalance();
         if (userBalance < propertyBookingRequestDTO.getDepositAmount()) {
             model.addAttribute("error", "Insufficient balance to book this property.");
@@ -71,7 +71,11 @@ public class BookingController {
         return REDIRECT_MY_BOOKING;
     }
 
-
-
+    @GetMapping("/current-rented-properties")
+    public String currentRentedProperties(Model model) {
+        List<BookingHistoryDTO> currentRented = bookingService.getCurrentRentedProperties();
+        model.addAttribute("currentRented", currentRented);
+        return "current-rented-properties";
+    }
 
 }
