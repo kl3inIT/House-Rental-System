@@ -43,7 +43,6 @@ public class SearchPropertyCriteriaDTO {
     private Integer maxBathrooms;
     
 
-    
     // Pagination and sorting
     private Integer page;
     private String sortBy;
