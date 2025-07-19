@@ -5,24 +5,24 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "Landlord_upgrade")
+@Table(name = "LandlordUpgrade")
 public class LandlordUpgrade {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "UserId", nullable = false)
     private User user;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private LandlordUpgradeRequestStatus status;
 
-    @Column(name = "created_at", nullable = false)
+    @Column(name = "CreatedAt", nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at")
+    @Column(name = "UpdatedAt")
     private LocalDateTime updatedAt;
 
     @Column(length = 500)

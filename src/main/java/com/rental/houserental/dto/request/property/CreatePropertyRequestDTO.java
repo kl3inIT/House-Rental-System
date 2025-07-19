@@ -28,7 +28,7 @@ public class CreatePropertyRequestDTO {
     private BigDecimal monthlyRent;
 
     @NotNull(message = "Number of bedrooms is required")
-    @Min(value = 0, message = "Bedrooms must be 0 or greater")
+    @Min(value = 1, message = "Bedrooms must be at least 1")
     @Max(value = 10, message = "Bedrooms must be 10 or less")
     private Integer bedrooms;
 
