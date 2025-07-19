@@ -61,6 +61,7 @@ public class AuthController {
                            BindingResult result,
                            RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
+            // Return view directly to preserve binding result
             return REGISTER;
         }
 
