@@ -68,15 +68,45 @@ public class HomeController {
     public String searchProperties(
             @ModelAttribute SearchPropertyCriteriaDTO criteria,
             @PageableDefault(size = 12) Pageable pageable,
-            Model model) {
+            Model model,
+            Principal principal) {
         Page<SearchPropertyResponseDTO> page = propertyService.searchProperties(criteria, pageable);
+        
+        // Load wishlist status if user is authenticated
+        if (principal != null) {
+            try {
+                User currentUser = userService.findByEmail(principal.getName());
+                List<Long> propertyIds = page.getContent().stream()
+                        .map(SearchPropertyResponseDTO::getId)
+                        .toList();
+                
+                Map<Long, Boolean> wishlistStatus = wishlistService.getWishlistStatus(currentUser.getId(), propertyIds);
+                model.addAttribute("wishlistStatus", wishlistStatus);
+            } catch (Exception e) {
+                log.warn("Error loading wishlist status for user: {}", principal.getName(), e);
+            }
+        }
+        
+        // Add sort options
+        List<Map<String, String>> sortOptions = List.of(
+            Map.of("value", "date", "displayName", "Latest"),
+            Map.of("value", "price", "displayName", "Price"),
+            Map.of("value", "views", "displayName", "Most Viewed"),
+            Map.of("value", "area", "displayName", "Area"),
+            Map.of("value", "bedrooms", "displayName", "Bedrooms"),
+            Map.of("value", "bathrooms", "displayName", "Bathrooms")
+        );
+        
         model.addAttribute("properties", page.getContent());
         model.addAttribute("totalElements", page.getTotalElements());
         model.addAttribute("totalPages", page.getTotalPages());
         model.addAttribute("currentPage", page.getNumber() + 1);
         model.addAttribute("searchCriteria", criteria);
         model.addAttribute("categories", categoryService.getAllCategories());
-        // TODO: add sort options if needed
+        model.addAttribute("sortOptions", sortOptions);
+        model.addAttribute("sortBy", criteria.getSortBy() != null ? criteria.getSortBy() : "date");
+        model.addAttribute("sortDirection", criteria.getSortDirection() != null ? criteria.getSortDirection() : "desc");
+        
         return "search-properties";
     }
 }

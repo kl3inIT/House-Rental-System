@@ -17,6 +17,10 @@ public class SearchPropertyCriteriaDTO {
     private String keyword;
     private String status;
     
+    // Multiple statuses support
+    @Builder.Default
+    private List<String> statuses = new ArrayList<>();
+    
     // Price filters
     @Builder.Default
     private List<String> priceRanges = new ArrayList<>();
@@ -44,4 +48,5 @@ public class SearchPropertyCriteriaDTO {
     // Pagination and sorting
     private Integer page;
     private String sortBy;
+    private String sortDirection; // "asc" or "desc"
 }

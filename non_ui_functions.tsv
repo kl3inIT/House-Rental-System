@@ -1,0 +1,13 @@
+#	Feature	System Function	Description
+1	Scheduled Tasks	Automated Status Management	Automatically update booking status (every 50 minutes) and listing status (every 30 minutes), synchronize property status
+2	Email Services	Email Communication System	Send email verification, password reset, landlord notifications using Thymeleaf templates and JavaMailSender
+3	File Storage	AWS S3 Storage Management	Upload/delete property images, validate files (10MB limit, JPG/PNG/WEBP), generate unique filenames, manage display order
+4	Authentication & Security	User Authentication System	OTP generation/validation, BCrypt password hashing, session management, rate limiting, CSRF protection
+5	Real-time Notifications	WebSocket Communication	Real-time notifications via WebSocket (SockJS + STOMP), notification management, deposit status updates
+6	Payment Processing	Payment Integration System	SePay webhook handling, transaction recording, automatic balance updates for users and landlords
+7	Authorization	Role-based Access Control	Dynamic role checking (USER/LANDLORD/ADMIN), path-based authorization, account status validation
+8	Caching & Session	Redis Data Management	Session storage, OTP caching, rate limiting counters, temporary data with TTL expiration
+9	System Configuration	Dynamic Configuration	Load system configs for pricing, feature toggles, business rules management
+10	Database Operations	Data Management System	Transaction management, bean validation, audit trail with automatic timestamps
+11	Background Processing	System Automation	Custom error view resolution, global model attributes injection for all views
+12	External Integration	Third-party Services	AWS S3 integration, SePay payment gateway, Gmail SMTP services 

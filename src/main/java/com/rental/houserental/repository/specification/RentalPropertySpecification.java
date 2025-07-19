@@ -163,9 +163,27 @@ public class RentalPropertySpecification {
                 } catch (IllegalArgumentException e) {
                     // Invalid status, ignore this filter
                 }
+            } else if (!criteria.getStatuses().isEmpty()) {
+                // Handle multiple statuses
+                List<PropertyStatus> validStatuses = new ArrayList<>();
+                for (String statusStr : criteria.getStatuses()) {
+                    try {
+                        PropertyStatus status = PropertyStatus.valueOf(statusStr.toUpperCase());
+                        validStatuses.add(status);
+                    } catch (IllegalArgumentException e) {
+                        // Invalid status, ignore this one
+                    }
+                }
+                if (!validStatuses.isEmpty()) {
+                    predicates.add(root.get("propertyStatus").in(validStatuses));
+                }
             } else {
-                // Default: only show available properties if no status filter is specified
-                predicates.add(criteriaBuilder.equal(root.get("propertyStatus"), PropertyStatus.AVAILABLE));
+                // Default: show AVAILABLE, BOOKED, and RENTED properties if no status filter is specified
+                predicates.add(root.get("propertyStatus").in(
+                    PropertyStatus.AVAILABLE, 
+                    PropertyStatus.BOOKED, 
+                    PropertyStatus.RENTED
+                ));
             }
 
             return criteriaBuilder.and(predicates.toArray(new jakarta.persistence.criteria.Predicate[0]));
