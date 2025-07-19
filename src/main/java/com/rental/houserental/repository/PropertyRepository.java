@@ -26,20 +26,20 @@ public interface PropertyRepository extends JpaRepository<RentalProperty, Long>,
 
     List<RentalProperty> findByLandlordIdAndPropertyStatusNot(Long landlordId, PropertyStatus propertyStatus);
 
-    List<RentalProperty> findByLandlordIdAndPropertyStatus(Long landlordId, PropertyStatus propertyStatus);
-
     @Query("SELECT p FROM RentalProperty p " +
             "WHERE p.landlord.id = :landlordId " +
             "AND (:status IS NULL OR p.propertyStatus = :status) " +
             "AND (:keyword IS NULL OR LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
             "AND (:minPrice IS NULL OR p.monthlyRent >= :minPrice) " +
-            "AND (:maxPrice IS NULL OR p.monthlyRent <= :maxPrice)")
+            "AND (:maxPrice IS NULL OR p.monthlyRent <= :maxPrice) " +
+            "AND (:categoryId IS NULL OR p.category.id = :categoryId)")
     Page<RentalProperty> searchByLandlord(
             @Param("landlordId") Long landlordId,
             @Param("status") PropertyStatus status,
             @Param("keyword") String keyword,
             @Param("minPrice") Integer minPrice,
             @Param("maxPrice") Integer maxPrice,
+            @Param("categoryId") Long categoryId,
             Pageable pageable
     );
 
@@ -60,13 +60,15 @@ public interface PropertyRepository extends JpaRepository<RentalProperty, Long>,
             "AND (:status IS NULL OR p.propertyStatus = :status) " +
             "AND (:keyword IS NULL OR LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
             "AND (:minPrice IS NULL OR p.monthlyRent >= :minPrice) " +
-            "AND (:maxPrice IS NULL OR p.monthlyRent <= :maxPrice)")
+            "AND (:maxPrice IS NULL OR p.monthlyRent <= :maxPrice) " +
+            "AND (:categoryId IS NULL OR p.category.id = :categoryId)")
     List<Object[]> getStatsByLandlord(
             @Param("landlordId") Long landlordId,
             @Param("status") PropertyStatus status,
             @Param("keyword") String keyword,
             @Param("minPrice") Integer minPrice,
-            @Param("maxPrice") Integer maxPrice
+            @Param("maxPrice") Integer maxPrice,
+            @Param("categoryId") Long categoryId
     );
 
     List<RentalProperty> findByCategoryIdAndIdNotAndPropertyStatus(

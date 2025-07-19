@@ -21,7 +21,7 @@ public class ListingSchedule {
     private final ListingRepository listingRepository;
     private final PropertyRepository propertyRepository;
 
-    @Scheduled(cron = "0 0/30 * * * ?")
+    @Scheduled(cron = "0 0/1 * * * ?")
     public void updateAllListingStatus() {
         List<Listing> listings = listingRepository.findAll();
         for (Listing listing : listings) {

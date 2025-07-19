@@ -167,9 +167,51 @@
 
             <div id="reviews-content" class="tab-content hidden">
                 <h3 class="text-lg font-semibold text-gray-900 mb-4">Reviews & Ratings</h3>
-                <div class="text-center py-8">
+                <div th:if="${#lists.isEmpty(reviews)}" class="text-center py-8">
                     <i class="fas fa-star text-4xl text-yellow-400 mb-4"></i>
                     <p class="text-gray-600">No reviews yet. Be the first to review this property!</p>
+                </div>
+                <div th:if="${!#lists.isEmpty(reviews)}" class="space-y-6 mb-8">
+                    <div th:each="review : ${reviews}" class="bg-gray-50 rounded-lg p-4 shadow-sm">
+                        <div class="flex items-center mb-2">
+                            <span class="font-semibold text-gray-800 mr-2" th:text="${review.tenantName}">User Name</span>
+                            <span class="text-yellow-400">
+                                <i class="fas fa-star" th:each="i : ${#numbers.sequence(1, review.star)}"></i>
+                            </span>
+                            <span class="ml-2 text-xs text-gray-500" th:text="${#temporals.format(review.createdAt, 'dd/MM/yyyy HH:mm')}"></span>
+                            <form th:if="${currentUserEmail != null and review.tenantEmail == currentUserEmail}" th:action="@{'/properties/' + ${property.id} + '/reviews/' + ${review.id} + '/delete'}" method="post" class="ml-auto">
+                                <button type="submit" class="text-red-600 hover:bg-red-100 rounded-full p-1 transition-colors duration-150" title="Delete">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </form>
+                        </div>
+                        <div class="text-gray-700" th:text="${review.description}"></div>
+                    </div>
+                </div>
+                <div sec:authorize="isAuthenticated()" class="mt-8">
+                    <div th:if="${hasReviewed}">
+                        <div class="text-green-600 font-semibold text-center">You have already reviewed this property.</div>
+                    </div>
+                    <div th:if="${!hasReviewed}">
+                        <h4 class="text-md font-semibold text-gray-800 mb-2">Leave a Review</h4>
+                        <form th:action="@{'/properties/' + ${property.id} + '/reviews'}" method="post" class="space-y-4">
+                            <div>
+                                <label for="star" class="block text-sm font-medium text-gray-700">Rating</label>
+                                <select id="star" name="star" class="mt-1 block w-24 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
+                                    <option value="">Select</option>
+                                    <option th:each="i : ${#numbers.sequence(1,5)}" th:value="${i}" th:text="${i}"></option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="description" class="block text-sm font-medium text-gray-700">Your Review</label>
+                                <textarea id="description" name="description" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required></textarea>
+                            </div>
+                            <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 font-medium">Submit Review</button>
+                        </form>
+                    </div>
+                </div>
+                <div sec:authorize="!isAuthenticated()" class="mt-8 text-center text-gray-500">
+                    <a th:href="@{/login}" class="text-blue-600 hover:underline">Login</a> to leave a review.
                 </div>
             </div>
         </div>

@@ -153,6 +153,8 @@ public class ListingServiceImpl implements ListingService {
         }
 
         listing.setStatus(ListingStatus.HIDDEN);
+        RentalProperty property = listing.getRentalProperty();
+        property.setPropertyStatus(PropertyStatus.HIDDEN);
         listingRepository.save(listing);
     }
 
@@ -165,6 +167,8 @@ public class ListingServiceImpl implements ListingService {
         }
 
         listing.setStatus(ListingStatus.ACTIVE);
+        RentalProperty property = listing.getRentalProperty();
+        property.setPropertyStatus(PropertyStatus.AVAILABLE);
         listingRepository.save(listing);
     }
 

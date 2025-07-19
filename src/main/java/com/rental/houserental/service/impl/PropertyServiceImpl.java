@@ -172,6 +172,7 @@ public class PropertyServiceImpl implements PropertyService {
                 filter.getKeyword(),
                 filter.getMinPrice() != null ? filter.getMinPrice() : null,
                 filter.getMaxPrice() != null ? filter.getMaxPrice() : null,
+                filter.getCategoryId() != null ? filter.getCategoryId() : null,
                 pageable
         );
         return page.map(this::toPropertyListItemDTO);
@@ -184,7 +185,8 @@ public class PropertyServiceImpl implements PropertyService {
                 filter.getStatus(),
                 filter.getKeyword(),
                 filter.getMinPrice(),
-                filter.getMaxPrice()
+                filter.getMaxPrice(),
+                filter.getCategoryId()
         );
 
         Object[] arr = (results != null && !results.isEmpty()) ? results.getFirst() : new Object[11];

@@ -87,6 +87,12 @@ public class CategoryController {
         try {
             categoryService.deleteCategory(id);
             redirectAttributes.addFlashAttribute("successMessage", "Delete category successfully!");
+        } catch (RuntimeException e) {
+            if (e.getMessage() != null && e.getMessage().contains("contains properties")) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Cannot delete category because it contains properties.");
+            } else {
+                redirectAttributes.addFlashAttribute("errorMessage", "Delete failed: " + e.getMessage());
+            }
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Delete failed: " + e.getMessage());
         }

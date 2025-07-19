@@ -15,8 +15,8 @@ public enum PropertyStatus {
     RENTED("Rented", "The property has been rented and is no longer available."),
     UNAVAILABLE("Unavailable", "The property is temporarily unavailable for rent."),
     EXPIRED("Expired", "The listing duration has ended."),
-    ADMIN_HIDDEN("Hidden by Admin", "The property is hidden by admin and cannot be modified by landlord."),
-    ADMIN_BANNED("Banned by Admin", "The property is banned due to policy violation.");
+    HIDDEN("Hidden", "The property is hidden and cannot be modified by landlord."),
+    BANNED("Banned", "The property is banned due to policy violation.");
 
     private final String displayName;
     private final String description;
@@ -61,7 +61,7 @@ public enum PropertyStatus {
     }
 
     public boolean isAdminControlled() {
-        return this == ADMIN_HIDDEN || this == ADMIN_BANNED;
+        return this == HIDDEN || this == BANNED;
     }
 
     public boolean canLandlordModify() {
@@ -69,10 +69,10 @@ public enum PropertyStatus {
     }
 
     public boolean isHiddenByAdmin() {
-        return this == ADMIN_HIDDEN;
+        return this == HIDDEN;
     }
 
     public boolean isBannedByAdmin() {
-        return this == ADMIN_BANNED;
+        return this == BANNED;
     }
 }
