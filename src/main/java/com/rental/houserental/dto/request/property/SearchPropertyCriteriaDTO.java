@@ -24,7 +24,6 @@ public class SearchPropertyCriteriaDTO {
     // Price filters
     @Builder.Default
     private List<String> priceRanges = new ArrayList<>();
-    private Integer maxPrice; // For home page search form
     
     // Area filters
     @Builder.Default

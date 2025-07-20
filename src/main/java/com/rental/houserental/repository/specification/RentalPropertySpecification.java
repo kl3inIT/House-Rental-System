@@ -44,69 +44,94 @@ public class RentalPropertySpecification {
             }
 
             // Property Type (Category) filter
-            if (!criteria.getPropertyTypes().isEmpty()) {
+            if (criteria.getPropertyTypes() != null && !criteria.getPropertyTypes().isEmpty()) {
+                log.info("Filtering by property types: {}", criteria.getPropertyTypes());
                 predicates.add(root.get("category").get("id").in(criteria.getPropertyTypes()));
             }
 
             // Price Range filters
-            if (!criteria.getPriceRanges().isEmpty()) {
+            if (criteria.getPriceRanges() != null && !criteria.getPriceRanges().isEmpty()) {
+                log.info("Processing price ranges: {}", criteria.getPriceRanges());
                 List<jakarta.persistence.criteria.Predicate> pricePredicates = new ArrayList<>();
                 
                 for (String range : criteria.getPriceRanges()) {
-                    String[] parts = range.split("-");
-                    if (parts.length == 2) {
-                        BigDecimal minPrice = new BigDecimal(parts[0]);
-                        BigDecimal maxPrice = new BigDecimal(parts[1]);
-                        
-                        if (maxPrice.compareTo(BigDecimal.valueOf(999999999)) == 0) {
-                            // "Above X" case
-                            pricePredicates.add(criteriaBuilder.greaterThanOrEqualTo(
-                                root.get("monthlyRent"), minPrice));
+                    if (range != null && !range.trim().isEmpty()) {
+                        String[] parts = range.split("-");
+                        if (parts.length == 2) {
+                            try {
+                                BigDecimal minPrice = new BigDecimal(parts[0]);
+                                BigDecimal maxPrice = new BigDecimal(parts[1]);
+                                
+                                log.info("Processing price range: {} - {} (min: {}, max: {})", parts[0], parts[1], minPrice, maxPrice);
+                                
+                                if (maxPrice.compareTo(BigDecimal.valueOf(999999999)) == 0) {
+                                    // "Above X" case - greater than minPrice
+                                    log.info("Creating 'Above {}' predicate for price > {}", minPrice, minPrice);
+                                    pricePredicates.add(criteriaBuilder.greaterThan(
+                                        root.get("monthlyRent"), minPrice));
+                                } else {
+                                    // Range case - between minPrice and maxPrice (inclusive)
+                                    log.info("Creating range predicate: {} <= price <= {}", minPrice, maxPrice);
+                                    pricePredicates.add(criteriaBuilder.and(
+                                        criteriaBuilder.greaterThanOrEqualTo(root.get("monthlyRent"), minPrice),
+                                        criteriaBuilder.lessThanOrEqualTo(root.get("monthlyRent"), maxPrice)
+                                    ));
+                                }
+                            } catch (NumberFormatException e) {
+                                log.warn("Invalid price range format: {}", range, e);
+                            }
                         } else {
-                            // Range case
-                            pricePredicates.add(criteriaBuilder.and(
-                                criteriaBuilder.greaterThanOrEqualTo(root.get("monthlyRent"), minPrice),
-                                criteriaBuilder.lessThanOrEqualTo(root.get("monthlyRent"), maxPrice)
-                            ));
+                            log.warn("Invalid price range format (expected min-max): {}", range);
                         }
                     }
                 }
                 
                 if (!pricePredicates.isEmpty()) {
                     predicates.add(criteriaBuilder.or(pricePredicates.toArray(new jakarta.persistence.criteria.Predicate[0])));
+                    log.info("Added {} price predicates", pricePredicates.size());
                 }
-            } else if (criteria.getMaxPrice() != null) {
-                // Max Price filter (for home page search) - only apply if no priceRanges are specified
-                log.info("Applying maxPrice filter: {}", criteria.getMaxPrice());
-                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("monthlyRent"), criteria.getMaxPrice()));
             }
 
             // Area Range filters
-            if (!criteria.getAreaRanges().isEmpty()) {
+            if (criteria.getAreaRanges() != null && !criteria.getAreaRanges().isEmpty()) {
+                log.info("Processing area ranges: {}", criteria.getAreaRanges());
                 List<jakarta.persistence.criteria.Predicate> areaPredicates = new ArrayList<>();
                 
                 for (String range : criteria.getAreaRanges()) {
-                    String[] parts = range.split("-");
-                    if (parts.length == 2) {
-                        BigDecimal minArea = new BigDecimal(parts[0]);
-                        BigDecimal maxArea = new BigDecimal(parts[1]);
-                        
-                        if (maxArea.compareTo(BigDecimal.valueOf(999999)) == 0) {
-                            // "Above X" case
-                            areaPredicates.add(criteriaBuilder.greaterThanOrEqualTo(
-                                root.get("area"), minArea));
+                    if (range != null && !range.trim().isEmpty()) {
+                        String[] parts = range.split("-");
+                        if (parts.length == 2) {
+                            try {
+                                BigDecimal minArea = new BigDecimal(parts[0]);
+                                BigDecimal maxArea = new BigDecimal(parts[1]);
+                                
+                                log.info("Processing area range: {} - {} (min: {}, max: {})", parts[0], parts[1], minArea, maxArea);
+                                
+                                if (maxArea.compareTo(BigDecimal.valueOf(999999)) == 0) {
+                                    // "Above X" case - greater than minArea
+                                    log.info("Creating 'Above {}' area predicate", minArea);
+                                    areaPredicates.add(criteriaBuilder.greaterThan(
+                                        root.get("area"), minArea));
+                                } else {
+                                    // Range case - between minArea and maxArea (inclusive)
+                                    log.info("Creating area range predicate: {} <= area <= {}", minArea, maxArea);
+                                    areaPredicates.add(criteriaBuilder.and(
+                                        criteriaBuilder.greaterThanOrEqualTo(root.get("area"), minArea),
+                                        criteriaBuilder.lessThanOrEqualTo(root.get("area"), maxArea)
+                                    ));
+                                }
+                            } catch (NumberFormatException e) {
+                                log.warn("Invalid area range format: {}", range, e);
+                            }
                         } else {
-                            // Range case
-                            areaPredicates.add(criteriaBuilder.and(
-                                criteriaBuilder.greaterThanOrEqualTo(root.get("area"), minArea),
-                                criteriaBuilder.lessThanOrEqualTo(root.get("area"), maxArea)
-                            ));
+                            log.warn("Invalid area range format (expected min-max): {}", range);
                         }
                     }
                 }
                 
                 if (!areaPredicates.isEmpty()) {
                     predicates.add(criteriaBuilder.or(areaPredicates.toArray(new jakarta.persistence.criteria.Predicate[0])));
+                    log.info("Added {} area predicates", areaPredicates.size());
                 }
             }
 

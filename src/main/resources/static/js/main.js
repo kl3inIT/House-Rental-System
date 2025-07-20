@@ -138,16 +138,16 @@ function initializeSearch() {
             
             const location = searchForm.querySelector('input[placeholder*="city"]').value;
             const propertyType = searchForm.querySelector('select').value;
-            const maxPrice = searchForm.querySelectorAll('select')[1].value;
+            const priceRange = searchForm.querySelectorAll('select')[1].value;
             
             // Build search URL
             const params = new URLSearchParams();
             if (location) params.set('location', location);
-            if (propertyType && propertyType !== 'Any Type') params.set('type', propertyType);
-            if (maxPrice && maxPrice !== 'Any Price') params.set('price', maxPrice);
+            if (propertyType && propertyType !== 'Any Type') params.set('propertyTypes', propertyType);
+            if (priceRange && priceRange !== 'Any Price') params.set('priceRanges', priceRange);
             
             // Redirect to search results
-            window.location.href = `/properties?${params.toString()}`;
+            window.location.href = `/properties/search?${params.toString()}`;
         });
     }
 }

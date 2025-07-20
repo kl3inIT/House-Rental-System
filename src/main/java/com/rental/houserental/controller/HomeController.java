@@ -69,32 +69,28 @@ public class HomeController {
     public String searchProperties(
             @ModelAttribute SearchPropertyCriteriaDTO criteria,
             @RequestParam(value = "propertyTypes", required = false) Long propertyType,
-            @RequestParam(value = "maxPrice", required = false) Integer maxPrice,
+            @RequestParam(value = "priceRanges", required = false) String priceRange,
             @PageableDefault(size = 12) Pageable pageable,
             Model model,
             Principal principal) {
         
         // Debug logging
-        log.info("Search criteria - maxPrice: {}, propertyType: {}", maxPrice, propertyType);
-        log.info("Search criteria DTO - maxPrice: {}, propertyTypes: {}", criteria.getMaxPrice(), criteria.getPropertyTypes());
+        log.info("Search criteria - priceRange: {}, propertyType: {}", priceRange, propertyType);
+        log.info("Search criteria DTO - priceRanges: {}, propertyTypes: {}", criteria.getPriceRanges(), criteria.getPropertyTypes());
         
         // Handle propertyTypes from home page search form (single value to list conversion)
         if (propertyType != null && criteria.getPropertyTypes().isEmpty()) {
             criteria.getPropertyTypes().add(propertyType);
         }
         
-        // Handle maxPrice from home page search form
-        if (maxPrice != null && criteria.getMaxPrice() == null) {
-            criteria.setMaxPrice(maxPrice);
-            log.info("Set maxPrice from request param: {}", maxPrice);
+        // Handle priceRange from home page search form
+        if (priceRange != null && !priceRange.trim().isEmpty() && criteria.getPriceRanges().isEmpty()) {
+            criteria.getPriceRanges().add(priceRange);
+            log.info("Added priceRange from request param: {}", priceRange);
         }
         
-        // Additional validation
-        if (criteria.getMaxPrice() != null) {
-            log.info("Final maxPrice value: {} (type: {})", criteria.getMaxPrice(), criteria.getMaxPrice().getClass().getSimpleName());
-        }
-        
-        log.info("Final search criteria - maxPrice: {}, propertyTypes: {}", criteria.getMaxPrice(), criteria.getPropertyTypes());
+        log.info("Final search criteria - priceRanges: {}, propertyTypes: {}", 
+                criteria.getPriceRanges(), criteria.getPropertyTypes());
         
         Page<SearchPropertyResponseDTO> page = propertyService.searchProperties(criteria, pageable);
         
